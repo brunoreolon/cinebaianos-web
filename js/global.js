@@ -1,6 +1,6 @@
-function getDiscordIdParametros() {
+function getQueryParam(param) {
     const parametros = new URLSearchParams(location.search);
-    return parametros.get('id');
+    return parametros.get(param);
 }
 
 function getUsuarioById(discordId) {
@@ -12,7 +12,7 @@ function usuarioLogado(discordId) {
 }
 
 function isUsuarioVotouNoFilme(votes, discordId) {
-    return votes.some(v => v.voter.discordId === discordId);
+    return votes.some(v => v.voter && v.voter.discordId === discordId);
 }
 
 function criarElemento(tag, classes = [], texto = '') {
@@ -37,7 +37,7 @@ function criarBadgeFilmeRecente(filme) {
     return criarElemento('div', ['badge-novo'], 'Novo');
 }
 
-function criarFigure(f) {
+function criarFigure(f, discordId) {
     const filme = f.movie
 
     const figure = criarElemento('figure', ['card']);
@@ -62,11 +62,24 @@ function criarFigure(f) {
     const dataAdicionado = criarElemento('p', ['thin'], formatarData(filme.dateAdded));
     divDataAdicionado.append(iconeCalendario, dataAdicionado);
 
-
     divFilho.append(titulo, anoLancamento, divUsuario, divDataAdicionado);
     figure.appendChild(divFilho);
 
-    return figure;
+    if (!isUsuarioVotouNoFilme(f.votes, discordId)) {
+        const botao = criarBotaoAvaliar();
+        figure.appendChild(botao);
+    }
+
+    if (foiAdicionadoRecentemente(f)) {
+        const badge = criarBadgeFilmeRecente(f);
+        figure.appendChild(badge);
+    }
+
+    const linkCard = criarElemento('a', ['card-link']);
+    linkCard.href = `detalhes-filme.html?id=${f.movie.id}`
+    linkCard.appendChild(figure);
+
+    return linkCard;
 }
 
 function criarBotaoAvaliar() {
