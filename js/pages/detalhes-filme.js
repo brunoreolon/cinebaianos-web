@@ -8,7 +8,7 @@ function getVotoDoUsuarioNoFilme(filme, usuarioId) {
 
 function preencherDetalhes(filme) {
     const poster = document.querySelector('#poster img');
-    poster.src = filme.posterPath || '/assets/img/placeholder-poster.png';
+    poster.src = filme.posterPath || 'assets/img/placeholder-poster.png';
     poster.alt = filme.title;
 
     // Parte1: Título e ano
@@ -162,7 +162,7 @@ function renderizarAvaliacoesRecebidas(votos) {
         const votante = getUsuarioById(v.voter.discordId);
 
         const img = document.createElement('img');
-        img.src = votante.avatar || '/assets/img/placeholder-avatar.png';
+        img.src = votante.avatar || 'assets/img/placeholder-avatar.png';
         img.alt = `Avatar de ${votante.name}`;
 
         const divInfo = document.createElement('div');

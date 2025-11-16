@@ -43,7 +43,7 @@ function criarFigure(f, discordId) {
     const figure = criarElemento('figure', ['card']);
 
     const poster = criarElemento('img');
-    poster.src = filme.posterPath || '/assets/img/placeholder-poster.png';
+    poster.src = filme.posterPath || 'assets/img/placeholder-poster.png';
     poster.alt = filme.title;
     figure.appendChild(poster);
 
