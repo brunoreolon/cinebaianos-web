@@ -43,7 +43,7 @@ function criarFigure(f, discordId) {
     const figure = criarElemento('figure', ['card']);
 
     const poster = criarElemento('img');
-    poster.src = filme.posterPath || 'assets/img/placeholder-poster.png';
+    poster.src = filme.posterPath || './assets/img/placeholder-poster.png';
     poster.alt = filme.title;
     figure.appendChild(poster);
 
@@ -54,7 +54,7 @@ function criarFigure(f, discordId) {
     const divUsuario = criarElemento('div', ['responsavel']);
     const iconeUsuario = criarElemento('i', ['fa-regular', 'fa-user']);
     const linkPerfil = criarElemento('a', ['link-perfil'], filme.chooser.name);
-    linkPerfil.href = `perfil.html?id=${filme.chooser.discordId}`;
+    linkPerfil.href = `./perfil.html?id=${filme.chooser.discordId}`;
     divUsuario.append(iconeUsuario, linkPerfil);
 
     const divDataAdicionado = criarElemento('div', ['responsavel']);
@@ -76,7 +76,7 @@ function criarFigure(f, discordId) {
     }
 
     const linkCard = criarElemento('a', ['card-link']);
-    linkCard.href = `detalhes-filme.html?id=${f.movie.id}`
+    linkCard.href = `./detalhes-filme.html?id=${f.movie.id}`
     linkCard.appendChild(figure);
 
     return linkCard;

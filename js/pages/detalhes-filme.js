@@ -31,7 +31,7 @@ function preencherDetalhes(filme) {
     document.querySelector('.duracao p').textContent = filme.duration || '2 horas';
     const linkPerfil = document.querySelector('.responsavel .link-perfil');
     linkPerfil.textContent = filme.chooser.name;
-    linkPerfil.href = `perfil.html?id=${filme.chooser.discordId}`;
+    linkPerfil.href = `./perfil.html?id=${filme.chooser.discordId}`;
     document.querySelector('.data-adicionado p').textContent = formatarData(filme.dateAdded);
 
     // Sinopse
@@ -149,7 +149,7 @@ function renderizarAvaliacoesRecebidas(votos) {
         const li = document.createElement('li');
 
         const a = document.createElement('a');
-        a.href = `perfil.html?id=${v.voter.discordId}`;
+        a.href = `./perfil.html?id=${v.voter.discordId}`;
         a.classList.add('item-voto');
 
         const article = document.createElement('article');
@@ -162,7 +162,7 @@ function renderizarAvaliacoesRecebidas(votos) {
         const votante = getUsuarioById(v.voter.discordId);
 
         const img = document.createElement('img');
-        img.src = votante.avatar || 'assets/img/placeholder-avatar.png';
+        img.src = votante.avatar || './assets/img/placeholder-avatar.png';
         img.alt = `Avatar de ${votante.name}`;
 
         const divInfo = document.createElement('div');

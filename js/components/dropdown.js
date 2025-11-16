@@ -9,7 +9,7 @@ function montarMenuUsuario() {
     linkAvatar.href = '#';
 
     const img = criarElemento('img', ['avatar']);
-    img.src = usuario.avatar || 'assets/img/placeholder-avatar.png';
+    img.src = usuario.avatar || './assets/img/placeholder-avatar.png';
 
     linkAvatar.appendChild(img);
     divAvatar.appendChild(linkAvatar);
@@ -20,7 +20,7 @@ function montarMenuUsuario() {
         <nav>
             <ul>
                 <li>
-                    <a href="perfil.html?id=${usuario.discordId}">
+                    <a href="./perfil.html?id=${usuario.discordId}">
                         <i class="fa-regular fa-user space"></i>
                         Meu Perfil
                     </a>

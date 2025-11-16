@@ -19,7 +19,7 @@ function criarPainelDadosUsuario(usuario) {
     // Imagem do usuário
     const divImagemPerfil = criarElemento('div', ['image']);
     const img = criarElemento('img');
-    img.src = usuario.avatar || 'assets/img/placeholder-avatar.png';
+    img.src = usuario.avatar || './assets/img/placeholder-avatar.png';
     divImagemPerfil.appendChild(img);
 
     // Informações do usuário
