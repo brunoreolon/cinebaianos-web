@@ -18,12 +18,6 @@ function criarCardsAguardandoAvaliacao() {
 
     filmesFiltrados.forEach(f => {
         const figure = criarFigure(f);
-
-        if (!isUsuarioVotouNoFilme(f.votes, usuario.discordId)) {
-            const botao = criarBotaoAvaliar();
-            figure.appendChild(botao);
-        }
-
         divPai.appendChild(figure);
     });
 }
@@ -34,18 +28,7 @@ function criarCardsTodos() {
     const divPai = obterElementoPaiByClass('.todos .inline');
 
     filmes.forEach(f => {
-        const figure = criarFigure(f);
-
-        if (!isUsuarioVotouNoFilme(f.votes, usuario.discordId)) {
-            const botao = criarBotaoAvaliar();
-            figure.appendChild(botao);
-        }
-
-        if (foiAdicionadoRecentemente(f)) {
-            const badge = criarBadgeFilmeRecente(f);
-            figure.appendChild(badge);
-        }
-
+        const figure = criarFigure(f, usuario.discordId);
         divPai.appendChild(figure);
     });
 }

@@ -1,5 +1,5 @@
 function criarPainelPerfilUsuario() {
-    const discordId = getDiscordIdParametros();
+    const discordId = getQueryParam('id');
     const usuario = getUsuarioById(discordId);
 
     criarPainelDadosUsuario(usuario);
@@ -142,7 +142,7 @@ function contarTodosVotosRecebidos(discordId) {
 }
 
 function criarListaVotos() {
-    const discordId = getDiscordIdParametros();
+    const discordId = getQueryParam('id');
     const usuario = getUsuarioById(discordId);
 
     const lista = form.lista();
@@ -187,7 +187,6 @@ function adicionarItem(filmesUsuario, discordId, votoId, descricao) {
         emoji = '🗂️';
     }
 
-    // Texto principal visível por padrão
     const spanTexto = criarElemento('span', ['texto'], descricaoCompleta);
     const spanIcone = criarElemento('span', ['icone'], emoji);
 
@@ -197,7 +196,7 @@ function adicionarItem(filmesUsuario, discordId, votoId, descricao) {
 }
 
 function selecionaItemLista() {
-    const discordId = getDiscordIdParametros();
+    const discordId = getQueryParam('id');
     const usuario = getUsuarioById(discordId);
     const lista = form.lista();
 

@@ -37,6 +37,12 @@ main section header h2 {
     gap: 24px;
 }
 
+.card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
 .card {
     position: relative;
     width: 100%;
