@@ -9,7 +9,7 @@ function montarMenuUsuario() {
     linkAvatar.href = '#';
 
     const img = criarElemento('img', ['avatar']);
-    img.src = usuario.avatar;
+    img.src = usuario.avatar || '/assets/img/placeholder-avatar.png';
 
     linkAvatar.appendChild(img);
     divAvatar.appendChild(linkAvatar);

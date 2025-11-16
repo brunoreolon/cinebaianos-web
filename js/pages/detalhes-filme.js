@@ -162,7 +162,7 @@ function renderizarAvaliacoesRecebidas(votos) {
         const votante = getUsuarioById(v.voter.discordId);
 
         const img = document.createElement('img');
-        img.src = votante.avatar || '/assets/img/default-avatar.png';
+        img.src = votante.avatar || '/assets/img/placeholder-avatar.png';
         img.alt = `Avatar de ${votante.name}`;
 
         const divInfo = document.createElement('div');
