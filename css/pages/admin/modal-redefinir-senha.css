@@ -1,0 +1,48 @@
+.dados {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 30px;
+}
+
+.dados > p {
+    margin-top: 24px;
+    color: oklch(.704 .04 256.788);
+}
+
+.campo input::placeholder {
+    font-size: 16px;
+}
+
+.redefinicao-acoes {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.redefinicao-acoes button {
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: none; 
+    font-size: 14px;
+    font-weight: 600;
+    transition: background 0.3s;
+    cursor: pointer;
+}
+
+.redefinicao-acoes button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+}
+
+.redefinicao-acoes button:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+.btn-redefinir-senha {
+    color: white;
+    background: oklch(.558 .288 302.321);
+}
