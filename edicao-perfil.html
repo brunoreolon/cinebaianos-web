@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+            <link rel="stylesheet" href="./css/mensagem-container.css" type="text/css">
+            <link rel="stylesheet" href="./css/global.css" type="text/css">
+            <link rel="stylesheet" href="./css/header.css" type="text/css">
+            <link rel="stylesheet" href="./css/footer.css" type="text/css">
+            <link rel="stylesheet" href="./css/edicao-perfil.css" type="text/css">
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+            <title>Editar meu Perfil</title>
+    </head>
+    <body>
+        <div id="container">
+            <div id="header-container"></div>
+            <div class="mensagem-container"></div>
+            <main>
+                <section class="perfil-edicao">
+
+                    <!-- Cabeçalho da seção -->
+                    <div class="secao-header">
+                        <h4>Editar Perfil</h4>
+                        <p>Atualize suas informações pessoais</p>
+                    </div>
+
+                    <!-- Foto + URL -->
+                    <div class="perfil-foto-linha">
+                        <div class="foto-atual">
+                            <img src="https://cdn.discordapp.com/avatars/339251538998329354/e9649bda48db6522e66fdda5bc06e748.webp?size=80" alt="Foto de perfil">
+                        </div>
+
+                        <div class="campo">
+                            <label for="fotoUrl">URL da Foto de Perfil</label>
+                            <input id="fotoUrl" type="url" placeholder="https://exemplo.com/foto.jpg" name="fotoUrl">
+                        </div>
+                    </div>
+
+                    <!-- Nome -->
+                    <div class="campo">
+                        <label for="nome">Nome *</label>
+                        <input id="nome" type="text" name="nome">
+                    </div>
+
+                    <!-- Email -->
+                    <div class="campo">
+                        <label for="email">Email *</label>
+                        <input id="email" type="email" name="email">
+                    </div>
+
+                    <!-- Bio -->
+                    <div class="campo">
+                        <label for="bio">Bio</label>
+                        <textarea id="bio" name="bio" rows="4" placeholder="Conte um pouco sobre você e seus gostos cinematográficos..."></textarea>
+                    </div>
+
+                    <!-- Criado em -->
+                    <div class="campo criado-em">
+                        <label>Membro desde</label>
+                        <p>14 de janeiro de 2024</p>
+                    </div>
+
+                    <!-- Ações -->
+                    <div class="perfil-botoes">
+                        <button class="btn-cancelar">Cancelar</button>
+
+                        <button class="btn-salvar">
+                            <i class="fa-regular fa-floppy-disk"></i>
+                            Salvar Alterações
+                        </button>
+                    </div>
+
+                </section>
+            </main>
+            <div id="footer-container"></div>
+        </div>
+        
+        <script src="./js/global.js"></script>
+        <script src="./js/mock.js"></script>
+        <script src="./js/components/dropdown.js"></script>
+        <script src="./js/components/mensagens.js"></script>
+        <script src="./js/include.js"></script>
+        <script src="./js/pages/edicao-perfil.js"></script>
+    </body>
+</html>
