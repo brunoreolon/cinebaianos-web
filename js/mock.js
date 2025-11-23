@@ -5,7 +5,9 @@ const usuarios = [
         "email": "bruno.reolonn+user3@gmail.com",
         "avatar": "https://cdn.discordapp.com/avatars/405389229762281473/faf62e68f3df357ec9853f27da382760.webp?size=80",
         "isBot": false,
-        "created": "01/01/2025"
+        "created": "01/01/2025",
+        "isAtivo": true,
+        "isAdmin": false
     },
     {
         "discordId": "271749848842108928",
@@ -13,7 +15,9 @@ const usuarios = [
         "email": "bruno.reolonn+user4@gmail.com",
         "avatar": "https://cdn.discordapp.com/avatars/271749848842108928/e4b2ef4d373ee4ba41400e14176fac9a.webp?size=80",
         "isBot": false,
-        "created": "01/01/2025"
+        "created": "01/01/2025",
+        "isAtivo": false,
+        "isAdmin": false
     },
     {
         "discordId": "339251538998329354",
@@ -21,7 +25,9 @@ const usuarios = [
         "email": "bruno.reolonn@gmail.com",
         "avatar": "https://cdn.discordapp.com/avatars/339251538998329354/e9649bda48db6522e66fdda5bc06e748.webp?size=80",
         "isBot": false,
-        "created": "01/01/2025"
+        "created": "01/01/2025",
+        "isAtivo": true,
+        "isAdmin": true
     },
     {
         "discordId": "555470950892568576",
@@ -29,7 +35,9 @@ const usuarios = [
         "email": "bruno.reolonn+user2@gmail.com",
         "avatar": "https://cdn.discordapp.com/avatars/555470950892568576/a_265afa3ac80758e62a5b6be02ab576f7.webp?size=80",
         "isBot": false,
-        "created": "01/01/2025"
+        "created": "01/01/2025",
+        "isAtivo": true,
+        "isAdmin": false
     },
     {
         "discordId": "1395999365931339806",
@@ -37,7 +45,9 @@ const usuarios = [
         "email": "bruno.reolonn+user99@gmail.com",
         "avatar": "https://cdn.discordapp.com/avatars/1395999365931339806/7d6d11bb0b6177c5ddcefa0c0b235a08.webp?size=80",
         "isBot": true,
-        "created": "01/01/2025"
+        "created": "01/01/2025",
+        "isAtivo": true,
+        "isAdmin": false
     }
 ]
 
@@ -92,8 +102,8 @@ const filmes = [
                 "vote": {
                     "id": 2,
                     "description": "Lixo",
-                    "color": "#FF0000",
-                    "emoji": "💩"
+                    "color": "#00FF00",
+                    "emoji": "🏆"
                 }
             },
             {

@@ -114,33 +114,6 @@ function criarPainelInformacoes(usuario) {
     divDadosFilmes.appendChild(totalVotos);
 }
 
-function totalFilmesDoUsario(discordId) {
-    const filmesFiltrados = filmes.filter(filme => {
-        return filme.movie.chooser.discordId === discordId;
-    });
-
-    return filmesFiltrados.length;
-}
-
-function contarVotosRecebidosPorTipo(discordId, votoId) {
-    return filmes.reduce((total, filme) => {
-        const votosDoUsuario = filme.votes.filter(v => 
-            v.voter.discordId === discordId &&
-            v.vote.id === votoId
-        );
-
-        return total + votosDoUsuario.length;
-    }, 0);
-}
-
-
-function contarTodosVotosRecebidos(discordId) {
-    return filmes.reduce((total, f) => {
-        if (f.movie.chooser.discordId !== discordId) return total;
-        return total + f.votes.length;
-    }, 0);
-}
-
 function criarListaVotos() {
     const discordId = getQueryParam('id');
     const usuario = getUsuarioById(discordId);
@@ -159,7 +132,7 @@ function criarListaVotos() {
     const liTodos = adicionarItem(false, usuario.discordId, -1, 'Todos');
     lista.appendChild(liTodos);
 
-    criarCardsFilmes(true, usuario.discordId, 0);
+    criarCardsFilmes(true, usuario, 0);
 }
 
 function adicionarItem(filmesUsuario, discordId, votoId, descricao) {
@@ -207,12 +180,12 @@ function selecionaItemLista() {
 
             const valor = parseInt(e.target.dataset.valor);
             const filmesUsuario = valor === 0;
-            criarCardsFilmes(filmesUsuario, usuario.discordId, valor);
+            criarCardsFilmes(filmesUsuario, usuario, valor);
         }
     });
 }
 
-function criarCardsFilmes(filmesUsuario, discordId, votoId) {
+function criarCardsFilmes(filmesUsuario, usuario, votoId) {
     const divPai = form.divPai();
 
     divPai.classList.remove('borda-padrao', 'mensagem');
@@ -220,11 +193,11 @@ function criarCardsFilmes(filmesUsuario, discordId, votoId) {
 
     const filmesFiltrados = filmes.filter(filme => {
         if (filmesUsuario) {
-            return filme.movie.chooser.discordId === discordId;
+            return filme.movie.chooser.discordId === usuario.discordId;
         }
 
         return filme.votes.some(v =>
-            v.voter.discordId === discordId &&
+            v.voter.discordId === usuario.discordId &&
             (votoId === 0 || votoId === -1 || v.vote.id === votoId)
         );
     });
@@ -236,7 +209,7 @@ function criarCardsFilmes(filmesUsuario, discordId, votoId) {
     }
 
     filmesFiltrados.forEach(f => {
-        const figure = criarFigure(f);
+        const figure = criarFigure(f, usuario.discordId);
         divPai.appendChild(figure);
     });
 }

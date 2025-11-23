@@ -26,14 +26,14 @@ function montarMenuUsuario() {
                     </a>
                 </li>
                 <li>
-                    <a href="?id=${usuario.discordId}">
+                    <a href="./edicao-perfil.html?id=${usuario.discordId}">
                         <i class="fa-solid fa-gear space"></i>
                         Editar perfil
                     </a>
                 </li>
                 <li class="separator"></li>
                 <li>
-                    <a href="#">
+                    <a href="./painel-admin.html">
                         <i class="fa-solid fa-shield space"></i>
                         <span class="rosa">Painel Admin</span>
                     </a>

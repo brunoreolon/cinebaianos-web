@@ -3,9 +3,11 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="./css/mensagem-container.css" type="text/css">
         <link rel="stylesheet" href="./css/global.css" type="text/css">
         <link rel="stylesheet" href="./css/header.css" type="text/css">
         <link rel="stylesheet" href="./css/footer.css" type="text/css">
+        <link rel="stylesheet" href="./css/modal-avaliar.css" type="text/css">
         <link rel="stylesheet" href="./css/perfil.css" type="text/css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
         <title>Meu Perfil</title>
@@ -13,6 +15,7 @@
     <body>
         <div id="container">
             <div id="header-container"></div>
+            <div class="mensagem-container"></div>
             <main>
                 <section id="painel-usuario" class="border">
                     <div id="dados-usuario"></div>
@@ -30,10 +33,22 @@
             </main>
             <div id="footer-container"></div>
         </div>
+        <div id="modal-avaliar" class="modal inativo">
+            <div class="modal-content">
+                <h3>Como você avalia este filme?</h3>
+                <span>Escolha uma das opções abaixo</span>
+                <span class="close">&times;</span>
+                <div id="opcoes-voto">
+                    <ul></ul>
+                </div>
+            </div>
+        </div>
 
-        <script src="./js/mock.js"></script>
         <script src="./js/global.js"></script>
+        <script src="./js/mock.js"></script>
         <script src="./js/components/dropdown.js"></script>
+        <script src="./js/components/mensagens.js"></script>
+        <script src="./js/pages/modal-avaliar.js"></script>
         <script src="./js/include.js"></script>
         <script src="./js/pages/perfil.js"></script>
     </body>

@@ -2,7 +2,7 @@ function criarCardsRecentes() {
     const divPai = obterElementoPaiByClass('.recentes .inline');
 
     filmes.forEach(f => {
-        const figure = criarFigure(f);
+        const figure = criarFigure(f, usuario.discordId);
         divPai.appendChild(figure);
     });
 }
@@ -17,7 +17,7 @@ function criarCardsAguardandoAvaliacao() {
     });
 
     filmesFiltrados.forEach(f => {
-        const figure = criarFigure(f);
+        const figure = criarFigure(f, usuario.discordId);
         divPai.appendChild(figure);
     });
 }

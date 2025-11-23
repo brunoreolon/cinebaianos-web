@@ -15,6 +15,32 @@ function isUsuarioVotouNoFilme(votes, discordId) {
     return votes.some(v => v.voter && v.voter.discordId === discordId);
 }
 
+function totalFilmesDoUsario(discordId) {
+    const filmesFiltrados = filmes.filter(filme => {
+        return filme.movie.chooser.discordId === discordId;
+    });
+
+    return filmesFiltrados.length;
+}
+
+function contarVotosRecebidosPorTipo(discordId, votoId) {
+    return filmes.reduce((total, filme) => {
+        const votosDoUsuario = filme.votes.filter(v => 
+            v.voter.discordId === discordId &&
+            v.vote.id === votoId
+        );
+
+        return total + votosDoUsuario.length;
+    }, 0);
+}
+
+function contarTodosVotosRecebidos(discordId) {
+    return filmes.reduce((total, f) => {
+        if (f.movie.chooser.discordId !== discordId) return total;
+        return total + f.votes.length;
+    }, 0);
+}
+
 function criarElemento(tag, classes = [], texto = '') {
     const el = document.createElement(tag);
     if (classes.length) el.classList.add(...classes);
@@ -37,7 +63,7 @@ function criarBadgeFilmeRecente(filme) {
     return criarElemento('div', ['badge-novo'], 'Novo');
 }
 
-function criarFigure(f, discordId) {
+function criarFigure(f, discordId = '') {
     const filme = f.movie
 
     const figure = criarElemento('figure', ['card']);
@@ -48,7 +74,7 @@ function criarFigure(f, discordId) {
     figure.appendChild(poster);
 
     const divFilho = criarElemento('div', ['detalhes']);
-    const titulo = criarElemento('p', ['destaque', 'titulo'], filme.title);
+    const titulo = criarElemento('p', ['destaque', 'card-titulo'], filme.title);
     const anoLancamento = criarElemento('p', ['ano'], filme.year);
 
     const divUsuario = criarElemento('div', ['responsavel']);
@@ -65,10 +91,9 @@ function criarFigure(f, discordId) {
     divFilho.append(titulo, anoLancamento, divUsuario, divDataAdicionado);
     figure.appendChild(divFilho);
 
-    if (!isUsuarioVotouNoFilme(f.votes, discordId)) {
-        const botao = criarBotaoAvaliar();
-        figure.appendChild(botao);
-    }
+    const footer = criarFooter(f, discordId);
+
+    figure.appendChild(footer);
 
     if (foiAdicionadoRecentemente(f)) {
         const badge = criarBadgeFilmeRecente(f);
@@ -77,14 +102,58 @@ function criarFigure(f, discordId) {
 
     const linkCard = criarElemento('a', ['card-link']);
     linkCard.href = `./detalhes-filme.html?id=${f.movie.id}`
+    linkCard.title = filme.title;
     linkCard.appendChild(figure);
 
     return linkCard;
 }
 
-function criarBotaoAvaliar() {
+function criarFooter(filme, discordId) {
+    const votos = filme.votes;
+    const footer = criarElemento('footer', ['card-footer']);
+    const divVotos = criarElemento('div', ['gap']);
+    const divMeuVoto = criarElemento('div');
+
+    const contagem = votos.reduce((acc, v) => {
+        const key = `${v.vote.emoji}`;
+        acc[key] = (acc[key] || 0) + 1;
+        return acc;
+    }, {});
+
+    Object.entries(contagem).forEach(([emoji, totalVotos]) => {
+        const span = criarElemento('span', ['gap']);
+        span.textContent = `${emoji}${totalVotos}`;
+        divVotos.append(span);
+    });
+
+    if (!isUsuarioVotouNoFilme(votos, discordId)) {
+        const botao = criarBotaoAvaliar(filme);
+        divMeuVoto.appendChild(botao);
+    } else {
+        const voto = getVotoDoUsuarioFilme(discordId, filme.votes);
+        const v = criarElemento('span', [], voto.vote.emoji);
+        divMeuVoto.appendChild(v);
+    }
+
+    footer.append(divVotos, divMeuVoto);
+
+    return footer;
+}
+
+function getVotoDoUsuarioFilme(discordId, votos) {
+    return votos.find(v => v.voter.discordId == discordId);
+}
+
+function criarBotaoAvaliar(filme) {
     const btnAvaliar = criarElemento('button', ['btn-avaliar'], 'Avaliar');
     btnAvaliar.type = 'button';
+
+    // só na página de cards (home) previne redirecionamento
+    btnAvaliar.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        abrirModalAvaliacao(filme, usuarioLogado('339251538998329354'), false);
+    });
 
     return btnAvaliar
 }
