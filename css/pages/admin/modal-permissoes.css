@@ -10,9 +10,9 @@
     align-items: center;
     gap: 14px;
     padding: 16px;
-    border: 1px solid oklch(.446 .043 257.281);
+    border: 1px solid var(--cor-cinza-3);
     border-radius: 10px;
-    background: oklch(.208 .042 265.755);
+    background: var(--cor-preto-7);
 }
 
 .dados-usuario > img {
@@ -34,7 +34,7 @@
 
 .dados-usuario .email {
     font-size: 16px;
-    color: oklch(.704 .04 256.788);
+    color: var(--cor-branco-2);
 }
 
 .permissoes {
@@ -48,9 +48,9 @@
 .conta-ativa, 
 .administrador {
     padding: 24px;
-    border: 1px solid oklch(.446 .043 257.281);
+    border: 1px solid var(--cor-cinza-3);
     border-radius: 10px;
-    background: oklch(.208 .042 265.755);
+    background:  var(--cor-preto-7);
 }
 
 .conta-ativa {
@@ -69,7 +69,7 @@
 
 .info-conta > i {
     font-size: 24px;
-    color: oklch(.792 .209 151.711);
+    color: var(--cor-verde-2);
 }
 
 .administrador {
@@ -88,15 +88,15 @@
 
 .info-administrador > i {
     font-size: 24px;
-    color: oklch(.852 .199 91.936);
+    color: var(--cor-ouro-1);
 }
 
 .permissoes > p {
     padding: 18px;
     border-radius: 10px;
     margin-top: 20px;
-    color: oklch(.852 .199 91.936);
-    background-color: color-mix(in oklab, oklch(.852 .199 91.936) 10%, transparent);
+    color: var(--cor-ouro-1);
+    background-color: color-mix(in oklab, var(--cor-ouro-1) 10%, transparent);
 }
 
 .gerenciamento-acoes {
@@ -107,12 +107,12 @@
 
 .gerenciamento-acoes button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 6px 8px oklch(var(--cor-preto-1-params) / 0.2);
 }
 
 .gerenciamento-acoes button:active {
     transform: translateY(0);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 6px oklch(var(--cor-preto-1-params)  / 0.15);
 }
 
 .btn-concluir {
@@ -123,8 +123,13 @@
     font-size: 14px;
     font-weight: 600;
     transition: background 0.3s;
-    color: white;
-    background: oklch(.558 .288 302.321);
+    color: var(--cor-branco-1);
+    background: var(--cor-roxo-3);
+    cursor: pointer;
+}
+
+.btn-concluir:hover {
+    background: var(--cor-roxo-4);
 }
 
 .toggle {
@@ -141,7 +146,7 @@
   display: block;
   width: 100%;
   height: 100%;
-  background-color: #ccc;
+  background-color: var(--cor-cinza-1);
   border-radius: 10px;
   position: relative;
   cursor: pointer;
@@ -153,7 +158,7 @@
   position: absolute;
   width: 16px;
   height: 16px;
-  background-color: white;
+  background-color: var(--cor-branco-1);
   border-radius: 50%;
   top: 2px;
   left: 2px;
@@ -161,7 +166,7 @@
 }
 
 .toggle input:checked + label {
-  background-color: #4ade80;
+  background-color: var(--cor-verde-1);
 }
 
 .toggle input:checked + label::after {
@@ -169,10 +174,10 @@
 }
 
 .toggle input:disabled + label {
-  background-color: #e0e0e0; /* cinza claro */
+  background-color: var(--cor-branco-3); /* cinza claro */
   cursor: not-allowed;       /* cursor de não permitido */
 }
 
 .toggle input:disabled + label::after {
-  background-color: #c0c0c0; /* bolinha mais escura, desabilitada */
+  background-color: var(--cor-branco-4); /* bolinha mais escura, desabilitada */
 }

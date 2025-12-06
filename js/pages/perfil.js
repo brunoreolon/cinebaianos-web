@@ -23,13 +23,13 @@ function criarPainelDadosUsuario(usuario) {
     divImagemPerfil.appendChild(img);
 
     // Informações do usuário
-    const divInformacoes = criarElemento('div');
+    const divInformacoes = criarElemento('div', ['dados']);
 
-    const nome = criarElemento('p', ['fonte-primaria', 'grande'], usuario.name);
-    const biografia = criarElemento('p', ['fonte-secundaria'], "Uma biografia qualquer aqui neste espaço");
+    const nome = criarElemento('p', ['fonte-primaria', 'grande', 'nome'], usuario.name);
+    const biografia = criarElemento('p', ['fonte-secundaria', 'bio'], "Uma biografia qualquer aqui neste espaço");
 
     // Linha "Membro desde"
-    const divMembroDesde = criarLinhaIconeTexto('fa-solid fa-calendar', usuario.created);
+    const divMembroDesde = criarLinhaIconeTexto('fa-solid fa-calendar', 'Membro desde  ' + usuario.created);
 
     divInformacoes.append(nome, biografia, divMembroDesde);
     divDadosUsuario.append(divImagemPerfil, divInformacoes);

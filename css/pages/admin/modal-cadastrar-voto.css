@@ -11,9 +11,9 @@
     height: 36px; 
     padding: 4px 12px;
     border-radius: 6px;
-    border: 1px solid oklch(.446 .043 257.281);
-    background: oklch(.208 .042 265.755);
-    color: white;
+    border: 1px solid var(--cor-cinza-3);
+    background: var(--cor-preto-7);
+    color: var(--cor-branco-1);
     box-sizing: border-box;
 }
 
@@ -21,9 +21,9 @@
     height: 36px;
     padding: 0 12px;
     border-radius: 6px;
-    border: 1px solid oklch(.446 .043 257.281);
-    background: oklch(.558 .288 302.321);
-    color: white;
+    border: 1px solid var(--cor-cinza-3);
+    background: var(--cor-roxo-3);
+    color: var(--cor-branco-1);
     cursor: pointer;
 }
 
@@ -35,8 +35,8 @@
     position: absolute;
     top: 100%; 
     left: 0;
-    background: oklch(.279 .041 260.031);
-    border: 1px solid white;
+    background: var(--cor-preto-3);
+    border: 1px solid var(--cor-branco-1);
     padding: 10px;
     border-radius: 10px;
     display: flex;
@@ -62,9 +62,9 @@
     gap: 10px;
     margin-top: 20px;
     padding: 16px;
-    border: 1px solid oklch(.446 .043 257.281);
+    border: 1px solid var(--cor-cinza-3);
     border-radius: 10px;
-    background: oklch(.208 .042 265.755);
+    background: var(--cor-preto-7);
 }
 
 .descricao {
@@ -93,15 +93,23 @@
 
 .cadastro-acoes button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 6px 8px oklch(var(--cor-preto-1-params) / 0.2);
 }
 
 .cadastro-acoes button:active {
     transform: translateY(0);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 6px oklch(var(--cor-preto-1-params) / 0.15);
 }
 
 .btn-criar-voto {
-    color: white;
-    background: oklch(.558 .288 302.321);
+    color: var(--cor-branco-1);
+    background: var(--cor-roxo-3);
+}
+
+.btn-criar-voto:hover {
+    background: var(--cor-roxo-4);
+}
+
+#btn-emoji:hover {
+    background: var(--cor-roxo-4);
 }

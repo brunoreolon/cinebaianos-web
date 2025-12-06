@@ -6,7 +6,7 @@
 }
 
 .secao-header i {
-    color: oklch(.714 .203 305.504);
+    color: var(--cor-roxo-1);
 }
 
 
@@ -17,7 +17,7 @@
     flex-direction: row;
     align-items: center;
     gap: 6px;
-    border: 1px solid oklch(.372 .044 257.287);
+    border: 1px solid var(--cor-cinza-3);
     border-radius: 20px;
     width: auto;
     margin: 30px 0;
@@ -32,7 +32,7 @@
     border-radius: 20px;
     border: none; 
     background: transparent;
-    color: white;
+    color: var(--cor-branco-1);
     font-size: 14px;
     cursor: pointer;
 }
@@ -49,7 +49,7 @@
 }
 
 .btn-menu.ativo {
-    background-color: oklch(.558 .288 302.321);
+    background-color: var(--cor-roxo-3);
     transition: opacity 0.3s, transform 0.3s;
 }
 
@@ -58,7 +58,7 @@
     flex-direction: row;
     justify-content: space-between;
     padding: 20px 20px;
-    border: 1px solid oklch(.372 .044 257.287);
+    border: 1px solid var(--cor-cinza-3);
     border-radius: 10px;
 }
 
@@ -68,7 +68,7 @@
 }
 
 .secao-topo p {
-    color: oklch(.704 .04 256.788);
+    color: var(--cor-branco-2);
     font-weight: 100;
 }
 
@@ -78,22 +78,23 @@
     padding: 0px 20px;
     border-radius: 10px;
     border: none; 
-    background: oklch(.558 .288 302.321);
-    color: white;
+    background: var(--cor-roxo-3);
+    color: var(--cor-branco-1);
     font-weight: 600;
     font-size: 14px;
     transition: background 0.3s;
+    cursor: pointer;
 }
 
 .btn-novo:hover {
     transform: translateY(-2px);
-    background: oklch(.496 .265 301.924);
-    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+    background: var(--cor-roxo-4);
+    box-shadow: 0 6px 8px oklch(var(--cor-preto-1-params) / 0.2);
 }
 
 .btn-novo:active {
     transform: translateY(0);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 6px oklch(var(--cor-preto-1-params) / 0.15);
 }
 
 .lista-votos {
@@ -109,7 +110,7 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    border: 1px solid oklch(.372 .044 257.287);
+    border: 1px solid var(--cor-cinza-3);
     border-radius: 20px;
     padding: 24px;
 }
@@ -132,14 +133,14 @@
 }
 
 .detalhes-voto p {
-    color: oklch(.704 .04 256.788);
+    color: var(--cor-branco-2);
     font-weight: 100;
     font-size: 14px;
     margin: 6px 0px 8px 0px;
 }
 
 .detalhes-voto span {
-    color: white;
+    color: var(--cor-branco-1);
     font-weight: 700;
     font-size: 12px;
     padding: 2px 8px;
@@ -150,9 +151,9 @@
     background: #00FF00;
 }
 
-.vermelho {
-    background: #FF0000;
-}
+/* .vermelho {
+    background: oklch(62.793% 0.25768 29.223);
+} */
 
 .voto-acoes button {
     border-radius: 10px;
@@ -161,34 +162,34 @@
 
 .voto-acoes button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 6px 8px oklch(var(--cor-preto-1-params) / 0.2);
 }
 
 .voto-acoes button:active {
     transform: translateY(0);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 6px oklch(var(--cor-preto-1-params) / 0.15);
 } 
 
 .btn-editar {
-    border: 1px solid #FFA500;
-    color: #FFA500;
+    border: 1px solid var(--cor-ouro-1);
+    color: var(--cor-ouro-1);
     transition: background 0.3s;
 }
 
 .btn-editar:hover {
-    background: #FFA500;
-    color: white;
+    background: var(--cor-ouro-1);
+    color: var(--cor-branco-1);
 }
 
 .btn-excluir {
-    border: 1px solid #D32F2F;
-    color: #D32F2F;
+    border: 1px solid var(--cor-vermelho-1);
+    color: var(--cor-vermelho-1);
     transition: background 0.3s;
 }
 
 .btn-excluir:hover {
-    background: #D32F2F;
-    color: white;
+    background: var(--cor-vermelho-1);
+    color: var(--cor-branco-1);
 }
 
 
@@ -199,7 +200,7 @@ tab bots
 .tabela-container {
     overflow-x: auto;
     margin-top: 20px;
-    border: 1px solid oklch(.372 .044 257.287);
+    border: 1px solid var(--cor-cinza-3);
     border-radius: 10px;
     padding: 24px;
 }
@@ -241,28 +242,29 @@ table thead th:last-child {
     border: none; 
     font-weight: 600;
     font-size: 14px;
-    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 6px 8px oklch(var(--cor-preto-1-params) / 0.2);
     transition: background 0.3s;
+    cursor: pointer;
 }
 
 .btn-acoes:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 6px 8px oklch(var(--cor-preto-1-params) / 0.2);
 }
 
 .btn-acoes:active {
     transform: translateY(0);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 6px oklch(var(--cor-preto-1-params) / 0.15);
 }
 
 .btn-permissoes {
-    color: oklch(.714 .203 305.504);
-    border: 1px solid oklch(.714 .203 305.504);
+    color: var(--cor-roxo-1);
+    border: 1px solid var(--cor-roxo-1);
 }
 
 .btn-permissoes:hover {
-    background: oklch(.496 .265 301.924); 
-    color: white;
+    background: var(--cor-roxo-3); 
+    color: var(--cor-branco-1);
 }
 
 
@@ -290,7 +292,7 @@ table thead th:last-child {
     align-items: center;
     gap: 4px;
     font-size: 12px;
-    color: #ccc;
+    color: var(--cor-cinza-1);
 }
 
 .badge {
@@ -305,12 +307,12 @@ table thead th:last-child {
 
 .badge-voce {
     background: transparent;
-    color: oklch(.714 .203 305.504); 
-    border: 1px solid oklch(.714 .203 305.504);
+    color: var(--cor-roxo-1); 
+    border: 1px solid var(--cor-roxo-1);
 }
 .badge-admin {
-    color: gold;
-    border: 1px solid gold;
+    color: var(--cor-ouro-1);
+    border: 1px solid var(--cor-ouro-1);
     background: transparent;
 }
 
@@ -325,17 +327,15 @@ table thead th:last-child {
 }
 
 .badge-ativo {
-    background-color: #00FF00;
-    color: #000;
+    background-color: var(--cor-verde-4);
+    color: var(--cor-branco-1);
 }
 
 .badge-inativo {
-    background-color: #FF0000;
-    color: #fff;
+    background-color: var(--cor-vermelho-1);
+    color: var(--cor-branco-1);
 }
 
 .estatisticas div {
     display: block;
 }
-
-/* tab bots */

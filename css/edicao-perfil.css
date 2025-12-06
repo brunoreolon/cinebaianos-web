@@ -1,13 +1,11 @@
-/* oklch(.372 .044 257.287) */
-
 .perfil-edicao {
     max-width: 980px;
     width: 100%;
     margin: 0 auto; 
-    border: 1px solid oklch(.372 .044 257.287);
+    border: 1px solid var(--cor-cinza-3);
     border-radius: 10px;
     padding: 24px;
-    background: oklch(.279 .041 260.031);
+    background: var(--cor-preto-3);
 }
 
 .secao-header h4,
@@ -17,7 +15,7 @@
 }
 
 .secao-header p {
-    color: oklch(.704 .04 256.788);
+    color: var(--cor-branco-2);
 }
 
 .perfil-foto-linha {
@@ -66,7 +64,7 @@
 }
 
 .criado-em p {
-    color: oklch(.704 .04 256.788);
+    color: var(--cor-branco-2);
 }
 
 .campo textarea {
@@ -81,21 +79,21 @@
 .campo input, 
 .campo textarea {
     outline: none;
-    border: 1px solid oklch(.446 .043 257.281); /* REMOVER BORDA */
+    border: 1px solid var(--cor-cinza-3); 
     border-radius: 6px;
-    background: oklch(.208 .042 265.755);
-    color: white; /* opcional, mas melhora muito a leitura */
+    background: var(--cor-preto-7);
+    color: var(--cor-branco-1); /* opcional, mas melhora muito a leitura */
 }
 
 @keyframes foco-brilhando {
-    0%   { box-shadow: 0 0 6px 2px oklch(.627 .265 303.9 / 0.5); }
-    50%  { box-shadow: 0 0 10px 3px oklch(.627 .265 303.9 / 0.8); }
-    100% { box-shadow: 0 0 6px 2px oklch(.627 .265 303.9 / 0.5); }
+    0%   { box-shadow: 0 0 6px 2px oklch(var(--cor-roxo-2-params) / 0.5); }
+    50%  { box-shadow: 0 0 10px 3px oklch(var(--cor-roxo-2-params) / 0.8); }
+    100% { box-shadow: 0 0 6px 2px oklch(var(--cor-roxo-2-params) / 0.5); }
 }
 
 .campo input:focus,
 .campo textarea:focus {
-    border-color: oklch(.627 .265 303.9);
+    border-color: var(--cor-roxo-2);
     animation: foco-brilhando 1.4s ease-in-out infinite;
 }
 
@@ -116,30 +114,30 @@
     border-radius: 10px;
     font-weight: 600;
     font-size: 14px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 6px oklch(var(--cor-preto-1-params) / 0.15);
     transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
     cursor: pointer;
 }
 
 .perfil-botoes button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 6px 8px oklch(var(--cor-preto-1-params) / 0.2);
 }
 
 .perfil-botoes button:active {
     transform: translateY(0);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 6px oklch(var(--cor-preto-1-params) / 0.15);
 }
 
 .btn-salvar {
-    background: oklch(.558 .288 302.321);
-    color: white;
+    background: var(--cor-roxo-3);
+    color: var(--cor-branco-1);
     border: none;
     transition: background 0.3s;
 }
 
 .btn-salvar:hover {
-    background: oklch(.496 .265 301.924);
+    background: var(--cor-roxo-4);
 }
 
 @media (max-width: 600px) {

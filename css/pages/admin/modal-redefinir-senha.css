@@ -7,7 +7,7 @@
 
 .dados > p {
     margin-top: 24px;
-    color: oklch(.704 .04 256.788);
+    color: var(--cor-branco-2);
 }
 
 .campo input::placeholder {
@@ -34,15 +34,19 @@
 
 .redefinicao-acoes button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 6px 8px oklch(var(--cor-preto-1-params) / 0.2);
 }
 
 .redefinicao-acoes button:active {
     transform: translateY(0);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 6px oklch(var(--cor-preto-1-params) / 0.15);
 }
 
 .btn-redefinir-senha {
-    color: white;
-    background: oklch(.558 .288 302.321);
+    color: var(--cor-branco-1);
+    background: var(--cor-roxo-3);
+}
+
+.btn-redefinir-senha:hover {
+    background: var(--cor-roxo-4);
 }
