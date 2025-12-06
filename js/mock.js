@@ -7,7 +7,8 @@ const usuarios = [
         "isBot": false,
         "created": "01/01/2025",
         "isAtivo": true,
-        "isAdmin": false
+        "isAdmin": false,
+        "biograpy": "teste fabio teste fabio teste fabio  teste fabioteste fabio  teste fabio teste fabio"
     },
     {
         "discordId": "271749848842108928",
@@ -17,7 +18,8 @@ const usuarios = [
         "isBot": false,
         "created": "01/01/2025",
         "isAtivo": false,
-        "isAdmin": false
+        "isAdmin": false,
+        "biograpy": "teste rodrigo teste rodrigo teste rodrigo teste rodrigo teste rodrigo teste rodrigo teste rodrigo "
     },
     {
         "discordId": "339251538998329354",
@@ -27,7 +29,8 @@ const usuarios = [
         "isBot": false,
         "created": "01/01/2025",
         "isAtivo": true,
-        "isAdmin": true
+        "isAdmin": true,
+        "biograpy": "teste bruno teste bruno teste bruno teste bruno teste bruno teste bruno"
     },
     {
         "discordId": "555470950892568576",
@@ -37,7 +40,8 @@ const usuarios = [
         "isBot": false,
         "created": "01/01/2025",
         "isAtivo": true,
-        "isAdmin": false
+        "isAdmin": false,
+        "biograpy": "teste almir teste almir teste almir teste almir  teste almir teste almir teste almirteste almir "
     },
     {
         "discordId": "1395999365931339806",
@@ -76,6 +80,45 @@ const votos = [
         "emoji": "💤",
         "active": true
     }
+]
+
+const filmesAdicionar = [
+    {
+        "movie": {
+            "id": 1,
+            "title": "O Predador: A Caçada",
+            "genre": "Thriller",
+            "year": "2022",
+            "tmdbId": "766507",
+            "dateAdded": "2025-09-14T03:28:57.63",
+            "posterPath": "",
+            "synopsis": "O geofísico Dr. Josh Keyes descobre que um experimento fracassado interrompeu a rotação da Terra. Para tentar descobrir o que está havendo e resolver a crise, Josh escala uma equipe com alguns dos mais brilhantes cientistas do mundo, que tem por missão ir até o núcleo da Terra para reativar a rotação do planeta."
+        }
+    },
+    {
+        "movie": {
+            "id": 2,
+            "title": "Alien: Covenant",
+            "genre": "Terror",
+            "year": "2017",
+            "tmdbId": "126889",
+            "dateAdded": "2025-09-14T03:28:58.67",
+            "posterPath": "https://image.tmdb.org/t/p/original/dNJqsL3ekBPUXsSDu6oABGZkJMM.jpg",
+            "synopsis": "O pai suburbano Hutch Mansell, ex-assassino letal, é levado de volta ao seu passado violento depois de impedir uma invasão domiciliar, desencadeando uma cadeia de eventos que revela segredos sobre o passado de sua esposa Becca."
+        }
+    },
+    {
+        "movie": {
+            "id": 3,
+            "title": "Operação Valquíria",
+            "genre": "Drama",
+            "year": "2008",
+            "tmdbId": "2253",
+            "dateAdded": "2025-09-11T03:28:59.652",
+            "posterPath": "https://image.tmdb.org/t/p/original/ud8eldqnwQWReI2aDBVfLE5lVip.jpg",
+            "synopsis": "Ambientado há 300 anos na Nação Comanche, esta é a história de Naru, uma guerreira destemida e hábil, criada na sombra dos lendários caçadores que habitam as Grandes Planícies. Quando um perigo ameaça seu povo, ela parte para protegê-los. Porém, sua presa é um predador alienígena altamente evoluído munido com armas tecnologicamente avançadas."
+        }
+    },
 ]
 
 const filmes = [

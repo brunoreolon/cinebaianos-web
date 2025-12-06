@@ -16,6 +16,35 @@
         <div id="container">
             <div id="header-container"></div>
             <div class="mensagem-container"></div>
+            <div id="adicionar-filme">
+                <button type="button" class="adicionar">
+                    <i class="fa-solid fa-plus"></i>
+                    Adicionar Filme
+                </button>
+            </div>
+            <div id="modal-novo-filme" class="modal inativo">
+                <div class="modal-content">
+                    <header>
+                        <h3>Adicionar Novo Filme</h3>
+                        <span class="close">&times;</span>
+                    </header>
+                    <section class="dados">
+                        <div class="campo">
+                            <input id="titulo" type="text" placeholder="Digite o nome do filme...">
+                            <button class="btn-pesquisar">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </button>
+                        </div>
+                        <div class="dica">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <span>Busque por um filme para adicionar</span>
+                        </div>
+                        <div class="filmes-encontrados" style="display: none;">
+                            <ul></ul>
+                        </div>
+                    </section>
+                </div>
+            </div>
             <main>
                 <!-- <section class="recentes">
                     <header><h2>Adicionados Recentemente</h2></header>
