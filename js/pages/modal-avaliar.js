@@ -1,8 +1,6 @@
 import { buscarTiposVotos, votar } from '../services/voto-service.js';
 import { buscarFilmePorId } from '../services/filme-service.js';
 import { form, criarFooter } from '../global.js';
-import { atualizarBotaoEMinhaAvaliacao } from '../pages/detalhes-filme.js';
-
 
 export async function abrirModalAvaliacao(filme, usuario, atualizarTelaDetalhes, index) {
     const modal = document.querySelector('#modal-avaliar');
@@ -32,9 +30,11 @@ export async function abrirModalAvaliacao(filme, usuario, atualizarTelaDetalhes,
             const filmeAtualizado = await buscarFilmePorId(filme.id);
 
             if (atualizarTelaDetalhes) {
-                const botao = document.querySelector('#botao-avaliar button');
-                const minhaAvaliacao = document.querySelector('#minha-avaliacao');
-                atualizarBotaoEMinhaAvaliacao(filmeAtualizado, usuario, botao, minhaAvaliacao);
+                const evento = new CustomEvent('filmeAtualizado', {
+                    detail: filmeAtualizado
+                });
+
+                window.dispatchEvent(evento);
             }
             
             fecharModal(modal);

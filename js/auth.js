@@ -1,5 +1,4 @@
-// URL base da API
-export const API_URL = "http://localhost:8080/api";
+import { API_URL } from './config.js'
 
 // Tipo de storage: localStorage (persistente) ou sessionStorage (sessão)
 function getStorage() {
@@ -137,23 +136,23 @@ export async function apiFetch(url, options = {}) {
 }
 
 export async function getUsuarioLogado() {
-    const token = localStorage.getItem('accessToken');
+    const storage = getStorage();
+    const token = storage.getItem("accessToken");
     if (!token) return null;
 
     try {
-        const res = await fetch('http://localhost:8080/api/users/me', {
+        const res = await fetch(`${API_URL}/users/me`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
         });
 
         if (!res.ok) {
-            // se o token expirou ou for inválido, retorna null
             return null;
         }
 
         const user = await res.json();
-        return user; // ex: { discordId, name, avatar, roles }
+        return user;
     } catch (err) {
         console.error('Erro ao buscar usuário logado:', err);
         return null;

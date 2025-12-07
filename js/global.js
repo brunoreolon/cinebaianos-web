@@ -107,7 +107,6 @@ export function criarFooter(filme, usuario) {
     return footer;
 }
 
-
 function getVotoDoUsuarioFilme(discordId, votos) {
     return votos.find(v => v.voter.discordId == discordId);
 }
@@ -120,7 +119,8 @@ function criarBotaoAvaliar(filme, usuario) {
     btnAvaliar.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        abrirModalAvaliacao(filme, usuario, false, true);
+
+        window.location.href = `./detalhes-filme.html?id=${filme.id}&avaliar=1`;
     });
 
     return btnAvaliar

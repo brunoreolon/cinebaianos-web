@@ -1,8 +1,9 @@
-import { apiFetch, getUsuarioLogado } from '../auth.js';
+import { apiFetch } from '../auth.js';
+import { API_URL } from '../config.js'
 
 export async function buscarFilmes({ page = 0, size = 100, sortBy = 'dateAdded', sortDir = 'desc' } = {}) {
     try {
-        const url = new URL('http://localhost:8080/api/movies');
+        const url = new URL(`${API_URL}/movies`);
         url.searchParams.append('page', page);
         url.searchParams.append('size', size);
         url.searchParams.append('sortBy', sortBy);
@@ -21,7 +22,7 @@ export async function buscarFilmes({ page = 0, size = 100, sortBy = 'dateAdded',
 
 export async function buscarFilmesAguardandoAvaliacao({ page = 0, size = 100, sortBy = 'dateAdded', sortDir = 'desc', discordId = 'discordId' } = {}) {
     try {
-        const url = new URL('http://localhost:8080/api/movies/awaiting-review');
+        const url = new URL(`${API_URL}/movies/awaiting-review`);
         url.searchParams.append('page', page);
         url.searchParams.append('size', size);
         url.searchParams.append('sortBy', sortBy);
@@ -41,7 +42,7 @@ export async function buscarFilmesAguardandoAvaliacao({ page = 0, size = 100, so
 
 export async function buscarFilmePorId(id) {
     try {
-        const url = new URL(`http://localhost:8080/api/movies/${id}`);
+        const url = new URL(`${API_URL}/movies/${id}`);
         const response = await apiFetch(url);
 
         if (!response.ok) throw new Error('Erro ao buscar filme');
@@ -56,7 +57,7 @@ export async function buscarFilmePorId(id) {
 
 export async function buscarFilmesPorTitulo(titulo) {
     try {
-        const url = new URL(`http://localhost:8080/api/tmdb/search/movies`);
+        const url = new URL(`${API_URL}/tmdb/search/movies`);
         url.searchParams.append('title', titulo);
 
         const response = await apiFetch(url);
@@ -73,8 +74,6 @@ export async function buscarFilmesPorTitulo(titulo) {
 
 export async function adicionarFilme(tmdbId, discordId, votoId = null) {
     try {
-        // const usuario = await getUsuarioLogado();
-
         // Monta o corpo da requisição
         const corpo = {
             movie: { id: tmdbId },
@@ -86,7 +85,7 @@ export async function adicionarFilme(tmdbId, discordId, votoId = null) {
             corpo.vote = { id: votoId };
         }
 
-        const url = new URL('http://localhost:8080/api/movies');
+        const url = new URL(`${API_URL}/movies`);
 
         const response = await apiFetch(url, {
             method: 'POST',

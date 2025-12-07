@@ -42,8 +42,10 @@ function preencherAvaliacoes(filme, usuario) {
     const minhaAvaliacao = document.querySelector('#minha-avaliacao');
 
     atualizarBotaoEMinhaAvaliacao(filme, usuario, botao, minhaAvaliacao);
-    renderizarResumoVotos(filme.votes);
-    renderizarAvaliacoesRecebidas(filme.votes);
+
+    botao.addEventListener('click', () => {
+        abrirModalAvaliacao(filme, usuario, true, false);
+    });
 }
 
 export function atualizarBotaoEMinhaAvaliacao(filme, usuario, botao, minhaAvaliacao) {
@@ -60,20 +62,16 @@ export function atualizarBotaoEMinhaAvaliacao(filme, usuario, botao, minhaAvalia
         
         const aviso = document.querySelector('#avaliacoes-recebidas .sem-avaliacoes');
         if (aviso) aviso.textContent = '';
-
-        renderizarResumoVotos(filme.votes);
-        renderizarAvaliacoesRecebidas(filme.votes);
     } else {
         botao.textContent = 'Avaliar Filme';
         minhaAvaliacao.style.display = 'none';
     }
 
-    botao.addEventListener('click', () => {
-        abrirModalAvaliacao(filme, usuario, true, false);
-    });
+    renderizarResumoVotos(filme.votes);
+    renderizarAvaliacoesRecebidas(filme.votes);
 }
 
-function renderizarResumoVotos(votos) {
+export function renderizarResumoVotos(votos) {
     const contagem = {};
 
     votos.forEach(voto => {
@@ -102,7 +100,7 @@ function renderizarResumoVotos(votos) {
     });
 }
 
-function renderizarAvaliacoesRecebidas(votos) {
+export function renderizarAvaliacoesRecebidas(votos) {
     const listaAvaliacoes = document.querySelector('#avaliacoes-recebidas');
     const h3 = listaAvaliacoes.querySelector('h3');
     const ul = listaAvaliacoes.querySelector('ul');
@@ -171,6 +169,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     const filme = await buscarFilmePorId(filmeId);
     if (!filme) return console.error('Filme não encontrado');
 
+    const deveAvaliar = getQueryParam('avaliar');
+    if (deveAvaliar === '1') {
+        abrirModalAvaliacao(filme, usuario, true, false);
+
+        const novaURL = window.location.pathname + window.location.search.replace(/(&)?avaliar=1/, '');
+        window.history.replaceState({}, '', novaURL);
+
+    }
+
     preencherDetalhes(filme);
     preencherAvaliacoes(filme, usuario);
+});
+
+window.addEventListener('filmeAtualizado', async (e) => {
+    const filmeAtualizado = e.detail;
+
+    const usuario = await getUsuarioLogado();
+    const botao = document.querySelector('#botao-avaliar button');
+    const minhaAvaliacao = document.querySelector('#minha-avaliacao');
+
+    atualizarBotaoEMinhaAvaliacao(filmeAtualizado, usuario, botao, minhaAvaliacao);
 });
