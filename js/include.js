@@ -1,3 +1,7 @@
+import { montarMenuUsuario, exibirMenuUsuario } from './components/dropdown.js';
+import { getUsuarioLogado } from './auth.js';
+
+
 async function incluirHeader() {
     const container = document.getElementById('header-container');
     if (!container) return;
@@ -6,8 +10,8 @@ async function incluirHeader() {
     const html = await resposta.text();
 
     container.innerHTML = html;
-
-    montarMenuUsuario();
+    const usuario = await getUsuarioLogado();
+    montarMenuUsuario(usuario);
     exibirMenuUsuario();
 }
 

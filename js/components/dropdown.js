@@ -1,5 +1,7 @@
-function montarMenuUsuario() {
-    const usuario = usuarioLogado('339251538998329354');
+import { form, criarElemento } from '../global.js';
+import { logout } from '../auth.js';
+
+export function montarMenuUsuario(usuario) {
     const avatarContainer = form.avatarContainer();
     const dropdownContainer = form.dropdownContainer();
 
@@ -40,7 +42,7 @@ function montarMenuUsuario() {
                 </li>
                 <li class="separator"></li>
                 <li>
-                    <a href="#">
+                    <a href="#" id="logout-link">
                         <i class="fa-solid fa-arrow-right-from-bracket space"></i>
                         <span class="vermelho">Sair</span>
                     </a>
@@ -50,9 +52,15 @@ function montarMenuUsuario() {
     `;
 
     dropdownContainer.appendChild(menu);
+
+    const logoutLink = menu.querySelector('#logout-link');
+    logoutLink.addEventListener('click', (e) => {
+        e.preventDefault(); // previne o comportamento padrão do link
+        logout();           // função do auth.js que remove tokens e redireciona
+    });
 }
 
-function exibirMenuUsuario() {
+export async function exibirMenuUsuario() {
     const avatarContainer = form.avatarContainer();
     const dropdownContainer = form.dropdownContainer();
     const menu = dropdownContainer.querySelector('.dropdown-menu');

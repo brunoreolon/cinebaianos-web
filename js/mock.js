@@ -1,4 +1,4 @@
-const usuarios = [
+const usuarios2 = [
     {
         "discordId": "405389229762281473",
         "name": "FabioParadyze",
@@ -55,7 +55,7 @@ const usuarios = [
     }
 ]
 
-const votos = [
+const votos2 = [
     {
         "id": 1,
         "name": "DA_HORA",
@@ -82,7 +82,7 @@ const votos = [
     }
 ]
 
-const filmesAdicionar = [
+const filmesAdicionar2 = [
     {
         "movie": {
             "id": 1,
@@ -121,7 +121,7 @@ const filmesAdicionar = [
     },
 ]
 
-const filmes = [
+const filmes2 = [
     {
         "movie": {
             "id": 1,

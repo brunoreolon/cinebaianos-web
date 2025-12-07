@@ -1,6 +1,7 @@
-function getFilmeById(filmeId) {
-    return filmes.find(f => f.movie.id === parseInt(filmeId));
-}
+import { requireLogin, getUsuarioLogado } from '../auth.js';
+import { buscarFilmePorId } from '../services/filme-service.js';
+import { abrirModalAvaliacao } from './modal-avaliar.js';
+import { getQueryParam, formatarData, isUsuarioVotouNoFilme, criarElemento } from '../global.js';
 
 function getVotoDoUsuarioNoFilme(filme, usuarioId) {
     return filme.votes.find(v => v.voter.discordId === usuarioId);
@@ -18,13 +19,11 @@ function preencherDetalhes(filme) {
     // Parte2: Gêneros
     const ulGeneros = document.querySelector('.parte2 ul');
     ulGeneros.innerHTML = '';
-    const li = criarElemento('li', [], filme.genre);
-    ulGeneros.appendChild(li);
-    // filme.genres.forEach(g => {
-    //     const li = document.createElement('li');
-    //     li.textContent = g;
-    //     ulGeneros.appendChild(li);
-    // });
+    filme.genres.forEach(g => {
+        const li = document.createElement('li');
+        li.textContent = g.name;
+        ulGeneros.appendChild(li);
+    });
 
     // Parte3: Diretor, duração, usuário e data
     document.querySelector('.diretor p:last-child').textContent = filme.director || 'Peter Jackson';
@@ -47,7 +46,7 @@ function preencherAvaliacoes(filme, usuario) {
     renderizarAvaliacoesRecebidas(filme.votes);
 }
 
-function atualizarBotaoEMinhaAvaliacao(filme, usuario, botao, minhaAvaliacao) {
+export function atualizarBotaoEMinhaAvaliacao(filme, usuario, botao, minhaAvaliacao) {
     const usuarioVotou = isUsuarioVotouNoFilme(filme.votes, usuario.discordId);
 
     if (usuarioVotou) {
@@ -58,13 +57,19 @@ function atualizarBotaoEMinhaAvaliacao(filme, usuario, botao, minhaAvaliacao) {
         const span = minhaAvaliacao.querySelector('span');
         span.textContent = voto.vote.emoji + voto.vote.description;
         span.style.color = voto.vote.color;
+        
+        const aviso = document.querySelector('#avaliacoes-recebidas .sem-avaliacoes');
+        if (aviso) aviso.textContent = '';
+
+        renderizarResumoVotos(filme.votes);
+        renderizarAvaliacoesRecebidas(filme.votes);
     } else {
         botao.textContent = 'Avaliar Filme';
         minhaAvaliacao.style.display = 'none';
     }
 
     botao.addEventListener('click', () => {
-        abrirModalAvaliacao(filme, usuario, true);
+        abrirModalAvaliacao(filme, usuario, true, false);
     });
 }
 
@@ -98,8 +103,19 @@ function renderizarResumoVotos(votos) {
 }
 
 function renderizarAvaliacoesRecebidas(votos) {
-    const listaAvaliacoes = document.querySelector('#avaliacoes-recebidas ul');
-    listaAvaliacoes.innerHTML = '';
+    const listaAvaliacoes = document.querySelector('#avaliacoes-recebidas');
+    const h3 = listaAvaliacoes.querySelector('h3');
+    const ul = listaAvaliacoes.querySelector('ul');
+
+    h3.textContent = `Avaliações (${votos.length})`;
+    ul.innerHTML = '';
+
+    if (votos.length === 0) {
+        const p = criarElemento('p', ['fonte-secundaria', 'sem-avaliacoes'], 'Nenhuma avaliação recebida ainda.');
+        p.style.textAlign = 'center';
+        listaAvaliacoes.appendChild(p);
+        return;
+    }
 
     votos.forEach(v => {
         const li = document.createElement('li');
@@ -115,7 +131,7 @@ function renderizarAvaliacoesRecebidas(votos) {
         const infoUsuario = document.createElement('div');
         infoUsuario.classList.add('info-usuario');
 
-        const votante = getUsuarioById(v.voter.discordId);
+        const votante = v.voter;
 
         const img = document.createElement('img');
         img.src = votante.avatar || './assets/img/placeholder-avatar.png';
@@ -125,7 +141,7 @@ function renderizarAvaliacoesRecebidas(votos) {
         const pNome = document.createElement('p');
         pNome.textContent = votante.name;
         const pData = document.createElement('p');
-        pData.textContent = '11/15/2025'; // formatarData(v.date);
+        pData.textContent = formatarData(v.vote.votedAt); 
 
         divInfo.append(pNome, pData);
         infoUsuario.append(img, divInfo);
@@ -140,19 +156,21 @@ function renderizarAvaliacoesRecebidas(votos) {
         article.append(infoUsuario, divVoto);
         a.appendChild(article);
         li.appendChild(a);
-        listaAvaliacoes.appendChild(li);
+        ul.appendChild(li);
     });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const usuario = usuarioLogado('339251538998329354');
+document.addEventListener('DOMContentLoaded', async () => {
+    requireLogin();
+
+    const usuario = await getUsuarioLogado();
     const filmeId = getQueryParam('id');
 
     if (!filmeId) return console.error('ID do filme não encontrado na URL');
 
-    const filme = getFilmeById(filmeId);
+    const filme = await buscarFilmePorId(filmeId);
     if (!filme) return console.error('Filme não encontrado');
 
-    preencherDetalhes(filme.movie);
+    preencherDetalhes(filme);
     preencherAvaliacoes(filme, usuario);
 });

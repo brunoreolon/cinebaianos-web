@@ -1,12 +1,16 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const usuario = usuarioLogado('339251538998329354');
+import { requireLogin, getUsuarioLogado } from '../auth.js';
+
+document.addEventListener('DOMContentLoaded', async () => {
+    requireLogin();
+
+    const usuario = await getUsuarioLogado();
 
     document.getElementById("fotoUrl").value = usuario.avatar || "";
     document.querySelector(".foto-atual img").src = usuario.avatar || "./assets/img/placeholder-avatar.png";
 
     document.getElementById("nome").value = usuario.name || "";
     document.getElementById("email").value = usuario.email || "";
-    document.getElementById("bio").value = usuario.biograpy || "";
+    document.getElementById("bio").value = usuario.biography || "";
 
     // Membro desde
     if (usuario.criadoEm) {

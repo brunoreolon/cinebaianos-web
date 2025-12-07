@@ -1,48 +1,35 @@
+import { requireLogin, getUsuarioLogado } from '../auth.js';
+import { buscarFilmes, buscarFilmesAguardandoAvaliacao, buscarFilmesPorTitulo, adicionarFilme } from '../services/filme-service.js';
+import { criarFigure, criarElemento, form } from '../global.js';
+
 function criarCardsRecentes() {
-    const divPai = obterElementoPaiByClass('.recentes .inline');
+    const divPai = document.querySelector('.recentes .inline');
 
     filmes.forEach(f => {
-        const figure = criarFigure(f, usuario.discordId);
+        const figure = criarFigure(f, usuario);
         divPai.appendChild(figure);
     });
 }
 
-function criarCardsAguardandoAvaliacao() {
-    const usuario = usuarioLogado('339251538998329354');
-
-    const divPai = obterElementoPaiByClass('.aguardando-avaliacao .inline');
-
-    const filmesFiltrados = filmes.filter(filme => {
-        return !isUsuarioVotouNoFilme(filme.votes, usuario.discordId);
-    });
-
-    filmesFiltrados.forEach(f => {
-        const figure = criarFigure(f, usuario.discordId);
-        divPai.appendChild(figure);
-    });
-}
-
-function criarCardsTodos() {
-    const usuario = usuarioLogado('339251538998329354');
-
-    const divPai = obterElementoPaiByClass('.todos .inline');
+function criarCardsAguardandoAvaliacao(usuario, filmes) {
+    const divPai = form.aguardandoAvaliacao();
 
     filmes.forEach(f => {
-        const figure = criarFigure(f, usuario.discordId);
+        const figure = criarFigure(f, usuario);
+        divPai.appendChild(figure, usuario.discordId);
+    });
+}
+
+function criarCardsTodos(usuario, filmes) {
+    const divPai = form.todos();
+
+    filmes.forEach(f => {
+        const figure = criarFigure(f, usuario);
         divPai.appendChild(figure);
     });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    // criarCardsRecentes();
-    criarCardsAguardandoAvaliacao();
-    criarCardsTodos();
-
-    const btnPesquisar = document.querySelector(".adicionar");
-    btnPesquisar.addEventListener('click', () => abrirModalNovoFilme());
-});
-
-function abrirModalNovoFilme() {
+async function abrirModalNovoFilme() {
     const modal = document.getElementById('modal-novo-filme');
     modal.classList.remove("inativo");
     modal.classList.add("ativo");
@@ -58,17 +45,17 @@ function abrirModalNovoFilme() {
     dica.style.display = "flex";
     containerFilmesEncontrados.style.display = "none";
 
-    btnPesquisar.onclick = () => {
-        const pesquisa = titulo.value.toLowerCase();
-        const resultados = filmesAdicionar.filter(f =>
-            f.movie.title.toLowerCase().includes(pesquisa)
-        );
-
+    btnPesquisar.onclick = async () => {
         listaFilmes.innerHTML = "";
+
+        const pesquisa = titulo.value.toLowerCase();
+        if (!pesquisa) return;
+
+        const resultados = await buscarFilmesPorTitulo(pesquisa);
 
         if (resultados.length > 0) {
             dica.style.display = "none";
-            renderizarFilmes(filmesAdicionar, listaFilmes);
+            renderizarFilmes(resultados, listaFilmes, modal);
             containerFilmesEncontrados.style.display = "block";
         } else {
             containerFilmesEncontrados.style.display = "none";
@@ -79,14 +66,13 @@ function abrirModalNovoFilme() {
     modal.onclick = e => { if (e.target === modal) fecharModal(modal); };
 }
 
-function renderizarFilmes(filmes, listaFilmes) {
+function renderizarFilmes(filmes, listaFilmes, modal) {
     if (filmes.length === 0) {
         containerFilmesEncontrados.style.display = "none";
         return;
     }
 
-    filmes.forEach(f => {
-        const movie = f.movie;
+    filmes.forEach(movie => {
         const li = criarElemento('li', ['lista']);
 
         li.innerHTML = `
@@ -99,7 +85,7 @@ function renderizarFilmes(filmes, listaFilmes) {
                 <div class="topo">
                     <div class="titulos">
                         <h3>${movie.title}</h3>
-                        <p>${movie.year}</p>
+                        <p>${movie.releaseDate.split('-')[0]}</p>
                     </div>
                 </div>
 
@@ -108,8 +94,18 @@ function renderizarFilmes(filmes, listaFilmes) {
         `;
 
         li.style.cursor = "pointer";
-        li.onclick = () => {
-            adicionarFilme(movie); // ← aqui adiciona o filme
+        li.onclick = async () => {
+            const usuario = await getUsuarioLogado();
+            const filmeAdicionado = await adicionarFilme(movie.id, usuario.discordId);
+            fecharModal(modal); 
+
+            if (filmeAdicionado) {
+                const aguardandoAvaliacao = form.aguardandoAvaliacao();
+                const todos = form.todos();
+                
+                aguardandoAvaliacao.prepend(criarFigure(filmeAdicionado, usuario));
+                todos.prepend(criarFigure(filmeAdicionado, usuario));
+            }
         };
 
         listaFilmes.appendChild(li);
@@ -121,3 +117,18 @@ function fecharModal(modal) {
     modal.classList.remove('ativo');
     setTimeout(() => modal.classList.add('inativo'), 300); 
 }
+
+document.addEventListener('DOMContentLoaded', async () => {
+    requireLogin();
+
+    const usuario = await getUsuarioLogado();
+    const filmesAguardandoAvaliacao = await buscarFilmesAguardandoAvaliacao({ discordId: usuario.discordId });
+    const filmes = await buscarFilmes();
+    
+    // criarCardsRecentes();
+    criarCardsAguardandoAvaliacao(usuario, filmesAguardandoAvaliacao);
+    criarCardsTodos(usuario, filmes);
+
+    const btnPesquisar = document.querySelector(".adicionar");
+    btnPesquisar.addEventListener('click', () => abrirModalNovoFilme());
+});

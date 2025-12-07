@@ -1,9 +1,11 @@
-function criarPainelPerfilUsuario() {
-    const discordId = getQueryParam('id');
-    const usuario = getUsuarioById(discordId);
+import { getQueryParam, form, criarElemento, criarFigure, formatarData } from '../global.js';
+import { getUsuarioById } from '../services/usuario-service.js';
+import { buscarFilmes } from '../services/filme-service.js';
+import { buscarTiposVotos } from '../services/voto-service.js';
 
+async function criarPainelPerfilUsuario(usuario, filmes, votos) {
     criarPainelDadosUsuario(usuario);
-    criarPainelInformacoes(usuario);
+    criarPainelInformacoes(usuario, filmes, votos);
 }
 
 function criarPainelDadosUsuario(usuario) {
@@ -26,10 +28,10 @@ function criarPainelDadosUsuario(usuario) {
     const divInformacoes = criarElemento('div', ['dados']);
 
     const nome = criarElemento('p', ['fonte-primaria', 'grande', 'nome'], usuario.name);
-    const biografia = criarElemento('p', ['fonte-secundaria', 'bio'], "Uma biografia qualquer aqui neste espaço");
+    const biografia = criarElemento('p', ['fonte-secundaria', 'bio'], usuario.biography || "Sem biografia");
 
     // Linha "Membro desde"
-    const divMembroDesde = criarLinhaIconeTexto('fa-solid fa-calendar', 'Membro desde  ' + usuario.created);
+    const divMembroDesde = criarLinhaIconeTexto('fa-solid fa-calendar', 'Membro desde  ' + formatarData(usuario.joined));
 
     divInformacoes.append(nome, biografia, divMembroDesde);
     divDadosUsuario.append(divImagemPerfil, divInformacoes);
@@ -93,17 +95,17 @@ function criarTotalVotos(totalVotosRecebidos, descricao) {
     return divPai;
 }
 
-function criarPainelInformacoes(usuario) {
+async function criarPainelInformacoes(usuario, filmes, votos) {
     const divDadosFilmes = form.dadosFilmes();
 
-    const totalFilmesAdicionados = totalFilmesDoUsario(usuario.discordId);
+    const totalFilmesAdicionados = totalFilmesDoUsario(usuario.discordId, filmes);
     const totalAdicionados = criarTotalAdicionado(totalFilmesAdicionados, 'Adicionados');
 
     divDadosFilmes.appendChild(totalAdicionados);
 
     let totalVotosRecebidos = 0;
     votos.forEach(v => {
-        let totalVotosRecebidosPorVoto = contarVotosRecebidosPorTipo(usuario.discordId, v.id);
+        let totalVotosRecebidosPorVoto = contarVotosRecebidosPorTipo(usuario.discordId, v.id, filmes);
         totalVotosRecebidos += totalVotosRecebidosPorVoto;
         const dados = criarTotalPorVoto(v.emoji, totalVotosRecebidosPorVoto, v.description);
 
@@ -114,35 +116,58 @@ function criarPainelInformacoes(usuario) {
     divDadosFilmes.appendChild(totalVotos);
 }
 
-function criarListaVotos() {
-    const discordId = getQueryParam('id');
-    const usuario = getUsuarioById(discordId);
+function contarVotosRecebidosPorTipo(discordId, votoId, filmes) {
+    return filmes.reduce((total, filme) => {
+        const votosDoUsuario = filme.votes.filter(v => 
+            v.voter.discordId === discordId &&
+            v.vote.id === votoId
+        );
 
+        return total + votosDoUsuario.length;
+    }, 0);
+}
+
+function totalFilmesDoUsario(discordId, filmesLista) {
+    const filmes = filmesLista.filter(filme => {
+        return filme.chooser.discordId === discordId;
+    });
+
+    return filmes.length;
+}
+
+function contarTodosVotosRecebidos(discordId, filmes) {
+    return filmes.reduce((total, f) => {
+        if (f.chooser.discordId !== discordId) return total;
+        return total + f.votes.length;
+    }, 0);
+}
+
+async function criarListaVotos(usuario, filmes, votos) {
     const lista = form.lista();
 
-    const liAdicionados = adicionarItem(true, usuario.discordId, 0, 'Adicionados');
+    const liAdicionados = adicionarItem(true, usuario.discordId, 0, 'Adicionados', filmes);
     liAdicionados.classList.add('ativo')
     lista.appendChild(liAdicionados);
 
     votos.forEach(v =>{
-        const li = adicionarItem(false, usuario.discordId, v.id, v.description);
+        const li = adicionarItem(false, usuario.discordId, v.id, v.description, filmes, votos);
         lista.appendChild(li);
     });
 
-    const liTodos = adicionarItem(false, usuario.discordId, -1, 'Todos');
+    const liTodos = adicionarItem(false, usuario.discordId, -1, 'Todos', filmes);
     lista.appendChild(liTodos);
 
-    criarCardsFilmes(true, usuario, 0);
+    criarCardsFilmes(true, usuario, 0, filmes);
 }
 
-function adicionarItem(filmesUsuario, discordId, votoId, descricao) {
+function adicionarItem(filmesUsuario, discordId, votoId, descricao, filmes, votos = null) {
     let total = 0;
     if (filmesUsuario) {
-        total = totalFilmesDoUsario(discordId);
+        total = totalFilmesDoUsario(discordId, filmes);
     } else if (votoId === -1) {
-        total = contarTodosVotosRecebidos(discordId);
+        total = contarTodosVotosRecebidos(discordId, filmes);
     } else {
-        total = contarVotosRecebidosPorTipo(discordId, votoId);
+        total = contarVotosRecebidosPorTipo(discordId, votoId, filmes);
     }
 
     const descricaoCompleta = descricao + " (" + total + ")";
@@ -168,9 +193,7 @@ function adicionarItem(filmesUsuario, discordId, votoId, descricao) {
     return li;
 }
 
-function selecionaItemLista() {
-    const discordId = getQueryParam('id');
-    const usuario = getUsuarioById(discordId);
+function selecionaItemLista(usuario, filmes) {
     const lista = form.lista();
 
     lista.addEventListener('click', (e) => {
@@ -180,12 +203,12 @@ function selecionaItemLista() {
 
             const valor = parseInt(e.target.dataset.valor);
             const filmesUsuario = valor === 0;
-            criarCardsFilmes(filmesUsuario, usuario, valor);
+            criarCardsFilmes(filmesUsuario, usuario, valor, filmes);
         }
     });
 }
 
-function criarCardsFilmes(filmesUsuario, usuario, votoId) {
+function criarCardsFilmes(filmesUsuario, usuario, votoId, filmes) {
     const divPai = form.divPai();
 
     divPai.classList.remove('borda-padrao', 'mensagem');
@@ -193,7 +216,7 @@ function criarCardsFilmes(filmesUsuario, usuario, votoId) {
 
     const filmesFiltrados = filmes.filter(filme => {
         if (filmesUsuario) {
-            return filme.movie.chooser.discordId === usuario.discordId;
+            return filme.chooser.discordId === usuario.discordId;
         }
 
         return filme.votes.some(v =>
@@ -209,13 +232,18 @@ function criarCardsFilmes(filmesUsuario, usuario, votoId) {
     }
 
     filmesFiltrados.forEach(f => {
-        const figure = criarFigure(f, usuario.discordId);
+        const figure = criarFigure(f, usuario);
         divPai.appendChild(figure);
     });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    criarPainelPerfilUsuario();
-    criarListaVotos();
-    selecionaItemLista();
+document.addEventListener('DOMContentLoaded', async () => {
+    const discordId = getQueryParam('id');
+    const usuario = await getUsuarioById(discordId);
+    const filmes = await buscarFilmes();
+    const votos = await buscarTiposVotos();
+
+    criarPainelPerfilUsuario(usuario, filmes, votos);
+    criarListaVotos(usuario, filmes, votos);
+    selecionaItemLista(usuario, filmes);
 });
