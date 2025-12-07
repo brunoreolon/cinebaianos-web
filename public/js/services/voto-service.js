@@ -1,9 +1,8 @@
 import { apiFetch } from '../auth.js';
-import { API_URL } from '../config.js'
 
 export async function buscarTiposVotos() {
     try {
-        const url = new URL(`${API_URL}/vote-types`);
+        const url = new URL(`/api/vote-types`, window.location.origin);
         const response = await apiFetch(url);  // apiFetch já adiciona token, headers etc.
         if (!response.ok) throw new Error('Erro ao buscar tipos de voto');
         const tiposVotos = await response.json();
@@ -22,7 +21,7 @@ export async function votar(tmdbId, discordId, votoId) {
             vote: Number(votoId) // apenas o número
         };
 
-        const url = new URL(`${API_URL}/votes`);
+        const url = new URL(`/api/votes`, window.location.origin);
 
         const response = await apiFetch(url, {
             method: 'POST',

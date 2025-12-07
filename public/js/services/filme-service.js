@@ -1,9 +1,8 @@
 import { apiFetch } from '../auth.js';
-import { API_URL } from '../config.js'
 
 export async function buscarFilmes({ page = 0, size = 100, sortBy = 'dateAdded', sortDir = 'desc' } = {}) {
     try {
-        const url = new URL(`${API_URL}/movies`);
+        const url = new URL(`/api/movies`, window.location.origin);
         url.searchParams.append('page', page);
         url.searchParams.append('size', size);
         url.searchParams.append('sortBy', sortBy);
@@ -22,7 +21,7 @@ export async function buscarFilmes({ page = 0, size = 100, sortBy = 'dateAdded',
 
 export async function buscarFilmesAguardandoAvaliacao({ page = 0, size = 100, sortBy = 'dateAdded', sortDir = 'desc', discordId = 'discordId' } = {}) {
     try {
-        const url = new URL(`${API_URL}/movies/awaiting-review`);
+        const url = new URL(`/api/movies/awaiting-review`, window.location.origin);
         url.searchParams.append('page', page);
         url.searchParams.append('size', size);
         url.searchParams.append('sortBy', sortBy);
@@ -42,7 +41,7 @@ export async function buscarFilmesAguardandoAvaliacao({ page = 0, size = 100, so
 
 export async function buscarFilmePorId(id) {
     try {
-        const url = new URL(`${API_URL}/movies/${id}`);
+        const url = new URL(`/api/movies/${id}`, window.location.origin);
         const response = await apiFetch(url);
 
         if (!response.ok) throw new Error('Erro ao buscar filme');
@@ -57,7 +56,7 @@ export async function buscarFilmePorId(id) {
 
 export async function buscarFilmesPorTitulo(titulo) {
     try {
-        const url = new URL(`${API_URL}/tmdb/search/movies`);
+        const url = new URL(`/api/tmdb/search/movies`, window.location.origin);
         url.searchParams.append('title', titulo);
 
         const response = await apiFetch(url);
@@ -85,7 +84,7 @@ export async function adicionarFilme(tmdbId, discordId, votoId = null) {
             corpo.vote = { id: votoId };
         }
 
-        const url = new URL(`${API_URL}/movies`);
+        const url = new URL(`/api/movies`, window.location.origin);
 
         const response = await apiFetch(url, {
             method: 'POST',

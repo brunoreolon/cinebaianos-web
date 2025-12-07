@@ -1,3 +1,4 @@
+import { requireLogin } from '../auth.js';
 import { getQueryParam, form, criarElemento, criarFigure, formatarData } from '../global.js';
 import { getUsuarioById } from '../services/usuario-service.js';
 import { buscarFilmes } from '../services/filme-service.js';
@@ -238,6 +239,8 @@ function criarCardsFilmes(filmesUsuario, usuario, votoId, filmes) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+    requireLogin();
+
     const discordId = getQueryParam('id');
     const usuario = await getUsuarioById(discordId);
     const filmes = await buscarFilmes();

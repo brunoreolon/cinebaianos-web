@@ -1,9 +1,8 @@
 import { apiFetch } from '../auth.js';
-import { API_URL } from '../config.js'
 
 export async function getUsuarioById(discordId) {
     try {
-        const url = new URL(`${API_URL}/users/${discordId}`);
+        const url = new URL(`/api/users/${discordId}`, window.location.origin);
         const response = await apiFetch(url);
 
         if (!response.ok) throw new Error('Erro ao buscar usuário');

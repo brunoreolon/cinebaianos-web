@@ -1,5 +1,3 @@
-import { API_URL } from './config.js'
-
 // Tipo de storage: localStorage (persistente) ou sessionStorage (sessão)
 function getStorage() {
     return sessionStorage.getItem("useSession") === "true" ? sessionStorage : localStorage;
@@ -12,7 +10,7 @@ function getStorage() {
  * @param {boolean} remember - true = persistente (localStorage), false = apenas sessão (sessionStorage)
  */
 export async function login(username, password, remember = true) {
-    const response = await fetch(`${API_URL}/auth/login`, {
+    const response = await fetch(`/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password })
@@ -53,7 +51,7 @@ export async function logout() {
     // Faz POST na API para invalidar refresh token
     if (refreshToken) {
         try {
-            await fetch(`${API_URL}/auth/logout`, {
+            await fetch(`/api/auth/logout`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ refreshToken })
@@ -90,7 +88,7 @@ export async function refreshToken() {
     const refreshToken = storage.getItem("refreshToken");
     if (!refreshToken) throw new Error("Sem refresh token");
 
-    const response = await fetch(`${API_URL}/auth/refresh`, {
+    const response = await fetch(`/api/auth/refresh`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ refreshToken })
@@ -141,7 +139,7 @@ export async function getUsuarioLogado() {
     if (!token) return null;
 
     try {
-        const res = await fetch(`${API_URL}/users/me`, {
+        const res = await fetch(`/api/users/me`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }

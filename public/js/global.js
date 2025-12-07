@@ -1,5 +1,3 @@
-import { abrirModalAvaliacao } from './pages/modal-avaliar.js';
-
 export function getQueryParam(param) {
     const parametros = new URLSearchParams(location.search);
     return parametros.get(param);
