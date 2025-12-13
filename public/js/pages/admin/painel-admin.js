@@ -1,6 +1,18 @@
-function renderUsuarios(usuarios) {
+import { ApiError } from '../../exception/api-error.js';
+import { criarMensagem } from '../../components/mensagens.js';
+import { MensagemTipo } from '../../components/mensagem-tipo.js';
+import { getUsuarioLogado, requireLogin, requireAdmin } from '../../auth.js';
+import { formatarData, ordenarVotosPorDescricao, ordenarUsuariosPorNome } from '../../global.js';
+import { abrirModalVoto } from '../../pages/admin/modal-cadastrar-voto.js';
+import { abrirModalRedefinirSenha } from '../../pages/admin/modal-redefinir-senha.js';
+import { abrirModalPermissoes } from '../../pages/admin/modal-permissoes.js';
+import { buscarUsuarios } from '../../services/usuario-service.js';
+import { buscarTiposVotos, excluirTipoVoto } from '../../services/voto-service.js';
+
+async function renderUsuarios(usuarios) {
     const tabelaUsuarios = document.querySelector("#usuarios tbody");
     const tabelaBots = document.querySelector("#bots tbody");
+    const usuarioLogado = await getUsuarioLogado();
 
     tabelaUsuarios.innerHTML = "";
     tabelaBots.innerHTML = "";
@@ -8,11 +20,11 @@ function renderUsuarios(usuarios) {
     usuarios.forEach(usuario => {
         const tr = document.createElement("tr");
         tr.dataset.discordId = usuario.discordId;
-        tr.dataset.isAdmin = usuario.isAdmin;
-        tr.dataset.isAtivo = usuario.isAtivo;
-        tr.dataset.isLogado = (usuario.discordId === '339251538998329354');
+        tr.dataset.isAdmin = usuario.admin;
+        tr.dataset.isAtivo = usuario.active;
+        tr.dataset.isLogado = (usuario.discordId === usuarioLogado.discordId);
 
-        const conteudoUsuario = usuario.isBot ? `
+        const conteudoUsuario = usuario.bot ? `
             <td data-label="Bot">
                 <div class="bots-info">
                     <img src="${usuario.avatar}" alt="Avatar Bot">
@@ -31,8 +43,8 @@ function renderUsuarios(usuarios) {
                             ${usuario.discordId === '339251538998329354' ? '<span class="badge badge-voce">Você</span>' : ""}
                         </div>
                         <div class="role">
-                            <span class="badge ${usuario.isAdmin ? "badge-admin" : ""}">
-                                ${usuario.isAdmin ? '<i class="fa-solid fa-shield"></i> Admin' : ""}
+                            <span class="badge ${usuario.admin ? "badge-admin" : ""}">
+                                ${usuario.admin ? '<i class="fa-solid fa-shield"></i> Admin' : ""}
                             </span>
                         </div>
                     </div>
@@ -41,15 +53,15 @@ function renderUsuarios(usuarios) {
         `;
         
         const email = `<td data-label="Email">${usuario.email}</td>`;
-        const created = `<td data-label="Membro Desde">${usuario.created}</td>`;
+        const created = `<td data-label="Membro Desde">${formatarData(usuario.joined)}</td>`;
         const status = `<td data-label="Status">
-            <span class="badge ${usuario.isAtivo ? "badge-ativo" : "badge-inativo"}">
-                ${usuario.isAtivo ? "<i class='fa-regular fa-circle-check'></i>" : "<i class='fa-solid fa-ban'></i>"}
-                ${usuario.isAtivo ? "Ativo" : "Inativo"}
+            <span class="badge ${usuario.active ? "badge-ativo" : "badge-inativo"}">
+                ${usuario.active ? "<i class='fa-regular fa-circle-check'></i>" : "<i class='fa-solid fa-ban'></i>"}
+                ${usuario.active ? "Ativo" : "Inativo"}
             </span>
         </td>`;
 
-        const estatisticas = usuario.isBot ? "" : `
+        const estatisticas = usuario.bot ? "" : `
             <td data-label="Estatísticas">
                 <div class="estatisticas">
                     <div>0 Filmes</div>
@@ -59,7 +71,7 @@ function renderUsuarios(usuarios) {
 
         const acoes = `
             <td data-label="Ações">
-                <div class="${usuario.isBot ? "acoes-bot" : "acoes-usuario"}">
+                <div class="${usuario.bot ? "acoes-bot" : "acoes-usuario"}">
                     <button class="btn-acoes btn-redefinir">
                         <i class="fa-solid fa-key"></i> Redefinir Senha
                     </button>
@@ -71,14 +83,14 @@ function renderUsuarios(usuarios) {
 
         tr.innerHTML = conteudoUsuario + email + created + status + (usuario.isBot ? "" : estatisticas) + acoes;
 
-        if (usuario.isBot) tabelaBots.appendChild(tr);
+        if (usuario.bot) tabelaBots.appendChild(tr);
         else tabelaUsuarios.appendChild(tr);
     });
 
     initModaisUsuarios();
 }
 
-function renderVotos(votos) {
+export function renderVotos(votos) {
     const containerVotos = document.querySelector(".lista-votos");
     containerVotos.innerHTML = "";
 
@@ -101,11 +113,30 @@ function renderVotos(votos) {
         `;
         containerVotos.appendChild(div);
 
-        div.querySelector('.btn-editar').onclick = () => abrirModalVoto(voto);
-        div.querySelector('.btn-excluir').onclick = () => {
-            if (confirm(`Deseja realmente excluir o voto "${voto.nome}"?`)) {
-                votos.splice(i, 1);
-                renderVotos(votos); // reaplica eventos
+        const btnCadastrar = document.querySelector('.btn-novo');
+        if (btnCadastrar) {
+            btnCadastrar.addEventListener('click', () => abrirModalVoto(null, votos));
+        }
+
+        div.querySelector('.btn-editar').onclick = () => abrirModalVoto(voto, votos);
+
+        div.querySelector('.btn-excluir').onclick = async () => {
+            if (confirm(`Deseja realmente excluir o voto "${voto.name}"?`)) {
+                try{
+                    const excluir = await excluirTipoVoto(voto.id);
+                    criarMensagem(`Voto ${voto.description} excluido com sucesso!`, MensagemTipo.SUCCESS);
+
+                    votos = votos.filter(v => v.id !== voto.id);
+
+                    renderVotos(votos);
+                } catch(err) {
+                    if (err instanceof ApiError) {
+                        criarMensagem(err.detail || "Erro ao excluir tipo de voto.", MensagemTipo.ERROR);
+                    } else {
+                        criarMensagem("Erro de conexão com o servidor.", MensagemTipo.ERROR);
+                    }
+                }
+                
             }
         };
     });
@@ -139,44 +170,38 @@ function initModaisUsuarios() {
     });
 }
 
-// function initModaisVotos() {
-//     const btnEditar = document.querySelectorAll('.btn-editar');
-//     btnEditar.forEach((btn, index) => {
-//         btn.addEventListener('click', () => {
-//             const voto = {
-//                 nome: document.querySelectorAll('.voto h3')[index].textContent,
-//                 descricao: document.querySelectorAll('.voto p')[index].textContent,
-//                 cor: document.querySelectorAll('.voto span')[index].textContent,
-//                 emoji: document.querySelectorAll('.emoji-voto')[index].textContent
-//             };
-//             abrirModalVoto(voto);
-//         });
-//     });
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        requireLogin();
+        await requireAdmin();
 
-//     const btnExcluir = document.querySelectorAll('.btn-excluir');
-//     btnExcluir.forEach((btn, index) => {
-//         btn.addEventListener('click', () => {
-//             // Aqui você pode abrir um modal de confirmação ou deletar direto
-//             console.log("Excluir voto", index);
-//         });
-//     });
-// }
+        // Tabs
+        document.querySelectorAll('.btn-menu').forEach((btn, index) => {
+            btn.onclick = () => {
+                document.querySelectorAll('.btn-menu').forEach(b => b.classList.remove('ativo'));
+                document.querySelectorAll('.tab-pane').forEach(t => t.classList.remove('ativo'));
+                btn.classList.add('ativo');
+                document.querySelectorAll('.tab-pane')[index].classList.add('ativo');
+            };
+        });
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Tabs
-    document.querySelectorAll('.btn-menu').forEach((btn, index) => {
-        btn.onclick = () => {
-            document.querySelectorAll('.btn-menu').forEach(b => b.classList.remove('ativo'));
-            document.querySelectorAll('.tab-pane').forEach(t => t.classList.remove('ativo'));
-            btn.classList.add('ativo');
-            document.querySelectorAll('.tab-pane')[index].classList.add('ativo');
-        };
-    });
+        const usuarios = ordenarUsuariosPorNome(await buscarUsuarios(true));
+        const votos = ordenarVotosPorDescricao(await buscarTiposVotos());
 
-    // Botão novo voto
-    const btnCadastrar = document.querySelector('.btn-novo');
-    if (btnCadastrar) btnCadastrar.onclick = () => abrirModalVoto();
+        renderUsuarios(usuarios);
+        renderVotos(votos);
 
-    renderUsuarios(usuarios); // lista mock/real
-    renderVotos(votos);       // lista mock/real
+    } catch (err) {
+        if (err instanceof ApiError && err.status === 403) {
+            sessionStorage.setItem("flashMessage", JSON.stringify({
+                texto: err.detail,
+                tipo: "ERROR"
+            }));
+
+            window.location.href = "./index.html";
+            return;
+        } else {
+            criarMensagem(err.detail || "Erro ao carregar o painel administrativo.", MensagemTipo.ERROR);
+        }
+    }
 });

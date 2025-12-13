@@ -1,4 +1,12 @@
-function abrirModalVoto(voto = null) {
+import { ApiError } from '../../exception/api-error.js';
+import { criarMensagem } from '../../components/mensagens.js';
+import { MensagemTipo } from '../../components/mensagem-tipo.js';
+import { criarTipoVoto, atualizarTipoVoto } from '../../services/voto-service.js';
+import { renderVotos } from '../../pages/admin/painel-admin.js';
+import { ordenarVotosPorDescricao } from '../../global.js';
+import { emojis } from '../../emojis.js';
+
+export async function abrirModalVoto(voto = null, votos) {
     const modal = document.getElementById("modal-cadastrar-voto");
     modal.classList.remove("inativo");
     modal.classList.add("ativo");
@@ -50,42 +58,52 @@ function abrirModalVoto(voto = null) {
     atualizarPreview();
 
     // Botão finalizar
-    btnFinalizar.onclick = () => {
+    btnFinalizar.onclick = async () => {
         if (!inputNome.value.trim() || !inputDescricao.value.trim()) {
             alert("Preencha nome e descrição do voto!");
             return;
         }
 
-        if (voto) {
-            // Atualiza voto existente
-            voto.name = inputNome.value.trim();
-            voto.description = inputDescricao.value.trim();
-            voto.color = inputCor.value;
-            voto.emoji = inputEmoji.value;
+        try {
+            if (voto) {
+                // Atualiza voto existente
+                voto.name = inputNome.value.trim();
+                voto.description = inputDescricao.value.trim();
+                voto.color = inputCor.value;
+                voto.emoji = inputEmoji.value;
 
-            // TODO: Aqui futuramente chamar endpoint PUT/PATCH da API
-            // ex: atualizarVotoAPI(voto);
-        } else {
-            // Cria novo voto
-            const novoVoto = {
-                id: votos.length ? votos[votos.length - 1].id + 1 : 1,
-                name: inputNome.value.trim(),
-                description: inputDescricao.value.trim(),
-                color: inputCor.value,
-                emoji: inputEmoji.value,
-                active: true
-            };
-            votos.push(novoVoto);
+                const tipoVotoAtualizado = await atualizarTipoVoto(voto);
+                criarMensagem(`Voto ${voto.description} atualizado com sucesso!`, MensagemTipo.SUCCESS);
 
-            // TODO: Aqui futuramente chamar endpoint POST da API
-            // ex: criarVotoAPI(novoVoto);
+                const index = votos.findIndex(v => v.id === voto.id);
+                if (index !== -1) votos[index] = tipoVotoAtualizado;
+            } else {
+                // Cria novo voto
+                const novoVoto = {
+                    name: inputNome.value.trim(),
+                    description: inputDescricao.value.trim(),
+                    color: inputCor.value,
+                    emoji: inputEmoji.value,
+                    active: true
+                };
+                
+                const tipoVotoNovo = await criarTipoVoto(novoVoto);
+                criarMensagem(`Voto ${novoVoto.description} criado com sucesso!`, MensagemTipo.SUCCESS);
+
+                votos.push(tipoVotoNovo);
+            }
+        } catch(err) {
+            if (err instanceof ApiError) {
+                criarMensagem(err.detail || "Erro ao cadastrar tipo de voto.", MensagemTipo.ERROR);
+            } else {
+                criarMensagem("Erro de conexão com o servidor.", MensagemTipo.ERROR);
+            }
         }
 
-        renderVotos(votos);
+        renderVotos(ordenarVotosPorDescricao(votos));
         fecharModal(modal);
     };
 
-    
     // fechar modal
     modal.querySelector('.close').onclick = () => fecharModal(modal);
     modal.querySelector('.btn-cancelar').onclick = () => fecharModal(modal);
@@ -100,12 +118,12 @@ function fecharModal(modal) {
 // Emoji Picker
 const btnEmoji = document.getElementById("btn-emoji");
 const picker = document.getElementById("emoji-picker");
-const emojis = ["😀","😁","😂","🤣","😎","😍","🤩","💩","🏆","👍","👎","❤️","🔥", "💤"];
 
 btnEmoji.addEventListener("click", (e) => {
     e.stopPropagation(); // evita fechar o picker imediatamente
     if (picker.classList.contains("inativo")) {
         picker.innerHTML = "";
+
         emojis.forEach(emoji => {
             const span = document.createElement("span");
             span.textContent = emoji;
@@ -125,26 +143,6 @@ btnEmoji.addEventListener("click", (e) => {
 document.addEventListener("click", () => {
     picker.classList.add("inativo");
 });
-
-document.addEventListener('DOMContentLoaded', () => {
-    const btnCadastrar = document.querySelector('.btn-novo');
-    if (btnCadastrar) {
-        btnCadastrar.addEventListener('click', () => abrirModalVoto());
-    }
-});
-
-document.querySelectorAll('.btn-editar').forEach((btn, index) => {
-    btn.addEventListener('click', () => {
-        const voto = {
-            nome: document.querySelectorAll('.voto h3')[index].textContent,
-            descricao: document.querySelectorAll('.voto p')[index].textContent,
-            cor: document.querySelectorAll('.voto span')[index].textContent,
-            emoji: document.querySelectorAll('.emoji-voto')[index].textContent
-        };
-        abrirModalVoto(voto);
-    });
-});
-
 
 // Inputs de cor
 const inputColor = document.querySelector('.campo-cor-inputs input[type="color"]');

@@ -1,4 +1,9 @@
-function abrirModalRedefinirSenha(dados) {
+import { ApiError } from '../../exception/api-error.js';
+import { criarMensagem } from '../../components/mensagens.js';
+import { MensagemTipo } from '../../components/mensagem-tipo.js';
+import { redefinirSenha } from '../../services/admin-service.js';
+
+export function abrirModalRedefinirSenha(dados) {
     const modal = document.getElementById('modal-redefinir-senha');
     modal.classList.remove("inativo");
     modal.classList.add("ativo");
@@ -15,19 +20,22 @@ function abrirModalRedefinirSenha(dados) {
     nomeEl.textContent = dados.nome;
     emailEl.textContent = dados.email;
     
-    btnRedefinir.onclick = () => {
+    btnRedefinir.onclick = async () => {
         if (senha.value.length < 6) {
             alert("A senha deve ter no mínimo 6 caracteres");
             return;
         }
-
-        const body = {
-            discordId: modal.dataset.discordId,
-            novaSenha: senha.value
-        };
-        console.log("Enviando:", body);
-        // Aqui você faria o fetch() para API
-        fecharModal(modal);
+        try {
+            const novaSenha = await redefinirSenha(modal.dataset.discordId, senha.value);
+            fecharModal(modal);
+            criarMensagem(`Senha redefinida com sucesso para o usuário ${dados.nome}. Um email será enviado para o usuário contendo a nova senha`, MensagemTipo.SUCCESS);
+        } catch(err) {
+            if (err instanceof ApiError) {
+                criarMensagem(err.detail || "Erro ao redefinir senha.", MensagemTipo.ERROR);
+            } else {
+                criarMensagem("Erro de conexão com o servidor.", MensagemTipo.ERROR);
+            }
+        }
     };
 
     modal.querySelector('.close').onclick = () => fecharModal(modal);

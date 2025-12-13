@@ -1,39 +1,106 @@
 import { apiFetch } from '../auth.js';
 
+/** Retorna a lista de tipos de voto disponíveis */
 export async function buscarTiposVotos() {
-    try {
-        const url = new URL(`/api/vote-types`, window.location.origin);
-        const response = await apiFetch(url);  // apiFetch já adiciona token, headers etc.
-        if (!response.ok) throw new Error('Erro ao buscar tipos de voto');
-        const tiposVotos = await response.json();
-        return tiposVotos;
-    } catch (err) {
-        console.error('Erro ao buscar tipos de votos:', err);
-        return null;
-    }
+    const url = new URL(`/api/vote-types`, window.location.origin);
+    const response = await apiFetch(url);
+
+    return await response.json();
 }
 
-export async function votar(tmdbId, discordId, votoId) {
-    try {
-        const corpo = {
-            voter: { discordId: discordId }, // se discordId for um Long na API, converta
-            movie: { id: Number(tmdbId) },
-            vote: Number(votoId) // apenas o número
-        };
+/**
+ * Registra o voto de um usuário em um filme
+ * @param {number|string} movieId - ID do filme
+ * @param {string} discordId - ID do usuário
+ * @param {number|string} votoId - ID do voto escolhido
+ */
+export async function votar(movieId, discordId, votoId) {
+    const corpo = {
+        voter: { discordId },
+        movie: { id: Number(movieId) },
+        vote: Number(votoId)
+    };
 
-        const url = new URL(`/api/votes`, window.location.origin);
+    const url = new URL(`/api/votes`, window.location.origin);
 
-        const response = await apiFetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(corpo)
-        });
+    const response = await apiFetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(corpo)
+    });
 
-        if (!response.ok) throw new Error('Erro ao votar');
+    return await response.json();
+}
 
+/**
+ * Altera o voto de um usuário em um filme
+ * @param {number|string} movieId - ID do filme
+ * @param {string} discordId - ID do usuário
+ * @param {number|string} votoId - ID do voto escolhido
+ */
+export async function alterarVoto(movieId, discordId, votoId) {
+    const corpo = { id: Number(votoId) };
+
+    const url = new URL(`/api/votes/users/${discordId}/movies/${movieId}`, window.location.origin);
+
+    const response = await apiFetch(url, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(corpo)
+    });
+
+    return await response.json();
+}
+
+export async function criarTipoVoto(voto) {
+    const corpo = { 
+        name: voto.name, 
+        description: voto.description, 
+        color: voto.color,
+        emoji: voto.emoji
+    };
+
+    const url = new URL(`/api/vote-types`, window.location.origin);
+
+    const response = await apiFetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(corpo)
+    });
+
+    return await response.json();
+}
+
+export async function atualizarTipoVoto(voto) {
+    const corpo = { 
+        name: voto.name, 
+        description: voto.description, 
+        color: voto.color,
+        emoji: voto.emoji
+    };
+
+    const url = new URL(`/api/vote-types/${voto.id}`, window.location.origin);
+
+    const response = await apiFetch(url, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(corpo)
+    });
+
+    return await response.json();
+}
+
+export async function excluirTipoVoto(id) {
+    const url = new URL(`/api/vote-types/${id}`, window.location.origin);
+
+    const response = await apiFetch(url, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' }
+    });
+
+    if (!response.ok) {
         return await response.json();
-    } catch (err) {
-        console.error('Erro ao votar:', err);
-        return null;
     }
+
+    return true;
 }

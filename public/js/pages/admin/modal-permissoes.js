@@ -1,4 +1,9 @@
-function abrirModalPermissoes(dados) {
+import { ApiError } from '../../exception/api-error.js';
+import { criarMensagem } from '../../components/mensagens.js';
+import { MensagemTipo } from '../../components/mensagem-tipo.js';
+import { atualizarAtivacaoConta, atualizarAdmin } from '../../services/admin-service.js';
+
+export function abrirModalPermissoes(dados) {
     const modal = document.getElementById('modal-gerenciar-permissoes');
     modal.classList.remove("inativo");
     modal.classList.add("ativo");
@@ -7,13 +12,27 @@ function abrirModalPermissoes(dados) {
     modal.querySelector(".email").textContent = dados.email;
     modal.querySelector("img").src = dados.avatar;
 
-    const checkboxAtivo = modal.querySelector("#toggle-ativo");
-    const checkboxAdmin = modal.querySelector("#toggle-admin");
     const alerta = modal.querySelector(".alerta-permissao");
 
+    // Clona os checkboxes para remover listeners antigos
+    const checkboxAtivoOld = modal.querySelector("#toggle-ativo");
+    const checkboxAdminOld = modal.querySelector("#toggle-admin");
+
+    const checkboxAtivo = checkboxAtivoOld.cloneNode(true);
+    const checkboxAdmin = checkboxAdminOld.cloneNode(true);
+
+    checkboxAtivoOld.replaceWith(checkboxAtivo);
+    checkboxAdminOld.replaceWith(checkboxAdmin);
+
+    // Define estados iniciais
+    const estadoInicial = {
+        ativo: !!dados.isAtivo,
+        admin: !!dados.isAdmin
+    };
+
     // Preenche os checkboxes
-    checkboxAtivo.checked = !!dados.isAtivo;
-    checkboxAdmin.checked = !!dados.isAdmin;
+    checkboxAtivo.checked = estadoInicial.ativo;
+    checkboxAdmin.checked = estadoInicial.admin;
 
     // Se o usuário estiver editando a si mesmo
     if (dados.isLogado) {
@@ -24,28 +43,75 @@ function abrirModalPermissoes(dados) {
         alerta.style.display = "none";
     }
 
-    // Atualiza o objeto "dados" quando o usuário interage com os checkboxes
+    // Atualiza o objeto "dados" quando interage
     checkboxAtivo.addEventListener('change', () => {
         dados.isAtivo = checkboxAtivo.checked;
     });
-
     checkboxAdmin.addEventListener('change', () => {
         dados.isAdmin = checkboxAdmin.checked;
     });
 
-    // Botão Concluído envia os dados (aqui apenas exemplo de log)
-    modal.querySelector(".btn-concluir").onclick = () => {
-        console.log("Dados atualizados:", dados);
-        // Aqui você pode chamar sua função para enviar para a API
-        // ex: atualizarUsuario(dados);
-        fecharModal(modal);
+    // Botão Concluído envia os dados
+    const btnConcluir = modal.querySelector(".btn-concluir");
+    btnConcluir.onclick = async () => {
+        try {
+            const promises = [];
+
+            if (dados.isAtivo !== estadoInicial.ativo) {
+                promises.push(atualizarAtivacaoConta(dados.discordId, dados.isAtivo));
+            }
+
+            if (dados.isAdmin !== estadoInicial.admin) {
+                promises.push(atualizarAdmin(dados.discordId, dados.isAdmin));
+            }
+
+            if (promises.length === 0) {
+                fecharModal(modal);
+                return;
+            }
+
+            await Promise.all(promises);
+
+            criarMensagem("Permissões atualizadas com sucesso.", MensagemTipo.SUCCESS);
+
+            const tr = document.querySelector(`tr[data-discord-id="${dados.discordId}"]`);
+            if (tr) {
+                // Atualiza badge de status
+                const spanStatus = tr.querySelector('[data-label="Status"] .badge');
+                spanStatus.className = `badge ${dados.isAtivo ? "badge-ativo" : "badge-inativo"}`;
+                spanStatus.innerHTML = dados.isAtivo
+                    ? "<i class='fa-regular fa-circle-check'></i> Ativo"
+                    : "<i class='fa-solid fa-ban'></i> Inativo";
+
+                // Atualiza badge de admin
+                const spanAdmin = tr.querySelector('[data-label="Usuário"] .badge');
+                if (spanAdmin) {
+                    if (dados.isAdmin) {
+                        spanAdmin.classList.add("badge-admin");
+                        spanAdmin.innerHTML = '<i class="fa-solid fa-shield"></i> Admin';
+                    } else {
+                        spanAdmin.classList.remove("badge-admin");
+                        spanAdmin.innerHTML = "";
+                    }
+                }
+            }
+
+            fecharModal(modal);
+        } catch (err) {
+            if (err instanceof ApiError) {
+                criarMensagem(err.detail || "Erro ao atualizar permissões.", MensagemTipo.ERROR);
+            } else {
+                criarMensagem("Erro de conexão com o servidor.", MensagemTipo.ERROR);
+            }
+        }
     };
 
+    // Fechar modal
     modal.querySelector('.close').onclick = () => fecharModal(modal);
     modal.onclick = e => { if (e.target === modal) fecharModal(modal); };
 }
 
 function fecharModal(modal) {
     modal.classList.remove('ativo');
-    setTimeout(() => modal.classList.add('inativo'), 300); 
+    setTimeout(() => modal.classList.add('inativo'), 300);
 }
