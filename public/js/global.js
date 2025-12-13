@@ -80,15 +80,18 @@ export function criarFooter(filme, usuario) {
     const divMeuVoto = criarElemento('div');
 
     const contagem = votos.reduce((acc, v) => {
-        const key = `${v.vote.emoji}`;
-        acc[key] = (acc[key] || 0) + 1;
+        const emoji = v.vote.emoji;
+        acc[emoji] = (acc[emoji] || 0) + 1;
         return acc;
     }, {});
 
-    Object.entries(contagem).forEach(([emoji, totalVotos]) => {
+    // Ordenar do maior para o menor
+    const votosOrdenados = Object.entries(contagem).sort(([, a], [, b]) => b - a);
+
+    votosOrdenados.forEach(([emoji, total]) => {
         const span = criarElemento('span', ['gap']);
-        span.textContent = `${emoji}${totalVotos}`;
-        divVotos.append(span);
+        span.textContent = `${emoji}${total}`;
+        divVotos.appendChild(span);
     });
 
     if (!isUsuarioVotouNoFilme(votos, usuario.discordId)) {
