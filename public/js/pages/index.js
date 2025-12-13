@@ -1,9 +1,12 @@
 import { requireLogin, getUsuarioLogado } from '../auth.js';
 import { buscarFilmes, buscarFilmesAguardandoAvaliacao, buscarFilmesPorTitulo, adicionarFilme } from '../services/filme-service.js';
 import { criarFigure, criarElemento, form } from '../global.js';
+import { ApiError } from '../exception/api-error.js';
+import { criarMensagem } from '../components/mensagens.js';
+import { MensagemTipo } from '../components/mensagem-tipo.js';
 
 function criarCardsRecentes() {
-    const divPai = document.querySelector('.recentes .inline');
+    const divPai = form.filmesRecentes();
 
     filmes.forEach(f => {
         const figure = criarFigure(f, usuario);
@@ -30,7 +33,7 @@ function criarCardsTodos(usuario, filmes) {
 }
 
 async function abrirModalNovoFilme() {
-    const modal = document.getElementById('modal-novo-filme');
+    const modal = form.modalNovoFilme();
     modal.classList.remove("inativo");
     modal.classList.add("ativo");
 
@@ -45,22 +48,46 @@ async function abrirModalNovoFilme() {
     dica.style.display = "flex";
     containerFilmesEncontrados.style.display = "none";
 
-    btnPesquisar.onclick = async () => {
+    // Função de pesquisa
+    async function pesquisarFilmes() {
         listaFilmes.innerHTML = "";
-
-        const pesquisa = titulo.value.toLowerCase();
+        const pesquisa = titulo.value.trim().toLowerCase();
         if (!pesquisa) return;
 
-        const resultados = await buscarFilmesPorTitulo(pesquisa);
+        try {
+            const resultados = await buscarFilmesPorTitulo(pesquisa);
 
-        if (resultados.length > 0) {
             dica.style.display = "none";
-            renderizarFilmes(resultados, listaFilmes, modal);
             containerFilmesEncontrados.style.display = "block";
-        } else {
-            containerFilmesEncontrados.style.display = "none";
+            renderizarFilmes(resultados, listaFilmes, modal)
+        } catch (err) {
+            containerFilmesEncontrados.style.display = "block";
+            dica.style.display = "none";
+            listaFilmes.innerHTML = "";
+
+            const msg = criarElemento('p', ['sem-filmes'],
+                err instanceof ApiError && err.errorCode === 'movie_not_found'
+                    ? `Nenhum filme encontrado com o título "${titulo.value}".`
+                    : "Erro ao buscar filmes. Tente novamente."
+            );
+
+            msg.style.fontSize = "16px";
+            msg.style.color = "var(--cor-branco-2)";
+            msg.style.textAlign = "center";
+            msg.style.margin = "20px 0";
+
+            listaFilmes.appendChild(msg);
         }
-    };
+    }
+
+    btnPesquisar.onclick = pesquisarFilmes;
+
+    titulo.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            pesquisarFilmes();
+        }
+    });
 
     modal.querySelector('.close').onclick = () => fecharModal(modal);
     modal.onclick = e => { if (e.target === modal) fecharModal(modal); };
@@ -85,7 +112,7 @@ function renderizarFilmes(filmes, listaFilmes, modal) {
                 <div class="topo">
                     <div class="titulos">
                         <h3>${movie.title}</h3>
-                        <p>${movie.releaseDate.split('-')[0]}</p>
+                        <p>${movie.releaseDate ? movie.releaseDate.split('-')[0] : "--/--/----"}</p>
                     </div>
                 </div>
 
@@ -95,16 +122,31 @@ function renderizarFilmes(filmes, listaFilmes, modal) {
 
         li.style.cursor = "pointer";
         li.onclick = async () => {
-            const usuario = await getUsuarioLogado();
-            const filmeAdicionado = await adicionarFilme(movie.id, usuario.discordId);
-            fecharModal(modal); 
+            try {
+                const usuario = await getUsuarioLogado();
+                if (!usuario) {
+                    window.location.href = "./login.html";
+                    return;
+                }
 
-            if (filmeAdicionado) {
+                const filmeAdicionado = await adicionarFilme(movie.id, usuario.discordId);
+
+                fecharModal(modal); 
+
+                criarMensagem(`Filme "${filmeAdicionado.title}" adicionado com sucesso!`, MensagemTipo.SUCCESS);
+                criarMensagem(`Filme "${filmeAdicionado.title}" está aguardando sua avaliação.`, MensagemTipo.ALERT);
+                
                 const aguardandoAvaliacao = form.aguardandoAvaliacao();
                 const todos = form.todos();
-                
+
                 aguardandoAvaliacao.prepend(criarFigure(filmeAdicionado, usuario));
                 todos.prepend(criarFigure(filmeAdicionado, usuario));
+            } catch (err) {
+                if (err instanceof ApiError) {
+                    criarMensagem(err.detail || "Erro ao adicionar filme.", MensagemTipo.ERROR);
+                } else {
+                    criarMensagem("Erro de conexão com o servidor.", MensagemTipo.ERROR);
+                }
             }
         };
 
@@ -119,16 +161,39 @@ function fecharModal(modal) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    requireLogin();
+    const flash = sessionStorage.getItem("flashMessage");
 
-    const usuario = await getUsuarioLogado();
-    const filmesAguardandoAvaliacao = await buscarFilmesAguardandoAvaliacao({ discordId: usuario.discordId });
-    const filmes = await buscarFilmes();
-    
-    // criarCardsRecentes();
-    criarCardsAguardandoAvaliacao(usuario, filmesAguardandoAvaliacao);
-    criarCardsTodos(usuario, filmes);
+    if (flash) {
+        const { texto, tipo } = JSON.parse(flash);
+        criarMensagem(texto, MensagemTipo[tipo]);
+        sessionStorage.removeItem("flashMessage");
+    }
 
-    const btnPesquisar = document.querySelector(".adicionar");
-    btnPesquisar.addEventListener('click', () => abrirModalNovoFilme());
+    try {
+        requireLogin();
+
+        const usuario = await getUsuarioLogado();
+        if (!usuario) {
+            window.location.href = "./login.html";
+            return;
+        }
+
+        const filmesAguardandoAvaliacao =
+            await buscarFilmesAguardandoAvaliacao({ discordId: usuario.discordId });
+
+        const filmes = await buscarFilmes();
+
+        criarCardsAguardandoAvaliacao(usuario, filmesAguardandoAvaliacao);
+        criarCardsTodos(usuario, filmes);
+
+        const btnPesquisar = document.querySelector(".adicionar");
+        btnPesquisar.addEventListener('click', abrirModalNovoFilme);
+    } catch (err) {
+        if (err instanceof ApiError) {
+            criarMensagem(
+                err.detail || "Erro ao carregar dados da aplicação.", MensagemTipo.ERROR);
+        } else {
+            criarMensagem("Erro de conexão com o servidor.", MensagemTipo.ERROR);
+        }
+    }
 });

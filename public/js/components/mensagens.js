@@ -1,44 +1,49 @@
-function criarMensagem(texto, tipo = 'info', duracao = 8000) {
+import { MensagemTipo } from './mensagem-tipo.js';
+
+export function criarMensagem(texto, tipo = MensagemTipo.INFO, duracao = 8000) {
     const container = document.querySelector('.mensagem-container');
 
+    // Criação do alerta
     const alert = document.createElement('div');
-    alert.className = `alert ${tipo}`;
+    alert.className = `alert ${tipo.css}`;
     alert.innerHTML = `
-        ${texto}
+        <div class="alert-content">
+            <i class="fa-solid ${tipo.icon}"></i>
+            <span class="alert-text">${texto}</span>
+        </div>
         <button class="alert-close">&times;</button>
     `;
 
+    // Adiciona o novo alerta ao container
     container.appendChild(alert);
 
-    // Mostrar com animação
+    // Funcionalidade de animação de entrada
     requestAnimationFrame(() => {
         alert.classList.add('show');
     });
 
+    // Função de fechamento (remover a mensagem da tela)
     const fechar = () => {
         alert.classList.remove('show');
         alert.classList.add('fechar');
 
-        setTimeout(() => {
-            alert.classList.remove('fechar');
-            alert.classList.add('remover');
-        }, 150); // tempo da primeira etapa
-
-        setTimeout(() => {
+        // Remover do DOM após animação de fechamento
+        alert.addEventListener('transitionend', () => {
             container.removeChild(alert);
-        }, 500); // tempo total da animação
+        });
     };
 
-    // Fechar ao clicar no X
+    // Fechar ao clicar no botão
     alert.querySelector('.alert-close').addEventListener('click', fechar);
 
-    // Fechar automaticamente após a duração
+    // Fechar automaticamente após o tempo de duração
     if (duracao > 0) {
-        setTimeout(fechar, duracao);
+        setTimeout(() => fechar(), duracao);
     }
 }
 
 
-// criarMensagem('Filme adicionado com sucesso!', 'success', 6000);
-// criarMensagem('Erro ao carregar dados.', 'error', 7000);
-// criarMensagem('Novo aviso disponível.', 'info');
+// criarMensagem('Filme adicionado com sucesso!', MensagemTipo.SUCCESS);
+// criarMensagem('Erro ao carregar dados.', MensagemTipo.ERROR);
+// criarMensagem('Novo aviso disponível.', MensagemTipo.INFO);
+// criarMensagem('Novo alerta!', MensagemTipo.ALERT);

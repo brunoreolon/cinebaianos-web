@@ -1,6 +1,22 @@
-// Tipo de storage: localStorage (persistente) ou sessionStorage (sessão)
+import { ApiError } from './exception/api-error.js';
+
+/* =========================
+ * Constantes
+ * ========================= */
+const STORAGE_KEYS = {
+    ACCESS: "accessToken",
+    REFRESH: "refreshToken",
+    EXPIRY: "tokenExpiry",
+    USE_SESSION: "useSession"
+};
+
+/* =========================
+ * Storage helper
+ * ========================= */
 function getStorage() {
-    return sessionStorage.getItem("useSession") === "true" ? sessionStorage : localStorage;
+    return sessionStorage.getItem(STORAGE_KEYS.USE_SESSION) === "true"
+        ? sessionStorage
+        : localStorage;
 }
 
 /**
@@ -16,21 +32,25 @@ export async function login(username, password, remember = true) {
         body: JSON.stringify({ username, password })
     });
 
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.errorCode || "Falha no login");
-    }
-
     const data = await response.json();
 
-    // Salva flag do tipo de storage
-    sessionStorage.setItem("useSession", remember ? "false" : "true");
+    if (!response.ok) {
+        throw new ApiError(data);
+    }
 
-    // Salva tokens e expiry no storage correto
+    // Define tipo de storage
+    sessionStorage.setItem(
+        STORAGE_KEYS.USE_SESSION,
+        remember ? "false" : "true"
+    );
+
     const storage = getStorage();
-    storage.setItem("accessToken", data.accessToken);
-    storage.setItem("refreshToken", data.refreshToken);
-    storage.setItem("tokenExpiry", Date.now() + data.expiresInSeconds * 1000);
+    storage.setItem(STORAGE_KEYS.ACCESS, data.accessToken);
+    storage.setItem(STORAGE_KEYS.REFRESH, data.refreshToken);
+    storage.setItem(
+        STORAGE_KEYS.EXPIRY,
+        Date.now() + data.expiresInSeconds * 1000
+    );
 
     return data;
 }
@@ -38,7 +58,7 @@ export async function login(username, password, remember = true) {
 /** Logout do usuário */
 export async function logout() {
     const storage = getStorage();
-    const refreshToken = storage.getItem("refreshToken");
+    const refreshToken = storage.getItem(STORAGE_KEYS.REFRESH);
 
     // Limpa storage
     storage.removeItem("accessToken");
@@ -46,7 +66,7 @@ export async function logout() {
     storage.removeItem("tokenExpiry");
 
     // Limpa flag de sessão
-    sessionStorage.removeItem("useSession");
+    sessionStorage.removeItem(STORAGE_KEYS.USE_SESSION);
 
     // Faz POST na API para invalidar refresh token
     if (refreshToken) {
@@ -68,11 +88,10 @@ export async function logout() {
 /** Verifica se usuário está logado */
 export function isLoggedIn() {
     const storage = getStorage();
-    const token = storage.getItem("accessToken");
-    const expiry = storage.getItem("tokenExpiry");
+    const token = storage.getItem(STORAGE_KEYS.ACCESS);
+    const expiry = storage.getItem(STORAGE_KEYS.EXPIRY);
 
-    if (!token || !expiry) return false;
-    return Date.now() < Number(expiry);
+    return Boolean(token) && expiry && Date.now() < Number(expiry);
 }
 
 /** Redireciona para login se não estiver logado */
@@ -82,11 +101,30 @@ export function requireLogin() {
     }
 }
 
+export async function requireAdmin() {
+    const usuario = await getUsuarioLogado();
+
+    if (!usuario || !usuario.admin) {
+        throw new ApiError({
+            status: 403,
+            title: "Acesso negado",
+            detail: "Você não tem permissão para acessar esta página.",
+            errorCode: "access_denied"
+        });
+    }
+
+    return usuario;
+}
+
 /** Renova token usando refresh token */
-export async function refreshToken() {
+let refreshingPromise = null;
+
+async function doRefresh() {
     const storage = getStorage();
-    const refreshToken = storage.getItem("refreshToken");
-    if (!refreshToken) throw new Error("Sem refresh token");
+    const refreshToken = storage.getItem(STORAGE_KEYS.REFRESH);
+    if (!refreshToken) {
+        throw new Error("Sem refresh token");
+    }
 
     const response = await fetch(`/api/auth/refresh`, {
         method: "POST",
@@ -94,13 +132,27 @@ export async function refreshToken() {
         body: JSON.stringify({ refreshToken })
     });
 
-    if (!response.ok) throw new Error("Falha ao renovar token");
+    if (!response.ok) {
+        throw new Error("Falha ao renovar token");
+    }
 
     const data = await response.json();
-    storage.setItem("accessToken", data.accessToken);
-    storage.setItem("tokenExpiry", Date.now() + data.expiresInSeconds * 1000);
+
+    storage.setItem(STORAGE_KEYS.ACCESS, data.accessToken);
+    storage.setItem(
+        STORAGE_KEYS.EXPIRY,
+        Date.now() + data.expiresInSeconds * 1000
+    );
 
     return data.accessToken;
+}
+
+export async function refreshToken() {
+    if (!refreshingPromise) {
+        refreshingPromise = doRefresh()
+            .finally(() => refreshingPromise = null);
+    }
+    return refreshingPromise;
 }
 
 /**
@@ -110,49 +162,58 @@ export async function refreshToken() {
  */
 export async function apiFetch(url, options = {}) {
     const storage = getStorage();
-    let token = storage.getItem("accessToken");
-    const expiry = storage.getItem("tokenExpiry");
+    let token = storage.getItem(STORAGE_KEYS.ACCESS);
+    const expiry = storage.getItem(STORAGE_KEYS.EXPIRY);
 
     // Se token expirou, tenta refresh
     if (!token || Date.now() > Number(expiry)) {
         try {
             token = await refreshToken();
         } catch (err) {
-            console.warn("Refresh falhou:", err);
-            window.location.href = "./login.html";
-            return;
+            storage.removeItem(STORAGE_KEYS.ACCESS);
+            storage.removeItem(STORAGE_KEYS.REFRESH);
+            storage.removeItem(STORAGE_KEYS.EXPIRY);
+            sessionStorage.removeItem(STORAGE_KEYS.USE_SESSION);
+
+            if (err?.errorCode === 'expired_refresh_token' || err?.errorCode === 'invalid_refresh_token') {
+                window.location.href = "./login.html";
+                return;
+            }
+
+            throw new ApiError({
+                status: err?.status || 500,
+                detail: err?.detail || "Falha ao renovar o token de acesso.",
+                errorCode: err?.errorCode || "unknown_error"
+            });
         }
     }
 
-    // Adiciona token no header
-    options.headers = {
-        ...(options.headers || {}),
-        "Authorization": `Bearer ${token}`
-    };
+    const response = await fetch(url, {
+        ...options,
+        headers: {
+            ...(options.headers || {}),
+            Authorization: `Bearer ${token}`
+        }
+    });
 
-    return fetch(url, options);
+    if (!response.ok) {
+        let data = {};
+        try {
+            data = await response.json();
+        } catch (_) {}
+
+        throw new ApiError(data);
+    }
+
+    return response;
 }
 
 export async function getUsuarioLogado() {
-    const storage = getStorage();
-    const token = storage.getItem("accessToken");
-    if (!token) return null;
-
     try {
-        const res = await fetch(`/api/users/me`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-
-        if (!res.ok) {
-            return null;
-        }
-
-        const user = await res.json();
-        return user;
+        const res = await apiFetch('/api/users/me');
+        return await res.json();
     } catch (err) {
-        console.error('Erro ao buscar usuário logado:', err);
+        console.warn("Erro ao buscar usuário logado:", err);
         return null;
     }
 }

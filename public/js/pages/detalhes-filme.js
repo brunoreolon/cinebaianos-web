@@ -1,7 +1,10 @@
 import { requireLogin, getUsuarioLogado } from '../auth.js';
 import { buscarFilmePorId } from '../services/filme-service.js';
 import { abrirModalAvaliacao } from './modal-avaliar.js';
-import { getQueryParam, formatarData, isUsuarioVotouNoFilme, criarElemento } from '../global.js';
+import { getQueryParam, formatarData, isUsuarioVotouNoFilme, criarElemento, ordenarVotosPorNomeUsuario } from '../global.js';
+import { ApiError } from '../exception/api-error.js';
+import { criarMensagem } from '../components/mensagens.js';
+import { MensagemTipo } from '../components/mensagem-tipo.js';
 
 function getVotoDoUsuarioNoFilme(filme, usuarioId) {
     return filme.votes.find(v => v.voter.discordId === usuarioId);
@@ -67,8 +70,10 @@ export function atualizarBotaoEMinhaAvaliacao(filme, usuario, botao, minhaAvalia
         minhaAvaliacao.style.display = 'none';
     }
 
+    const votosOrdenadosPorUsuario = ordenarVotosPorNomeUsuario(filme.votes);
+
     renderizarResumoVotos(filme.votes);
-    renderizarAvaliacoesRecebidas(filme.votes);
+    renderizarAvaliacoesRecebidas(votosOrdenadosPorUsuario);
 }
 
 export function renderizarResumoVotos(votos) {
@@ -91,7 +96,9 @@ export function renderizarResumoVotos(votos) {
     const container = document.querySelector('#avaliacoes span');
     container.innerHTML = '';
 
-    Object.values(contagem).forEach(data => {
+    const votosOrdenados = Object.values(contagem).sort((a, b) => b.qtd - a.qtd);
+
+    votosOrdenados.forEach(data => {
         const span = document.createElement('span');
         span.textContent = `${data.emoji} ${data.qtd} ${data.descricao}`;
         span.style.color = data.color;
@@ -159,35 +166,60 @@ export function renderizarAvaliacoesRecebidas(votos) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    requireLogin();
+    try {
+        requireLogin();
 
-    const usuario = await getUsuarioLogado();
-    const filmeId = getQueryParam('id');
+        const usuario = await getUsuarioLogado();
+        if (!usuario) {
+            window.location.href = "./login.html";
+            return;
+        }
 
-    if (!filmeId) return console.error('ID do filme não encontrado na URL');
+        const filmeId = getQueryParam('id');
 
-    const filme = await buscarFilmePorId(filmeId);
-    if (!filme) return console.error('Filme não encontrado');
+        if (!filmeId) throw new Error('ID do filme não encontrado na URL');
 
-    const deveAvaliar = getQueryParam('avaliar');
-    if (deveAvaliar === '1') {
-        abrirModalAvaliacao(filme, usuario, true, false);
+        const filme = await buscarFilmePorId(filmeId);
+        if (!filme) throw new Error('Filme não encontrado');
 
-        const novaURL = window.location.pathname + window.location.search.replace(/(&)?avaliar=1/, '');
-        window.history.replaceState({}, '', novaURL);
+        const deveAvaliar = getQueryParam('avaliar');
+        if (deveAvaliar === '1') {
+            abrirModalAvaliacao(filme, usuario, true, false);
 
+            const novaURL = window.location.pathname + window.location.search.replace(/(&)?avaliar=1/, '');
+            window.history.replaceState({}, '', novaURL);
+        }
+
+        preencherDetalhes(filme);
+        preencherAvaliacoes(filme, usuario);
+    } catch (err) {
+        if (err instanceof ApiError) {
+            criarMensagem(err.detail || "Erro ao carregar detalhes do filme.", MensagemTipo.ERROR);
+        } else {
+            criarMensagem(err.message || "Erro ao carregar detalhes do filme.", MensagemTipo.ERROR);
+        }
     }
-
-    preencherDetalhes(filme);
-    preencherAvaliacoes(filme, usuario);
 });
 
 window.addEventListener('filmeAtualizado', async (e) => {
-    const filmeAtualizado = e.detail;
+    try {
+        const filmeAtualizado = e.detail;
 
-    const usuario = await getUsuarioLogado();
-    const botao = document.querySelector('#botao-avaliar button');
-    const minhaAvaliacao = document.querySelector('#minha-avaliacao');
+        const usuario = await getUsuarioLogado();
+        if (!usuario) {
+            window.location.href = "./login.html";
+            return;
+        }
+        
+        const botao = document.querySelector('#botao-avaliar button');
+        const minhaAvaliacao = document.querySelector('#minha-avaliacao');
 
-    atualizarBotaoEMinhaAvaliacao(filmeAtualizado, usuario, botao, minhaAvaliacao);
+        atualizarBotaoEMinhaAvaliacao(filmeAtualizado, usuario, botao, minhaAvaliacao);
+    } catch (err) {
+        if (err instanceof ApiError) {
+            criarMensagem(err.detail || "Erro ao atualizar avaliação.", MensagemTipo.ERROR);
+        } else {
+            criarMensagem("Erro ao atualizar avaliação.", MensagemTipo.ERROR);
+        }
+    }
 });

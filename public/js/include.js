@@ -11,6 +11,11 @@ async function incluirHeader() {
 
     container.innerHTML = html;
     const usuario = await getUsuarioLogado();
+    if (!usuario) {
+        window.location.href = "./login.html";
+        return;
+    }
+
     montarMenuUsuario(usuario);
     exibirMenuUsuario();
 }

@@ -92,7 +92,7 @@ export function criarFooter(filme, usuario) {
     });
 
     if (!isUsuarioVotouNoFilme(votos, usuario.discordId)) {
-        const botao = criarBotaoAvaliar(filme, usuario);
+        const botao = criarBotaoAvaliar(filme);
         divMeuVoto.appendChild(botao);
     } else {
         const voto = getVotoDoUsuarioFilme(usuario.discordId, votos);
@@ -109,7 +109,7 @@ function getVotoDoUsuarioFilme(discordId, votos) {
     return votos.find(v => v.voter.discordId == discordId);
 }
 
-function criarBotaoAvaliar(filme, usuario) {
+function criarBotaoAvaliar(filme) {
     const btnAvaliar = criarElemento('button', ['btn-avaliar'], 'Avaliar');
     btnAvaliar.type = 'button';
 
@@ -134,6 +134,24 @@ export function formatarData(dataStr) {
     return `${dia}/${mes}/${ano}`;
 }
 
+export function ordenarUsuariosPorNome(usuarios) {
+    return [...usuarios].sort((a, b) =>
+        a.name.localeCompare(b.name, 'pt-BR', { sensitivity: 'base' })
+    );
+}
+
+export function ordenarVotosPorDescricao(votos) {
+    return [...votos].sort((a, b) =>
+        a.name.localeCompare(b.description, 'pt-BR', { sensitivity: 'base' })
+    );
+}
+
+export function ordenarVotosPorNomeUsuario(votos) {
+    return [...votos].sort((a, b) =>
+        a.voter.name.localeCompare(b.voter.name, 'pt-BR', { sensitivity: 'base' })
+    );
+}
+
 export const form = {
     menuPerfil: () =>document.querySelector('.profile-menu'),
     avatarContainer: () => document.querySelector('#avatar-container'),
@@ -143,5 +161,7 @@ export const form = {
     dadosUsuario: () => document.getElementById('dados-usuario'),
     dadosFilmes: () => document.getElementById('dados-filmes'),
     aguardandoAvaliacao: () => document.querySelector('.aguardando-avaliacao .inline'),
-    todos: () => document.querySelector('.todos .inline')
+    todos: () => document.querySelector('.todos .inline'),
+    filmesRecentes: () => document.querySelector('.recentes .inline'),
+    modalNovoFilme: () => document.getElementById('modal-novo-filme')
 }

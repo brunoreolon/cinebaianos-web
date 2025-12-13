@@ -3,6 +3,9 @@ import { getQueryParam, form, criarElemento, criarFigure, formatarData } from '.
 import { getUsuarioById } from '../services/usuario-service.js';
 import { buscarFilmes } from '../services/filme-service.js';
 import { buscarTiposVotos } from '../services/voto-service.js';
+import { ApiError } from '../exception/api-error.js';
+import { criarMensagem } from '../components/mensagens.js';
+import { MensagemTipo } from '../components/mensagem-tipo.js';
 
 async function criarPainelPerfilUsuario(usuario, filmes, votos) {
     criarPainelDadosUsuario(usuario);
@@ -138,8 +141,8 @@ function totalFilmesDoUsario(discordId, filmesLista) {
 
 function contarTodosVotosRecebidos(discordId, filmes) {
     return filmes.reduce((total, f) => {
-        if (f.chooser.discordId !== discordId) return total;
-        return total + f.votes.length;
+        const votouNoFilme = f.votes.some(v => v.voter.discordId === discordId);
+        return total + (votouNoFilme ? 1 : 0);
     }, 0);
 }
 
@@ -239,14 +242,23 @@ function criarCardsFilmes(filmesUsuario, usuario, votoId, filmes) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    requireLogin();
+    try {
+        requireLogin();
 
-    const discordId = getQueryParam('id');
-    const usuario = await getUsuarioById(discordId);
-    const filmes = await buscarFilmes();
-    const votos = await buscarTiposVotos();
+        const discordId = getQueryParam('id');
+        const usuario = await getUsuarioById(discordId);
+        const filmes = await buscarFilmes();
+        const votos = await buscarTiposVotos();
 
-    criarPainelPerfilUsuario(usuario, filmes, votos);
-    criarListaVotos(usuario, filmes, votos);
-    selecionaItemLista(usuario, filmes);
+        criarPainelPerfilUsuario(usuario, filmes, votos);
+        criarListaVotos(usuario, filmes, votos);
+        selecionaItemLista(usuario, filmes);
+    } catch (err) {
+        if (err instanceof ApiError) {
+            criarMensagem(err.detail || "Erro ao carregar dados da aplicação.", MensagemTipo.ERROR);
+        } else {
+            criarMensagem("Erro de conexão com o servidor.", MensagemTipo.ERROR);
+        }
+    }
+    
 });
