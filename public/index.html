@@ -56,6 +56,43 @@
                 </section>
                 <section class="todos">
                     <header><h2>Todos os Filmes</h2></header>
+
+                    <!-- FILTROS -->
+                    <div id="filtro">
+                        <div class="filtros-superiores">
+                            <!-- Ordenar por -->
+                            <div class="filtro-ordenar">
+                                <span>Ordenar por:</span>
+                                <select id="ordenar-por">
+                                    <option value="dateAdded" selected>Adicionado em</option>
+                                    <option value="title">Título</option>
+                                    <option value="chooser.name">Usuário</option>
+                                </select>
+
+                                <select id="ordenar-direcao">
+                                    <option value="asc">ASC</option>
+                                    <option value="desc" selected>DESC</option>
+                                </select>
+                            </div>
+
+                            <div class="divisao"></div>
+
+                            <!-- Filtrar por usuário -->
+                            <div class="filtro-usuario">
+                                <span>Usuário:</span>
+                                <select id="filtro-usuario">
+                                    <option value="">Todos</option>
+                                    <!-- Aqui você pode preencher dinamicamente via JS -->
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Buscar por título -->
+                        <div class="filtro-busca">
+                            <input type="text" id="buscar-titulo" placeholder="Buscar por título" />
+                        </div>
+                    </div>
+
                     <div class="inline"></div>
                 </section>
             </main>
