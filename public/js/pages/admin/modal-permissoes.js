@@ -2,8 +2,9 @@ import { ApiError } from '../../exception/api-error.js';
 import { criarMensagem } from '../../components/mensagens.js';
 import { MensagemTipo } from '../../components/mensagem-tipo.js';
 import { atualizarAtivacaoConta, atualizarAdmin } from '../../services/admin-service.js';
+import { MY_DISCORD_ID } from '../../../config.js';
 
-export function abrirModalPermissoes(dados) {
+export function abrirModalPermissoes(dados, usuarioLogado) {
     const modal = document.getElementById('modal-gerenciar-permissoes');
     modal.classList.remove("inativo");
     modal.classList.add("ativo");
@@ -55,6 +56,11 @@ export function abrirModalPermissoes(dados) {
     const btnConcluir = modal.querySelector(".btn-concluir");
     btnConcluir.onclick = async () => {
         try {
+            if (dados.discordId === MY_DISCORD_ID && dados.discordId != usuarioLogado.discordId) {
+                criarMensagem("Você tentou… e falhou miseravelmente 😎", MensagemTipo.ERROR);
+                return;
+            }
+
             const promises = [];
 
             if (dados.isAtivo !== estadoInicial.ativo) {

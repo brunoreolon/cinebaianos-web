@@ -217,3 +217,49 @@ export async function getUsuarioLogado() {
         return null;
     }
 }
+
+/**
+ * Recupepar senha
+ * @param {string} email 
+ */
+export async function recuperarLogin(email) {
+    const response = await fetch(`/api/auth/recover`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email })
+    });
+
+    let data = {};
+    try {
+        data = await response.json();
+    } catch (_) {}
+
+    if (!response.ok) {
+        throw new ApiError(data);
+    }
+
+    return data;
+}
+
+/**
+ * Redefinir senha
+ * @param {string} token 
+ * @param {string} novaSenha
+ */
+export async function redefinirSenha(token, newPassword) {
+    const url = new URL(`/api/auth/reset-password`, window.location.origin);
+
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, newPassword })
+    });
+
+    if (!response.ok) {
+        let data = {};
+        try { data = await response.json(); } catch (_) {}
+        throw new ApiError(data);
+    }
+
+    return true;
+}

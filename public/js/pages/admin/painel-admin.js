@@ -40,7 +40,7 @@ async function renderUsuarios(usuarios) {
                     <div class="usuario-texto">
                         <div class="nome-badge">
                             <span class="nome">${usuario.name}</span>
-                            ${usuario.discordId === '339251538998329354' ? '<span class="badge badge-voce">Você</span>' : ""}
+                            ${usuario.discordId === usuarioLogado.discordId ? '<span class="badge badge-voce">Você</span>' : ""}
                         </div>
                         <div class="role">
                             <span class="badge ${usuario.admin ? "badge-admin" : ""}">
@@ -87,7 +87,7 @@ async function renderUsuarios(usuarios) {
         else tabelaUsuarios.appendChild(tr);
     });
 
-    initModaisUsuarios();
+    initModaisUsuarios(usuarioLogado);
 }
 
 export function renderVotos(votos) {
@@ -142,7 +142,7 @@ export function renderVotos(votos) {
     });
 }
 
-function initModaisUsuarios() {
+function initModaisUsuarios(usuarioLogado) {
     // Redefinir senha
     document.querySelectorAll('.btn-redefinir').forEach(btn => {
         const linha = btn.closest("tr");
@@ -166,7 +166,7 @@ function initModaisUsuarios() {
             isAtivo: linha.dataset.isAtivo === "true",
             isLogado: linha.dataset.isLogado === "true"
         };
-        btn.onclick = () => abrirModalPermissoes(dados);
+        btn.onclick = () => abrirModalPermissoes(dados, usuarioLogado);
     });
 }
 

@@ -12,46 +12,107 @@
     <body>
         <main id="container">
             <div class="mensagem-container"></div>
-            
-            <!-- Cabeçalho / branding -->
-            <header class="login-header">
-                <div class="logo">
-                    <i class="fa-solid fa-clapperboard fa-3x" aria-hidden="true"></i>
-                </div>
-                <h1>CineBaianos</h1>
-                <p>Bem-vindo de volta!</p>
-            </header>
 
-            <!-- Formulário de login -->
-            <section class="login-form-section">
-                <form id="form-login" class="login-form">
-                    <!-- Email -->
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" name="email" placeholder="seu@email.com" required>
+            <!-- LOGIN -->
+            <div id="login-view" class="auth-view active">
+                <header class="login-header">
+                    <div class="logo">
+                        <i class="fa-solid fa-clapperboard fa-3x"></i>
                     </div>
+                    <h1>CineBaianos</h1>
+                    <p>Bem-vindo de volta!</p>
+                </header>
 
-                    <!-- Senha -->
-                    <div class="form-group">
-                        <label for="senha">Senha</label>
-                        <input type="password" id="senha" name="senha" placeholder="********" required>
-                    </div>
-
-                    <!-- Lembrar-me e Esqueceu a senha -->
-                    <div class="form-actions">
-                        <div class="remember-me">
-                            <input type="checkbox" id="remember" name="remember">
-                            <label for="remember">Lembrar-me</label>
+                <section class="login-form-section">
+                    <form id="form-login" class="login-form">
+                        <div class="form-group">
+                            <label for="login-email">Email</label>
+                            <input type="email" id="login-email" required>
                         </div>
-                        <div class="forgot-password">
-                            <button type="button" class="link-button">Esqueceu a senha?</button>
-                        </div>
-                    </div>
 
-                    <!-- Botão de login -->
-                    <button type="submit" class="btn-login">Entrar</button>
-                </form>
-            </section>
+                        <div class="form-group">
+                            <label for="login-senha">Senha</label>
+                            <input type="password" id="login-senha" required>
+                        </div>
+
+                        <div class="form-actions">
+                            <div class="remember-me">
+                                <input type="checkbox" id="remember">
+                                <label for="remember">Lembrar-me</label>
+                            </div>
+
+                            <button type="button" id="btn-forgot" class="btn-forgot link-button">
+                                Esqueceu a senha?
+                            </button>
+                        </div>
+
+                        <button type="submit" class="btn-login">Entrar</button>
+                    </form>
+                </section>
+            </div>
+
+            <!-- RECUPERAR SENHA -->
+            <div id="recover-view" class="auth-view">
+                <header class="login-header">
+                    <div class="logo">
+                        <i class="fa-solid fa-clapperboard fa-3x"></i>
+                    </div>
+                    <h1>CineBaianos</h1>
+                    <p>Redefinir senha</p>
+                </header>
+
+                <section class="login-form-section">
+                    <form id="form-recover" class="login-form">
+                        <div class="form-group">
+                            <label for="recover-email">Email</label>
+                            <input type="email" id="recover-email" placeholder="seu@email.com" required>
+                        </div>
+
+                        <span class="info-text fonte-secundaria">
+                            Enviaremos instruções para redefinir sua senha
+                        </span>
+
+                        <div class="form-actions acoes">
+                            <button type="submit" id="btn-recover" class="btn-login">
+                                Enviar instruções
+                            </button>
+
+                            <button type="button" id="btn-back" class="link-button">
+                                Voltar ao login
+                            </button>
+                        </div>
+                    </form>
+                </section>
+            </div>
+
+            <!-- RESETAR SENHA -->
+            <div id="reset-view" class="auth-view">
+                <header class="login-header">
+                    <div class="logo">
+                        <i class="fa-solid fa-clapperboard fa-3x"></i>
+                    </div>
+                    <h1>CineBaianos</h1>
+                    <p>Redefinir senha</p>
+                </header>
+
+                <section class="login-form-section">
+                    <form id="form-reset" class="login-form">
+                        <input type="hidden" id="reset-token">
+
+                        <div class="form-group">
+                            <label for="reset-password">Nova senha</label>
+                            <input type="password" id="reset-password" placeholder="Digite sua nova senha" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="reset-password-confirm">Confirme a senha</label>
+                            <input type="password" id="reset-password-confirm" placeholder="Confirme a nova senha" required>
+                        </div>
+
+                        <button type="submit" class="btn-login">Redefinir senha</button>
+                    </form>
+                </section>
+            </div>
         </main>
 
         <script type="module" src="./js/pages/login.js"></script>

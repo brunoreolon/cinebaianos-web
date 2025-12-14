@@ -15,7 +15,10 @@ app.use(express.static(path.join(process.cwd(), 'public')));
 app.get('/config.js', (req, res) => {
   res.type('application/javascript');
   // O front-end sempre acessa via '/api', que é o proxy
-  res.send(`export const API_URL = '/api';`);
+  res.send(`
+    export const API_URL = '/api';
+    export const MY_DISCORD_ID = '${process.env.MY_DISCORD_ID}';
+  `);
 });
 
 // Middleware para interpretar JSON
