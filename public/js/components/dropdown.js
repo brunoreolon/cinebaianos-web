@@ -7,13 +7,15 @@ export function montarMenuUsuario(usuario) {
 
     const divAvatar = criarElemento('div', ['avatar-wrapper']);
 
-    const linkAvatar = criarElemento('a');
+    const linkAvatar = criarElemento('a', ['link']);
     linkAvatar.href = '#';
 
     const img = criarElemento('img', ['avatar']);
     img.src = usuario.avatar || './assets/img/placeholder-avatar.png';
 
-    linkAvatar.appendChild(img);
+    const nomeUsuario = criarElemento('p', ['nome-usuario'], usuario.name);
+
+    linkAvatar.append(nomeUsuario, img);
     divAvatar.appendChild(linkAvatar);
     avatarContainer.appendChild(divAvatar);
 
