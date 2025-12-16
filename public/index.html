@@ -10,7 +10,7 @@
         <link rel="stylesheet" href="./css/modal-avaliar.css" type="text/css">
         <link rel="stylesheet" href="./css/index.css" type="text/css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-        <title>Index</title>
+        <title>CineBaianos</title>
     </head>
     <body>
         <div id="container">
@@ -63,16 +63,38 @@
                             <!-- Ordenar por -->
                             <div class="filtro-ordenar">
                                 <span>Ordenar por:</span>
+
                                 <select id="ordenar-por">
                                     <option value="dateAdded" selected>Adicionado em</option>
                                     <option value="title">Título</option>
                                     <option value="chooser.name">Usuário</option>
                                 </select>
 
-                                <select id="ordenar-direcao">
-                                    <option value="asc">ASC</option>
-                                    <option value="desc" selected>DESC</option>
-                                </select>
+                                <div class="ordenacao-direcao">
+                                    <button id="ordenar-direcao" type="button" data-direction="desc"
+                                        class="inline-flex items-center justify-center h-8 rounded-md gap-1.5 px-3
+                                            bg-slate-700 border border-slate-600 hover:bg-slate-600 text-white"
+                                        aria-label="Alternar direção da ordenação">
+                                        <!-- Ícone -->
+                                        <svg
+                                            id="icone-direcao"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            class="w-4 h-4"
+                                        >
+                                            <path d="m21 16-4 4-4-4"></path>
+                                            <path d="M17 20V4"></path>
+                                            <path d="m3 8 4-4 4 4"></path>
+                                            <path d="M7 4v16"></path>
+                                        </svg>
+                                    </button>
+                                    <span id="texto-direcao" class="texto-direcao">Z - A</span>
+                                </div>
                             </div>
 
                             <div class="divisao"></div>
@@ -82,7 +104,19 @@
                                 <span>Usuário:</span>
                                 <select id="filtro-usuario">
                                     <option value="">Todos</option>
-                                    <!-- Aqui você pode preencher dinamicamente via JS -->
+                                </select>
+                            </div>
+
+                            <div class="divisao"></div>
+
+                            <!-- Quantidade por página -->
+                            <div class="filtro-size">
+                                <span>Itens por página:</span>
+                                <select id="filmes-size">
+                                    <option value="1" selected>10</option>
+                                    <option value="20">20</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
                                 </select>
                             </div>
                         </div>
@@ -94,6 +128,8 @@
                     </div>
 
                     <div class="inline"></div>
+
+                    <div class="paginacao"></div>
                 </section>
             </main>
             <div id="footer-container"></div>

@@ -233,20 +233,11 @@
     margin-bottom: 10px; 
 }
 
-.filtro-ordenar, .filtro-usuario {
+.filtro-usuario {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 10px;
-}
-
-.filtro-ordenar span,
-.filtro-ordenar select {
-    min-width: 100px;     /* cada item ocupa no mínimo 100px */
-}
-
-.filtro-ordenar select {
-    flex: 1 1 auto;       /* cresce e encolhe conforme necessário */
 }
 
 .filtro-usuario {
@@ -279,7 +270,6 @@
     box-shadow: 0 0 5px var(--cor-azul-2);
 }
 
-.filtro-ordenar select,
 .filtro-usuario select {
     margin-right: 10px;
 }
@@ -317,6 +307,91 @@
 
 .filtro-busca input::placeholder {
     color: var(--cor-cinza-2);
+}
+
+ .filtro-ordenar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+.ordenacao-direcao {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 6px;
+    border: 1px solid var(--cor-cinza-3); 
+    background-color: var(--cor-preto-2);
+    transition: border 0.2s, box-shadow 0.2s;
+    padding: 0 5px;
+    cursor: pointer; 
+}
+
+.ordenacao-direcao.ativo {
+    border-color: var(--cor-roxo-2);
+    box-shadow: 0 0 5px var(--cor-azul-2);
+}
+
+#ordenar-direcao {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;        
+    height: 28px;      
+    flex-shrink: 0;   
+    background-color: transparent; 
+    border: none;       
+    border-radius: 6px; 
+    cursor: pointer;
+    padding: 0 6px;    
+    transition: background 0.2s, transform 0.2s;
+}
+
+#ordenar-direcao:hover {
+    background-color: var(--cor-cinza-2);
+}
+
+#ordenar-direcao svg {
+    height: 14px; 
+    stroke: var(--cor-branco-1);      
+}
+
+.texto-direcao {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--cor-branco-2);
+    user-select: none;
+    cursor: pointer;
+}
+
+.paginacao {
+    margin-top: 80px;
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.paginacao .btn-pagina {
+    padding: 15px 15px;
+    border-radius: 6px;
+    border: 1px solid var(--cor-cinza-3);
+    background-color: var(--cor-preto-2);
+    color: var(--cor-branco);
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.paginacao .btn-pagina:hover:not(:disabled) {
+    background-color: var(--cor-roxo-3); 
+    color: var(--cor-branco-1);          
+}
+
+.paginacao .btn-pagina:disabled {
+    background-color: var(--cor-roxo-3);
+    color: black;
+    cursor: default;
 }
 
 @media (max-width: 600px) {

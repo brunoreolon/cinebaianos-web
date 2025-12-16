@@ -1,4 +1,5 @@
 import { requireLogin, getUsuarioLogado } from '../auth.js';
+import { formatarDataExtenso } from '../global.js';
 import { alterarDadosUsuario } from '../services/usuario-service.js';
 import { ApiError } from '../exception/api-error.js';
 import { criarMensagem } from '../components/mensagens.js';
@@ -19,20 +20,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById("nome").value = usuario.name || "";
         document.getElementById("email").value = usuario.email || "";
         document.getElementById("bio").value = usuario.biography || "";
-
-        // Membro desde
-        if (usuario.criadoEm) {
-            const data = new Date(usuario.criadoEm);
-            const formatada = data.toLocaleDateString("pt-BR", {
-                day: "2-digit",
-                month: "long",
-                year: "numeric"
-            });
-
-            document.querySelector(".criado-em p").textContent = formatada;
-        }
+        document.getElementById("criado-em").textContent = formatarDataExtenso(usuario.joined) || "";
 
         document.querySelector('.btn-salvar').addEventListener('click', async () => {
+            const inputNovaSenha = document.getElementById("nova-senha");
+            const inputConfirmacaoSenha = document.getElementById("confirmacao-senha");
+
+            const novaSenha = inputNovaSenha.value;
+            const confirmacaoSenha = inputConfirmacaoSenha.value;
+
+            if (novaSenha || confirmacaoSenha) {
+                if (!novaSenha || !confirmacaoSenha) {
+                    criarMensagem("Para trocar a senha, preencha os dois campos.", MensagemTipo.ERROR);
+                    return;
+                }
+
+                if (novaSenha !== confirmacaoSenha) {
+                    criarMensagem("As senhas não coincidem.", MensagemTipo.ERROR);
+                    return;
+                }
+            }
+
             const dados = {
                 avatar: document.getElementById("fotoUrl").value,
                 name: document.getElementById("nome").value,
@@ -40,7 +48,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 biography: document.getElementById("bio").value
             };
 
+            if (novaSenha) {
+                dados.password = novaSenha;
+            }
+
             const response = await alterarDadosUsuario(usuario.discordId, dados);
+
+            inputNovaSenha.value = '';
+            inputConfirmacaoSenha.value = '';
+
             criarMensagem("Dados atualizados com sucesso!", MensagemTipo.SUCCESS);
         });
 

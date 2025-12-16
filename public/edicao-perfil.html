@@ -54,10 +54,24 @@
                         <textarea id="bio" name="bio" rows="4" placeholder="Conte um pouco sobre você e seus gostos cinematográficos..."></textarea>
                     </div>
 
-                    <!-- Criado em -->
+                    <!-- Senha -->
+                    <div class="campos-senha">
+                        <div class="campo">
+                            <label for="nova-senha">Nova senha</label>
+                            <input id="nova-senha" type="password" name="novaSenha" autocomplete="new-password" placeholder="Deixe em branco para manter a senha atual">
+                        </div>
+
+                        <div class="campo">
+                            <label for="confirmacao-senha">Confirmar nova senha</label>
+                            <input
+                                id="confirmacao-senha" type="password" name="confirmacaoSenha" autocomplete="new-password">
+                        </div>
+                    </div>
+
+                     <!-- Criado em -->
                     <div class="campo criado-em">
                         <label>Membro desde</label>
-                        <p>14 de janeiro de 2024</p>
+                        <p id="criado-em"></p>
                     </div>
 
                     <!-- Ações -->

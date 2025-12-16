@@ -137,6 +137,18 @@ export function formatarData(dataStr) {
     return `${dia}/${mes}/${ano}`;
 }
 
+export function formatarDataExtenso(dataStr) {
+    if (!dataStr) return "";
+
+    const data = new Date(dataStr);
+
+    return data.toLocaleDateString("pt-BR", {
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+    });
+}
+
 export function ordenarUsuariosPorNome(usuarios) {
     return [...usuarios].sort((a, b) =>
         a.name.localeCompare(b.name, 'pt-BR', { sensitivity: 'base' })

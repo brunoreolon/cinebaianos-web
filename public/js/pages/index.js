@@ -49,29 +49,50 @@ function criarCardsTodos(filmes) {
 }
 
 // ====================== FILTROS "TODOS OS FILMES" ======================
-async function atualizarFilmes() {
+async function atualizarFilmes(page = 0) {
     const ordenarPor = document.querySelector('#ordenar-por')?.value;
-    const ordenarDirecao = document.querySelector('#ordenar-direcao')?.value;
+    const ordenarDirecao = document.querySelector('#ordenar-direcao')?.dataset.direction;
     const filtroUsuario = document.querySelector('#filtro-usuario')?.value;
     const buscarTitulo = document.querySelector('#buscar-titulo')?.value.trim();
+    const size = Number(document.querySelector('#filmes-size')?.value) || 20;
 
     try {
-        filmesTodos = await buscarFilmes({
+        const moviePage = await buscarFilmes({
+            page,
+            size,
             sortBy: ordenarPor || 'dateAdded',
             sortDir: ordenarDirecao || 'desc',
             discordId: filtroUsuario || null,
             title: buscarTitulo || null,
         });
 
+        filmesTodos = moviePage.movies;
         criarCardsTodos(filmesTodos);
+
+        criarPaginacao(moviePage.totalPages, page);
     } catch (err) {
         criarCardsTodos([]);
-
         if (err instanceof ApiError) {
             criarMensagem(err.detail || "Erro ao buscar filmes.", MensagemTipo.ERROR);
         } else {
             criarMensagem("Erro de conexão com o servidor.", MensagemTipo.ERROR);
         }
+    }
+}
+
+function criarPaginacao(totalPages, currentPage) {
+    const container = document.querySelector('.paginacao');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    for (let i = 0; i < totalPages; i++) {
+        const btn = document.createElement('button');
+        btn.textContent = i + 1;
+        btn.disabled = i === currentPage;
+        btn.classList.add('btn-pagina');
+        btn.onclick = () => atualizarFilmes(i);
+        container.appendChild(btn);
     }
 }
 
@@ -208,7 +229,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Eventos de filtro
         document.querySelector('#ordenar-por')?.addEventListener('change', atualizarFilmes);
-        document.querySelector('#ordenar-direcao')?.addEventListener('change', atualizarFilmes);
+
+        const containerDirecao = document.querySelector('.ordenacao-direcao');
+        const botaoDirecao = containerDirecao.querySelector('button'); // botão interno, apenas decorativo
+        const textoDirecao = containerDirecao.querySelector('#texto-direcao');
+
+        containerDirecao.addEventListener('click', () => {
+            // alterna a direção
+            const novaDirecao = botaoDirecao.dataset.direction === 'asc' ? 'desc' : 'asc';
+            botaoDirecao.dataset.direction = novaDirecao;
+            textoDirecao.textContent = novaDirecao === 'asc' ? 'A - Z' : 'Z - A';
+
+            // aplica efeito visual no container
+            containerDirecao.classList.add('ativo');
+            setTimeout(() => containerDirecao.classList.remove('ativo'), 200);
+
+            // dispara a ordenação
+            atualizarFilmes();
+        });
+
+        const selectSize = document.querySelector('#filmes-size');
+        selectSize.addEventListener('change', () => atualizarFilmes(0)); // muda tamanho, volta à página 0
+
         filtroUsuarioSelect?.addEventListener('change', atualizarFilmes);
         document.querySelector('#buscar-titulo')?.addEventListener('input', debounce(atualizarFilmes));
 

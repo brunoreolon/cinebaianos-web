@@ -250,9 +250,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const filmes = await buscarFilmes();
         const votos = await buscarTiposVotos();
 
-        criarPainelPerfilUsuario(usuario, filmes, votos);
-        criarListaVotos(usuario, filmes, votos);
-        selecionaItemLista(usuario, filmes);
+        criarPainelPerfilUsuario(usuario, filmes.movies , votos);
+        criarListaVotos(usuario, filmes.movies, votos);
+        selecionaItemLista(usuario, filmes.movies);
     } catch (err) {
         if (err instanceof ApiError) {
             criarMensagem(err.detail || "Erro ao carregar dados da aplicação.", MensagemTipo.ERROR);

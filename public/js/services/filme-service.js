@@ -13,7 +13,7 @@ export async function buscarFilmes({ page = 0, size = 100, sortBy = 'dateAdded',
     const response = await apiFetch(url);
     const data = await response.json();
 
-    return data.movies || [];
+    return data;
 }
 
 export async function buscarFilmesAguardandoAvaliacao({ page = 0, size = 100, sortBy = 'dateAdded', sortDir = 'desc', discordId, title } = {}) {
