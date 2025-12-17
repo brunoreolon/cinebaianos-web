@@ -1,5 +1,5 @@
 #painel-usuario {
-    padding: 14px 40px 20px 40px;
+    padding: 20px 40px;
 }
 
 .border img {
@@ -88,26 +88,28 @@
 }
 
 #dados-votos {
-    display: flex;
-    flex-wrap: wrap; /* Permite quebrar linha em telas pequenas */
-    gap: 15px;       /* Espaçamento entre os boxes */
-    width: 100%;     /* Garante que o container use a largura total */
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
 }
 
-#dados-votos > .box {
-    background-color: var(--cor-preto-3);
-    border-radius: 10px;
+#dados-votos .box {
+    background-color: var(--cor-roxo-3); 
     padding: 15px;
-    
-    /* O SEGREDO ESTÁ AQUI: */
-    flex: 1;          /* Faz o box crescer para ocupar o espaço disponível */
-    min-width: 120px; /* Impede que fiquem finos demais em telas pequenas */
-    
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* Centraliza o conteúdo interno do box */
-    justify-content: center;
-    text-align: center;
+    border-radius: 12px;
+    transition: transform 0.2s;
+}
+
+#dados-votos .box:hover {
+    transform: translateY(-5px); 
+}
+
+#votos-recebidos {
+    margin: 20px 0;
+    padding: 20px;
+    background-color: var(--cor-cinza-3);
+    border-radius: 15px;
 }
 
 .sem-margin {
@@ -116,12 +118,30 @@
 
 #dados-filmes {
     display: flex;
-    flex-wrap: wrap; 
-    justify-content: space-between; 
-    gap: 40px;
+    justify-content: space-around;
+    align-items: center;
+    padding: 10px 0;
+    background: transparent;
+}
+
+#dados-filmes > div {
     text-align: center;
-    margin: 0;
-    padding: 0 20px; 
+    border-left: 1px solid var(--cor-cinza-3); 
+    flex: 1;
+}
+
+#dados-filmes > div:first-child {
+    border-left: none;
+}
+
+#dados-filmes .grande {
+    font-weight: 300; 
+    color: var(--cor-branco-1);
+}
+
+#dados-filmes .grande {
+    font-weight: 300; 
+    color: var(--cor-branco-1);
 }
 
 @media(max-width: 1200px) {
