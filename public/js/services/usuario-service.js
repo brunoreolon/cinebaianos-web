@@ -43,3 +43,10 @@ export async function buscarUsuarios(incluirBot = false) {
 
     return await response.json();
 }
+
+export async function buscarStatisticasUsuario(discordId) {
+    const url = new URL(`/api/users/${discordId}/summary`, window.location.origin);
+    const response = await apiFetch(url);
+
+    return await response.json();
+}

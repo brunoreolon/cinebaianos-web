@@ -12,8 +12,19 @@ export async function buscarTiposVotos() {
  * Retorna os votos que o usuário recebeu 
  * @param {string} discordId - ID do usuário
  * */
-export async function buscarVotosRecebidosUsuario(discordId) {
-    const url = new URL(`/api/votes/users/${discordId}`, window.location.origin);
+export async function buscarStatisticasVotosRecebidosUsuario(discordId) {
+    const url = new URL(`/api/users/${discordId}/votes/received`, window.location.origin);
+    const response = await apiFetch(url);
+
+    return await response.json();
+}
+
+/** 
+ * Retorna os votos que o usuário deu 
+ * @param {string} discordId - ID do usuário
+ * */
+export async function buscarStatisticasVotosDadosUsuario(discordId) {
+    const url = new URL(`/api/users/${discordId}/votes/given`, window.location.origin);
     const response = await apiFetch(url);
 
     return await response.json();

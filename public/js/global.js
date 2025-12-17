@@ -74,7 +74,7 @@ export function criarFigure(filme, usuario = '') {
 }
 
 export function criarFooter(filme, usuario) {
-    const votos = filme.votes || []; // ← garante que sempre seja um array
+    const votos = filme.votes || [];
     const footer = criarElemento('footer', ['card-footer']);
     const divVotos = criarElemento('div', ['gap']);
     const divMeuVoto = criarElemento('div');

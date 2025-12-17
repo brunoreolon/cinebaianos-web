@@ -134,16 +134,6 @@
     border-left: none;
 }
 
-#dados-filmes .grande {
-    font-weight: 300; 
-    color: var(--cor-branco-1);
-}
-
-#dados-filmes .grande {
-    font-weight: 300; 
-    color: var(--cor-branco-1);
-}
-
 @media(max-width: 1200px) {
     #dados-filmes, #dados-votos {
         justify-content: center;
