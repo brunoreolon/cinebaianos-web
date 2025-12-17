@@ -8,10 +8,13 @@
     width: 110px;
 }
 
+.dados {
+    align-self: flex-start;
+}
+
 #dados-usuario {
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
+    align-items: flex-start;
     width: 100%;
     gap: 20px;
 }
@@ -43,26 +46,17 @@
     margin-top: 20px;
 }
 
-@media (max-width: 650px) {
-    #dados-usuario {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    #dados-usuario .image {
-        margin-right: 0;
-        margin-bottom: 12px;
-    }
-
-    #dados-usuario > div {
-        align-items: center; 
-    }
-}
-
 #separator {
     width: 100%;
     margin: 16px 0px;
     border: 1px solid var(--cor-cinza-3);
+}
+
+.bio {
+    word-break: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    max-width: 100%;
 }
 
 .membro-desde {
@@ -163,30 +157,133 @@
     margin: 0px;
 }
 
-#lista li {
+.flex.align-center {
+    margin-bottom: 10px;
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 8px 12px;       
-    cursor: pointer;        
-    user-select: none;       
-}
-
-#lista li .icone {
-    display: none;
+    justify-content: center;
+    gap: 8px;
 }
 
 #lista li span {
     pointer-events: none;    
 }
 
+#lista {
+    display: flex;
+    flex-direction: row;
+    gap: 6px;
+    margin: 0;
+    padding: 0 6px;
+    list-style: none; /* Garante que não apareça bolinhas */
+}
+
+#lista li {
+    display: flex;
+    align-items: center; /* Centraliza verticalmente o ícone e o texto */
+    justify-content: flex-start; /* No desktop, alinha à esquerda */
+    gap: 10px;
+    line-height: 1; /* Remove espaçamentos extras de linha que variam entre fontes */
+}
+
+#lista li .icone i {
+    margin: 0;
+    font-size: 20px; /* Ajuste conforme necessário para bater com o tamanho do emoji */
+}
+
+/* Itens da lista */
+/* #lista li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;       
+    cursor: pointer;        
+    user-select: none;       
+} */
+
+#lista li .texto { display: inline; }
+#lista li .icone { display: none; }
+i, .icone {
+    font-style: normal !important;
+}
+
+/* Botão toggle mobile */
+#menu-toggle {
+    display: none;
+    font-size: 24px;
+    background: var(--cor-roxo-3);
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    margin-bottom: 6px;
+}
+
 @media (max-width: 650px) {
-    #lista li .texto {
-        display: none;
+    #dados-usuario {
+        flex-direction: column;
+        align-items: center;
     }
 
-    #lista li .icone {
-        display: inline-block;
-        font-size: 22px; 
+    #dados-usuario .image {
+        margin-right: 0;
+        margin-bottom: 12px;
+    }
+
+    #dados-usuario > div {
+        align-items: center; 
+    }
+
+    .bio {
+        display: -webkit-box;
+        -webkit-line-clamp: 3; 
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    #menu-toggle {
+        display: block;
+    }
+
+    #abas {
+        border: none; 
+        width: 100%;
+    }
+
+    #lista {
+        display: none !important; 
+        flex-direction: column;
+        width: 100%;
+        gap: 8px;
+        padding: 10px;
+    }
+
+    #lista.mostrar {
+        display: flex !important;
+    }
+    
+    #lista li .icone { 
+        display: inline-block !important; 
+        font-size: 28px; 
+        padding: 5px;
+    }
+
+    #lista li {
+        justify-content: center;
+        min-height: 50px;
+    }
+}
+
+@media (max-width: 450px) {
+    #lista li .texto { 
+        display: none !important; 
+    }
+
+    #lista li .icone { 
+        display: inline-block !important; 
+        font-size: 28px; 
+        padding: 5px;
     }
 }

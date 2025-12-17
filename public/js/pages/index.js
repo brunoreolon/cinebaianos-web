@@ -228,10 +228,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         // Eventos de filtro
-        document.querySelector('#ordenar-por')?.addEventListener('change', atualizarFilmes);
+        document.querySelector('#ordenar-por')?.addEventListener('change', () => atualizarFilmes(0));
 
         const containerDirecao = document.querySelector('.ordenacao-direcao');
-        const botaoDirecao = containerDirecao.querySelector('button'); // botão interno, apenas decorativo
+        const botaoDirecao = containerDirecao.querySelector('button'); 
         const textoDirecao = containerDirecao.querySelector('#texto-direcao');
 
         containerDirecao.addEventListener('click', () => {
@@ -249,12 +249,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         const selectSize = document.querySelector('#filmes-size');
-        selectSize.addEventListener('change', () => atualizarFilmes(0)); // muda tamanho, volta à página 0
+        selectSize.addEventListener('change', () => atualizarFilmes(0)); 
 
-        filtroUsuarioSelect?.addEventListener('change', atualizarFilmes);
-        document.querySelector('#buscar-titulo')?.addEventListener('input', debounce(atualizarFilmes));
+        filtroUsuarioSelect?.addEventListener('change', () => atualizarFilmes(0));
+        document.querySelector('#buscar-titulo')?.addEventListener('input', debounce(atualizarFilmes(0)));
 
-        await atualizarFilmes(); // render inicial já aplicando filtros da API
+        await atualizarFilmes(); 
 
         document.querySelector(".adicionar")?.addEventListener('click', abrirModalNovoFilme);
     } catch (err) {

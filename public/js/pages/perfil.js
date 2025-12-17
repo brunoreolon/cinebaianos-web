@@ -58,10 +58,13 @@ function criarLinhaIconeTexto(classeIcone, texto) {
 function criarTotalAdicionado(totalFilmesAdicionados, descricao) {
     const divPai = criarElemento('div');
 
-    const divFilho = criarElemento('p', ['flex']);
+    const divFilho = criarElemento('div', ['flex', 'align-center']);
+    divFilho.style.marginTop = '5px';
+    divFilho.style.marginBottom = '10px';
+    
     const icone = criarElemento('i', ['fa-solid', 'fa-film', 'grande']);
 
-    const quantidade = criarElemento('p', ['grande', 'sem-margin'], totalFilmesAdicionados);
+    const quantidade = criarElemento('p', ['grande', 'sem-margin'], totalFilmesAdicionados.toString());
     const desc = criarElemento('p', ['fonte-secundaria', 'sem-margin'], descricao);
 
     divFilho.append(icone, quantidade);
@@ -73,10 +76,10 @@ function criarTotalAdicionado(totalFilmesAdicionados, descricao) {
 function criarTotalPorVoto(emoji, totalVotosRecebidosPorVoto, descricao) {
     const divPai = criarElemento('div');
 
-    const divFilho = criarElemento('p', ['flex']);
-    const icone = criarElemento('i', [], emoji);
+    const divFilho = criarElemento('div', ['flex', 'align-center']);
+    const icone = criarElemento('i', ['grande'], emoji);
 
-    const quantidade = criarElemento('p', ['grande', 'sem-margin'], totalVotosRecebidosPorVoto);
+    const quantidade = criarElemento('p', ['grande', 'sem-margin'], totalVotosRecebidosPorVoto.toString());
     const desc = criarElemento('p', ['fonte-secundaria', 'sem-margin'], descricao);
 
     divFilho.append(icone, quantidade);
@@ -88,9 +91,11 @@ function criarTotalPorVoto(emoji, totalVotosRecebidosPorVoto, descricao) {
 function criarTotalVotos(totalVotosRecebidos, descricao) {
     const divPai = criarElemento('div');
 
-    const divFilho = criarElemento('p', ['flex']);
-
-    const quantidade = criarElemento('p', ['grande', 'sem-margin'], totalVotosRecebidos);
+    const divFilho = criarElemento('div', ['flex', 'align-center']);
+    divFilho.style.marginTop = '5px';
+    divFilho.style.marginBottom = '10px';
+    
+    const quantidade = criarElemento('p', ['grande', 'sem-margin'], totalVotosRecebidos.toString());
     const desc = criarElemento('p', ['fonte-secundaria', 'sem-margin'], descricao);
 
     divFilho.append(quantidade);
@@ -148,6 +153,7 @@ function contarTodosVotosRecebidos(discordId, filmes) {
 
 async function criarListaVotos(usuario, filmes, votos) {
     const lista = form.lista();
+    
 
     const liAdicionados = adicionarItem(true, usuario.discordId, 0, 'Adicionados', filmes);
     liAdicionados.classList.add('ativo')
@@ -179,20 +185,25 @@ function adicionarItem(filmesUsuario, discordId, votoId, descricao, filmes, voto
     const li = criarElemento('li');
     li.dataset.valor = votoId;
 
-    let emoji = '';
-    if (!filmesUsuario && votoId > 0) {
-        const voto = votos.find(v => v.id === votoId);
-        emoji = voto ? voto.emoji : '';
-    } else if (filmesUsuario) {
-        emoji = '🎬';
+    const spanIcone = criarElemento('span', ['icone']);
+    
+    // Se for FontAwesome (Adicionados / Todos)
+    if (filmesUsuario) {
+        const i = criarElemento('i', ['fa-solid', 'fa-film']);
+        spanIcone.appendChild(i);
     } else if (votoId === -1) {
-        emoji = '🗂️';
+        const i = criarElemento('i', ['fa-solid', 'fa-layer-group']); // Exemplo de ícone FA
+        spanIcone.appendChild(i);
+    } else {
+        // Se for Emoji (Votos)
+        const voto = votos.find(v => v.id === votoId);
+        spanIcone.textContent = voto ? voto.emoji : '';
     }
 
     const spanTexto = criarElemento('span', ['texto'], descricaoCompleta);
-    const spanIcone = criarElemento('span', ['icone'], emoji);
 
-    li.append(spanTexto, spanIcone);
+    // DICA: Coloque o ícone ANTES do texto se quiser o padrão visual comum
+    li.append(spanIcone, spanTexto); 
 
     return li;
 }
@@ -201,13 +212,17 @@ function selecionaItemLista(usuario, filmes) {
     const lista = form.lista();
 
     lista.addEventListener('click', (e) => {
-        if (e.target.tagName === 'LI') {
+        const li = e.target.closest('li'); // Garante que pegamos o LI mesmo clicando no span
+        if (li) {
             lista.querySelectorAll('li').forEach(item => item.classList.remove('ativo'));
-            e.target.classList.add('ativo');
+            li.classList.add('ativo');
 
-            const valor = parseInt(e.target.dataset.valor);
+            const valor = parseInt(li.dataset.valor);
             const filmesUsuario = valor === 0;
             criarCardsFilmes(filmesUsuario, usuario, valor, filmes);
+
+            // CORREÇÃO: Fecha a lista após selecionar um item no mobile
+            lista.classList.remove('mostrar');
         }
     });
 }
@@ -260,5 +275,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             criarMensagem("Erro de conexão com o servidor.", MensagemTipo.ERROR);
         }
     }
-    
+
+    const menuToggle = document.querySelector('#menu-toggle');
+    const listaMobile = document.querySelector('#lista');
+
+    menuToggle.addEventListener('click', (e) => {
+        e.stopPropagation(); // Evita que o clique propague
+        listaMobile.classList.toggle('mostrar');
+    });
+
+    // Fecha o menu se clicar em qualquer lugar da tela (melhor experiência)
+    document.addEventListener('click', (e) => {
+        if (!listaMobile.contains(e.target) && !menuToggle.contains(e.target)) {
+            listaMobile.classList.remove('mostrar');
+        }
+    });
 });

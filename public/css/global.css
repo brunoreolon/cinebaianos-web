@@ -110,7 +110,7 @@ main section header h2 {
 
 @media(max-width: 900px) {
     #container {
-        margin: 0px 80px;
+        margin: 0px 10px;
     }
 
     .inline {
@@ -119,9 +119,9 @@ main section header h2 {
 }
 
 @media(max-width: 600px) {
-    #container {
+    /* #container {
         margin: 10px;
-    }
+    } */
 
     .inline {
         grid-template-columns: repeat(2, 1fr);

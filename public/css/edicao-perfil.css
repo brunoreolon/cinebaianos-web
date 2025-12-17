@@ -41,10 +41,23 @@
     text-decoration: none;
     gap: 4px;
     margin-top: 28px;
+    min-width: 0;
+}
+
+.campo textarea {
+    width: 100%;
+    box-sizing: border-box;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    white-space: pre-wrap;
+}
+
+.perfil-edicao {
+    overflow-x: hidden;
 }
 
 .perfil-foto-linha .campo {
-    margin-top: 0; /* não queremos margin aqui */
+    margin-top: 0; 
 }
 
 .campo label {
