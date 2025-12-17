@@ -8,6 +8,17 @@ export async function buscarTiposVotos() {
     return await response.json();
 }
 
+/** 
+ * Retorna os votos que o usuário recebeu 
+ * @param {string} discordId - ID do usuário
+ * */
+export async function buscarVotosRecebidosUsuario(discordId) {
+    const url = new URL(`/api/votes/users/${discordId}`, window.location.origin);
+    const response = await apiFetch(url);
+
+    return await response.json();
+}
+
 /**
  * Registra o voto de um usuário em um filme
  * @param {number|string} movieId - ID do filme

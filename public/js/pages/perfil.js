@@ -2,14 +2,15 @@ import { requireLogin } from '../auth.js';
 import { getQueryParam, form, criarElemento, criarFigure, formatarData } from '../global.js';
 import { getUsuarioById } from '../services/usuario-service.js';
 import { buscarFilmes } from '../services/filme-service.js';
-import { buscarTiposVotos } from '../services/voto-service.js';
+import { buscarTiposVotos, buscarVotosRecebidosUsuario } from '../services/voto-service.js';
 import { ApiError } from '../exception/api-error.js';
 import { criarMensagem } from '../components/mensagens.js';
 import { MensagemTipo } from '../components/mensagem-tipo.js';
 
 async function criarPainelPerfilUsuario(usuario, filmes, votos) {
     criarPainelDadosUsuario(usuario);
-    criarPainelInformacoes(usuario, filmes, votos);
+    criarPainelInformacoesVotosRecebidos(usuario, filmes, votos);
+    criarPainelInformacoesVotosDoUsuarioNosFilmes(usuario, filmes, votos);
 }
 
 function criarPainelDadosUsuario(usuario) {
@@ -74,7 +75,7 @@ function criarTotalAdicionado(totalFilmesAdicionados, descricao) {
 }
 
 function criarTotalPorVoto(emoji, totalVotosRecebidosPorVoto, descricao) {
-    const divPai = criarElemento('div');
+    const divPai = criarElemento('div', ['box']);
 
     const divFilho = criarElemento('div', ['flex', 'align-center']);
     const icone = criarElemento('i', ['grande'], emoji);
@@ -104,7 +105,22 @@ function criarTotalVotos(totalVotosRecebidos, descricao) {
     return divPai;
 }
 
-async function criarPainelInformacoes(usuario, filmes, votos) {
+async function criarPainelInformacoesVotosRecebidos(usuario, filmes, votos) {
+    const votosRecebidos = await buscarVotosRecebidosUsuario(usuario.discordId);
+    const divDadosVotos = form.dadosVotos();
+
+    votosRecebidos.votes.forEach(v => {
+        let total = v.totalVotes;
+        let emoji = v.type.emoji;
+        let descricao = v.type.description;
+        
+        const dados = criarTotalPorVoto(emoji, total, descricao);
+
+        divDadosVotos.appendChild(dados);
+    });
+}
+
+async function criarPainelInformacoesVotosDoUsuarioNosFilmes(usuario, filmes, votos) {
     const divDadosFilmes = form.dadosFilmes();
 
     const totalFilmesAdicionados = totalFilmesDoUsario(usuario.discordId, filmes);

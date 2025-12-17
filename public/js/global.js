@@ -174,6 +174,7 @@ export const form = {
     lista: () => document.getElementById('lista'),
     divPai: () => document.querySelector('.inline'), 
     dadosUsuario: () => document.getElementById('dados-usuario'),
+    dadosVotos: () => document.getElementById('dados-votos'),
     dadosFilmes: () => document.getElementById('dados-filmes'),
     aguardandoAvaliacao: () => document.querySelector('.aguardando-avaliacao .inline'),
     todos: () => document.querySelector('.todos .inline'),

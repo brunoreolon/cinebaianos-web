@@ -1,5 +1,5 @@
 #painel-usuario {
-    padding: 14px 40px;
+    padding: 14px 40px 20px 40px;
 }
 
 .border img {
@@ -72,6 +72,42 @@
 .flex {
     display: flex;
     align-items: center;
+    gap: 10px;
+}
+
+.icone-award {
+    color: var(--cor-ouro-1);
+    font-weight: 100;
+    font-size: 20px;
+}
+
+.titulo-votos-recebidos {
+    font-size: 16px;
+    font-weight: 100;
+    margin: 10px 0px;
+}
+
+#dados-votos {
+    display: flex;
+    flex-wrap: wrap; /* Permite quebrar linha em telas pequenas */
+    gap: 15px;       /* Espaçamento entre os boxes */
+    width: 100%;     /* Garante que o container use a largura total */
+}
+
+#dados-votos > .box {
+    background-color: var(--cor-preto-3);
+    border-radius: 10px;
+    padding: 15px;
+    
+    /* O SEGREDO ESTÁ AQUI: */
+    flex: 1;          /* Faz o box crescer para ocupar o espaço disponível */
+    min-width: 120px; /* Impede que fiquem finos demais em telas pequenas */
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centraliza o conteúdo interno do box */
+    justify-content: center;
+    text-align: center;
 }
 
 .sem-margin {
@@ -89,16 +125,18 @@
 }
 
 @media(max-width: 1200px) {
-    #dados-filmes {
+    #dados-filmes, #dados-votos {
         justify-content: center;
     }
 }
 
-#dados-filmes > div {
+#dados-filmes > div,
+#dados-votos > div {
     min-width: 120px;
 }
 
-#dados-filmes .flex {
+#dados-filmes .flex,
+#dados-votos .flex {
     flex: 0 0 auto;
     display: flex;
     align-items: center;
