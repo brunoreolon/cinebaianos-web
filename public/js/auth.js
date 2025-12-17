@@ -1,4 +1,6 @@
 import { ApiError } from './exception/api-error.js';
+import { criarMensagem } from './components/mensagens.js';
+import { MensagemTipo } from './components/mensagem-tipo.js';
 
 /* =========================
  * Constantes
@@ -176,7 +178,12 @@ export async function apiFetch(url, options = {}) {
             sessionStorage.removeItem(STORAGE_KEYS.USE_SESSION);
 
             if (err?.errorCode === 'expired_refresh_token' || err?.errorCode === 'invalid_refresh_token') {
+                sessionStorage.setItem("flashMessage", JSON.stringify({
+                    texto: "Sua sessão expirou, faça login novamente.",
+                    tipo: "ALERT"
+                }));
                 window.location.href = "./login.html";
+
                 return;
             }
 

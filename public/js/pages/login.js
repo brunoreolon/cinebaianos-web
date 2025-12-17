@@ -4,6 +4,13 @@ import { MensagemTipo } from '../components/mensagem-tipo.js';
 import { ApiError } from '../exception/api-error.js';
 
 document.addEventListener('DOMContentLoaded', () => {
+    const flash = sessionStorage.getItem("flashMessage");
+    if (flash) {
+        const { texto, tipo } = JSON.parse(flash);
+        criarMensagem(texto, MensagemTipo[tipo]);
+        sessionStorage.removeItem("flashMessage");
+    }
+
     // ====== VIEWS ======
     const loginView = document.getElementById("login-view");
     const recoverView = document.getElementById("recover-view");
