@@ -1,6 +1,6 @@
 import { votoService } from '../services/voto-service.js';
 import { filmeService } from '../services/filme-service.js';
-import { form, criarFooter } from '../global.js';
+import { form, criarFooter, ordenarVotosPorDescricao } from '../global.js';
 import { ApiError } from '../exception/api-error.js';
 import { criarMensagem } from '../components/mensagens.js';
 import { MensagemTipo } from '../components/mensagem-tipo.js';
@@ -14,7 +14,7 @@ export async function abrirModalAvaliacao(filme, usuario, atualizarTelaDetalhes 
     opcoesContainer.innerHTML = '';
 
     try {
-        const votos = await votoService.buscarTiposVotos();
+        const votos = ordenarVotosPorDescricao(await votoService.buscarTiposVotos());
 
         votos.forEach(v => {
             const li = document.createElement('li');
