@@ -187,6 +187,10 @@ export function renderizarAvaliacoesRecebidas(votos) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+    const container = document.getElementById('container');
+    const loader = document.getElementById('loader');
+    if (loader) loader.style.display = 'block';
+
     try {
         requireLogin();
 
@@ -219,6 +223,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
             criarMensagem(err.message || "Erro ao carregar detalhes do filme.", MensagemTipo.ERROR);
         }
+    } finally {
+        if (container) container.classList.remove('inativo-js');  
+        if (loader) loader.style.display = 'none';
     }
 });
 

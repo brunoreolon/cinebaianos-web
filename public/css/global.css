@@ -50,6 +50,44 @@ body {
     font-family: Arial, Helvetica, sans-serif;
 }
 
+.inativo-js {
+    display: none;
+}
+
+#loader {
+    position: fixed;           
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;             
+    align-items: center;       
+    justify-content: center;   
+    z-index: 9999;            
+}
+
+#loader .spinner {
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+#loader .spinner::after {
+    content: '';
+    display: block;
+    margin: 10px auto 0;
+    width: 30px;
+    height: 30px;
+    border: 4px solid var(--cor-cinza-3);
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
 #container {
     margin: 0px 160px;
 }

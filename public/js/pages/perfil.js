@@ -81,7 +81,7 @@ function criarCard({ descricao, quantidade, emoji = null, iconClass = null, icon
 function criarPainelInformacoesVotosRecebidos(votosRecebidos) {
     const divDadosVotos = form.dadosVotos();
 
-    votosRecebidos.votes.forEach(v => {
+    for (const v of votosRecebidos.votes) {
         let total = v.totalVotes;
         let emoji = v.type.emoji;
         let descricao = v.type.description;
@@ -89,7 +89,7 @@ function criarPainelInformacoesVotosRecebidos(votosRecebidos) {
         const dados = criarCard({ descricao: descricao, quantidade: total, emoji: emoji });
 
         divDadosVotos.appendChild(dados);
-    });
+    };
 }
 
 function criarPainelInformacoesVotosDoUsuarioNosFilmes(stats, votosStats) {
@@ -222,13 +222,22 @@ function configurarMenuMobile() {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    carregarPagina().catch(err => {
+    const container = document.getElementById('container');
+    const loader = document.getElementById('loader');
+    if (loader) loader.style.display = 'block';
+
+    try {
+        await carregarPagina();
+    } catch (err) {
         if (err instanceof ApiError) {
             criarMensagem(err.detail || "Erro ao carregar dados da aplicação.", MensagemTipo.ERROR);
         } else {
             criarMensagem("Erro de conexão com o servidor.", MensagemTipo.ERROR);
         }
-    });
+    } finally {
+        if (container) container.classList.remove('inativo-js');  
+        if (loader) loader.style.display = 'none';
+    }
 
     configurarMenuMobile();
 });

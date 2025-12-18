@@ -6,7 +6,7 @@ import { formatarData, ordenarVotosPorDescricao, ordenarUsuariosPorNome } from '
 import { abrirModalVoto } from '../../pages/admin/modal-cadastrar-voto.js';
 import { abrirModalRedefinirSenha } from '../../pages/admin/modal-redefinir-senha.js';
 import { abrirModalPermissoes } from '../../pages/admin/modal-permissoes.js';
-import { buscarUsuarios } from '../../services/usuario-service.js';
+import { buscarUsuarios, buscarStatisticasUsuario } from '../../services/usuario-service.js';
 import { buscarTiposVotos, excluirTipoVoto } from '../../services/voto-service.js';
 
 async function renderUsuarios(usuarios) {
@@ -17,7 +17,9 @@ async function renderUsuarios(usuarios) {
     tabelaUsuarios.innerHTML = "";
     tabelaBots.innerHTML = "";
 
-    usuarios.forEach(usuario => {
+    for (const usuario of usuarios) {
+        const usuarioStats = await buscarStatisticasUsuario(usuario.discordId);
+
         const tr = document.createElement("tr");
         tr.dataset.discordId = usuario.discordId;
         tr.dataset.isAdmin = usuario.admin;
@@ -64,8 +66,8 @@ async function renderUsuarios(usuarios) {
         const estatisticas = usuario.bot ? "" : `
             <td data-label="Estatísticas">
                 <div class="estatisticas">
-                    <div>0 Filmes</div>
-                    <div>0 Votos</div>
+                    <div>${usuarioStats.userStats.totalMoviesAdded} Filmes</div>
+                    <div>${usuarioStats.userStats.totalVotesGiven} Votos</div>
                 </div>
             </td>`;
 
@@ -85,7 +87,7 @@ async function renderUsuarios(usuarios) {
 
         if (usuario.bot) tabelaBots.appendChild(tr);
         else tabelaUsuarios.appendChild(tr);
-    });
+    };
 
     initModaisUsuarios(usuarioLogado);
 }
@@ -171,6 +173,10 @@ function initModaisUsuarios(usuarioLogado) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+    const container = document.getElementById('container');
+    const loader = document.getElementById('loader');
+    if (loader) loader.style.display = 'block';
+
     try {
         requireLogin();
         await requireAdmin();
@@ -203,5 +209,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
             criarMensagem(err.detail || "Erro ao carregar o painel administrativo.", MensagemTipo.ERROR);
         }
+    } finally {
+        if (container) container.classList.remove('inativo-js');  
+        if (loader) loader.style.display = 'none';
     }
 });

@@ -24,7 +24,7 @@ function criarCardsAguardandoAvaliacao(usuario, filmes) {
     divPai.innerHTML = '';
 
     if (!filmes || filmes.length === 0) {
-        const p = criarElemento('p', ['fonte-secundaria'], 'Nenhum filme aguardando avaliação.');
+        const p = criarElemento('p', ['fonte-secundaria', 'sem-filmes-ag-avaliacao'], 'Nenhum filme aguardando avaliação.');
         p.style.color = 'teal';
         divPai.appendChild(p);
         return;
@@ -152,6 +152,9 @@ async function abrirModalNovoFilme() {
 
                         const filmeAdicionado = await adicionarFilme(movie.id, usuarioLogado.discordId);
 
+                        const textoAgAvaliacao = document.querySelector('.sem-filmes-ag-avaliacao');
+                        textoAgAvaliacao?.remove();
+
                         fecharModal(modal);
 
                         criarMensagem(`Filme "${filmeAdicionado.title}" adicionado com sucesso!`, MensagemTipo.SUCCESS);
@@ -207,6 +210,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         sessionStorage.removeItem("flashMessage");
     }
 
+    const container = document.getElementById('container');
+    const loader = document.getElementById('loader');
+    if (loader) loader.style.display = 'block';
+    
     try {
         requireLogin();
 
@@ -263,5 +270,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
             criarMensagem("Erro de conexão com o servidor.", MensagemTipo.ERROR);
         }
+    } finally {
+        if (container) container.classList.remove('inativo-js');  
+        if (loader) loader.style.display = 'none';
     }
 });
