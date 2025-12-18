@@ -10,9 +10,13 @@ function getVotoDoUsuarioNoFilme(filme, usuarioId) {
     return filme.votes.find(v => v.voter.discordId === usuarioId);
 }
 
-function preencherDetalhes(filme) {
+function preencherDetalhes(filme, usuario) {
     const btnRemoverFilme = document.querySelector('.btn-remover-filme');
-    btnRemoverFilme?.addEventListener('click', async () => {
+
+    if (filme.chooser.discordId === usuario.discordId) {
+        btnRemoverFilme.classList.remove('disable');
+
+        btnRemoverFilme?.addEventListener('click', async () => {
         const confirmar = confirm('Você tem certeza que deseja remover este filme?');
         if (!confirmar) return;
 
@@ -31,7 +35,10 @@ function preencherDetalhes(filme) {
             }
         }
     });
-
+    } else {
+        btnRemoverFilme.classList.add('disable');
+    }
+    
     const poster = document.querySelector('#poster img');
     poster.src = filme.posterPath || 'assets/img/placeholder-poster.png';
     poster.alt = filme.title;
@@ -215,7 +222,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             window.history.replaceState({}, '', novaURL);
         }
 
-        preencherDetalhes(filme);
+        preencherDetalhes(filme, usuario,);
         preencherAvaliacoes(filme, usuario);
     } catch (err) {
         if (err instanceof ApiError) {

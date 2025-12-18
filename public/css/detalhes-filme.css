@@ -81,6 +81,10 @@
     gap: 8px;
 }
 
+.btn-remover-filme.disable {
+    display: none;
+}
+
 .btn-remover-filme {
     display: flex;
     align-items: center;
