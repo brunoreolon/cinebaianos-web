@@ -15,7 +15,7 @@ export function montarMenuUsuario(usuario) {
 
     const nomeUsuario = criarElemento('p', ['nome-usuario'], usuario.name);
 
-    linkAvatar.append(nomeUsuario, img);
+    linkAvatar.append(img, nomeUsuario);
     divAvatar.appendChild(linkAvatar);
     avatarContainer.appendChild(divAvatar);
 

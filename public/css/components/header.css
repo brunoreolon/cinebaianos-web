@@ -142,3 +142,25 @@
     border: 1px solid var(--cor-cinza-3);
     border-radius: 10px;
 }
+
+.links {
+    display: flex;
+    flex-direction: row;
+    gap: 50px;
+    align-items: center;
+}
+
+.btn-ranking {
+    padding: 6px 16px;
+    border-radius: 10px;
+    color: var(--cor-roxo-3);
+    border: 1px solid var(--cor-roxo-3);
+    box-shadow: 0 4px 6px oklch(var(--cor-preto-1-params) / 0.15);
+    transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-ranking:hover {
+    background: var(--cor-roxo-3);
+    color: var(--cor-branco-1);
+    cursor: pointer;
+}
