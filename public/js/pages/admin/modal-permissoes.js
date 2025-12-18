@@ -90,7 +90,7 @@ export function abrirModalPermissoes(dados, usuarioLogado) {
                     : "<i class='fa-solid fa-ban'></i> Inativo";
 
                 // Atualiza badge de admin
-                const spanAdmin = tr.querySelector('[data-label="Usuário"] .badge');
+                const spanAdmin = tr.querySelector('[data-label="Usuário"] .role .badge');
                 if (spanAdmin) {
                     if (dados.isAdmin) {
                         spanAdmin.classList.add("badge-admin");

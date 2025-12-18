@@ -68,6 +68,50 @@
     font-size: 14px;
 } 
 
+.topo-detalhes {
+    display: flex;
+    align-items: center;        
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.info-filme {
+    display: flex;
+    flex-direction: column;    
+    gap: 8px;
+}
+
+.btn-remover-filme {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 10px 14px;
+    border: none;
+    border-radius: 6px;
+
+    background-color: var(--cor-vermelho-1);
+    color: var(--cor-branco-1);
+    cursor: pointer;
+
+    white-space: nowrap;  
+    
+    box-shadow: 0 4px 6px oklch(var(--cor-preto-1-params) / 0.15);
+    transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-remover-filme:hover {
+    background-color: var(--cor-vermelho-2);
+    cursor: pointer;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px oklch(var(--cor-preto-1-params) / 0.2);
+}
+
+.btn-remover-filme:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 6px oklch(var(--cor-preto-1-params) / 0.15);
+}
+
 .parte3 {
     border: 1px solid var(--cor-cinza-3);
     border-radius: 10px;

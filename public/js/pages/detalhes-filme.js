@@ -1,5 +1,5 @@
 import { requireLogin, getUsuarioLogado } from '../auth.js';
-import { buscarFilmePorId } from '../services/filme-service.js';
+import { buscarFilmePorId, excluirFilme } from '../services/filme-service.js';
 import { abrirModalAvaliacao } from './modal-avaliar.js';
 import { getQueryParam, formatarData, isUsuarioVotouNoFilme, criarElemento, ordenarVotosPorNomeUsuario } from '../global.js';
 import { ApiError } from '../exception/api-error.js';
@@ -11,6 +11,27 @@ function getVotoDoUsuarioNoFilme(filme, usuarioId) {
 }
 
 function preencherDetalhes(filme) {
+    const btnRemoverFilme = document.querySelector('.btn-remover-filme');
+    btnRemoverFilme?.addEventListener('click', async () => {
+        const confirmar = confirm('Você tem certeza que deseja remover este filme?');
+        if (!confirmar) return;
+
+        try {
+            await excluirFilme(filme.id);
+            sessionStorage.setItem("flashMessage", JSON.stringify({
+                texto: "Filme removido com sucesso.",
+                tipo: "SUCCESS"
+            }));
+            window.location.href = "./index.html";
+        } catch (err) {
+            if (err instanceof ApiError) {
+                criarMensagem(err.detail || "Erro ao excluir filme.", MensagemTipo.ERROR);
+            } else {
+                criarMensagem(err.message || "Erro inesperado.", MensagemTipo.ERROR);
+            }
+        }
+    });
+
     const poster = document.querySelector('#poster img');
     poster.src = filme.posterPath || 'assets/img/placeholder-poster.png';
     poster.alt = filme.title;

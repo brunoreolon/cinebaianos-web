@@ -11,9 +11,8 @@ export async function buscarFilmes({ page = 0, size = 100, sortBy = 'dateAdded',
     if (title) url.searchParams.append('title', title);
 
     const response = await apiFetch(url);
-    const data = await response.json();
 
-    return data;
+    return await response.json();
 }
 
 export async function buscarFilmesAguardandoAvaliacao({ page = 0, size = 100, sortBy = 'dateAdded', sortDir = 'desc', discordId, title } = {}) {
@@ -66,4 +65,11 @@ export async function adicionarFilme(tmdbId, discordId, votoId = null) {
     });
 
     return await response.json();
+}
+
+export async function excluirFilme(id) {
+    const url = new URL(`/api/movies/${id}`, window.location.origin);
+    await apiFetch(url, { method: 'DELETE' });
+
+    return true;
 }
