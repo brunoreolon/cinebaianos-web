@@ -1,5 +1,5 @@
-import { requireLogin, getUsuarioLogado } from '../auth.js';
-import { buscarFilmePorId, excluirFilme } from '../services/filme-service.js';
+import { authService } from '../services/auth-service.js';
+import { filmeService } from '../services/filme-service.js';
 import { abrirModalAvaliacao } from './modal-avaliar.js';
 import { getQueryParam, formatarData, isUsuarioVotouNoFilme, criarElemento, ordenarVotosPorNomeUsuario } from '../global.js';
 import { ApiError } from '../exception/api-error.js';
@@ -21,7 +21,7 @@ function preencherDetalhes(filme, usuario) {
         if (!confirmar) return;
 
         try {
-            await excluirFilme(filme.id);
+            await filmeService.excluirFilme(filme.id);
             sessionStorage.setItem("flashMessage", JSON.stringify({
                 texto: "Filme removido com sucesso.",
                 tipo: "SUCCESS"
@@ -51,8 +51,7 @@ function preencherDetalhes(filme, usuario) {
     const ulGeneros = document.querySelector('.parte2 ul');
     ulGeneros.innerHTML = '';
     filme.genres.forEach(g => {
-        const li = document.createElement('li');
-        li.textContent = g.name;
+        const li = criarElemento('li', [], g.name);
         ulGeneros.appendChild(li);
     });
 
@@ -127,8 +126,7 @@ export function renderizarResumoVotos(votos) {
     const votosOrdenados = Object.values(contagem).sort((a, b) => b.qtd - a.qtd);
 
     votosOrdenados.forEach(data => {
-        const span = document.createElement('span');
-        span.textContent = `${data.emoji} ${data.qtd} ${data.descricao}`;
+        const span = criarElemento('span', [], `${data.emoji} ${data.qtd} ${data.descricao}`);
         span.style.color = data.color;
         span.style.marginRight = '15px';
         container.appendChild(span);
@@ -151,39 +149,35 @@ export function renderizarAvaliacoesRecebidas(votos) {
     }
 
     votos.forEach(v => {
-        const li = document.createElement('li');
+        const li = criarElemento('li');
 
-        const a = document.createElement('a');
+        const a = criarElemento('a', ['item-voto']);
         a.href = `./perfil.html?id=${v.voter.discordId}`;
-        a.classList.add('item-voto');
 
-        const article = document.createElement('article');
-        article.classList.add('avaliacao-feita');
-
-        // info do usuário
-        const infoUsuario = document.createElement('div');
-        infoUsuario.classList.add('info-usuario');
-
+        const article = criarElemento('article', ['avaliacao-feita']);
+        const infoUsuario = criarElemento('div', ['info-usuario']);
         const votante = v.voter;
 
-        const img = document.createElement('img');
+        const img = criarElemento('img');
         img.src = votante.avatar || './assets/img/placeholder-avatar.png';
         img.alt = `Avatar de ${votante.name}`;
 
-        const divInfo = document.createElement('div');
-        const pNome = document.createElement('p');
-        pNome.textContent = votante.name;
-        const pData = document.createElement('p');
-        pData.textContent = formatarData(v.vote.votedAt); 
+        const divInfo = criarElemento('div', ['dados-usuario']);
+        const pNome = criarElemento('p', [], votante.name);
+        const pData = criarElemento('p', [], formatarData(v.vote.votedAt));
 
         divInfo.append(pNome, pData);
         infoUsuario.append(img, divInfo);
 
         // voto
-        const divVoto = document.createElement('div');
-        const spanVoto = document.createElement('span');
-        spanVoto.textContent = v.vote.emoji + v.vote.description;
+        const divVoto = criarElemento('div');
+        const spanVoto = criarElemento('span', ['voto-usuario']);
         spanVoto.style.color = v.vote.color;
+
+        const emoji = document.createTextNode(v.vote.emoji);
+        const descVoto = criarElemento('span', ['descricao'], v.vote.description);
+
+        spanVoto.append(emoji, descVoto);
         divVoto.append(spanVoto);
 
         article.append(infoUsuario, divVoto);
@@ -199,9 +193,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (loader) loader.style.display = 'block';
 
     try {
-        requireLogin();
+        authService.requireLogin();
 
-        const usuario = await getUsuarioLogado();
+        const usuario = await authService.getUsuarioLogado();
         if (!usuario) {
             window.location.href = "./login.html";
             return;
@@ -211,7 +205,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (!filmeId) throw new Error('ID do filme não encontrado na URL');
 
-        const filme = await buscarFilmePorId(filmeId);
+        const filme = await filmeService.buscarFilmePorId(filmeId);
         if (!filme) throw new Error('Filme não encontrado');
 
         const deveAvaliar = getQueryParam('avaliar');
@@ -240,7 +234,7 @@ window.addEventListener('filmeAtualizado', async (e) => {
     try {
         const filmeAtualizado = e.detail;
 
-        const usuario = await getUsuarioLogado();
+        const usuario = await authService.getUsuarioLogado();
         if (!usuario) {
             window.location.href = "./login.html";
             return;

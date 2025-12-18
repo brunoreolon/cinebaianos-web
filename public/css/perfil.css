@@ -87,6 +87,32 @@
     margin: 10px 0px;
 }
 
+@media (max-width: 480px) {
+    #dados-filmes {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+
+@media (max-width: 360px) {
+    #dados-filmes {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media(max-width: 750px) {
+    #votos-recebidos .titulo {
+        display: block;
+    }
+
+    #dados-filmes {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 15px;
+        margin: 20px 0;
+    }
+}
+
 #dados-votos {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
@@ -117,16 +143,17 @@
 }
 
 #dados-filmes {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    padding: 10px 0;
-    background: transparent;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+}
+
+#dados-filmes > .box {
+    text-align: center;
+    padding: 12px 8px;
 }
 
 #dados-filmes > div {
     text-align: center;
-    border-left: 1px solid var(--cor-cinza-3); 
     flex: 1;
 }
 

@@ -1,8 +1,8 @@
-import { requireLogin } from '../auth.js';
+import { authService } from '../services/auth-service.js';
+import { usuarioService } from '../services/usuario-service.js';
+import { filmeService } from '../services/filme-service.js';
+import { votoService } from '../services/voto-service.js';
 import { getQueryParam, form, criarElemento, criarFigure, formatarData } from '../global.js';
-import { getUsuarioById, buscarStatisticasUsuario } from '../services/usuario-service.js';
-import { buscarFilmes } from '../services/filme-service.js';
-import { buscarStatisticasVotosRecebidosUsuario, buscarStatisticasVotosDadosUsuario } from '../services/voto-service.js';
 import { ApiError } from '../exception/api-error.js';
 import { criarMensagem } from '../components/mensagens.js';
 import { MensagemTipo } from '../components/mensagem-tipo.js';
@@ -105,7 +105,7 @@ function criarPainelInformacoesVotosDoUsuarioNosFilmes(stats, votosStats) {
         divDadosFilmes.appendChild(dados);
     });
 
-    const totalVotos = criarCard({ descricao: 'Total de Votos', quantidade: stats.userStats.totalVotesGiven });
+    const totalVotos = criarCard({ descricao: 'Total de Votos', quantidade: stats.userStats.totalVotesGiven, iconClass: ['fa-solid', 'fa-star'], iconGrande: true });
     divDadosFilmes.appendChild(totalVotos);
 }
 
@@ -113,7 +113,7 @@ function criarListaVotos(usuario, stats, votosDados, filmes) {
     const lista = form.lista();
     lista.innerHTML = '';
 
-    const liAdicionados = criarItemLista({ valor: 0, descricao: 'Adicionados', total: stats.userStats.totalMoviesAdded });
+    const liAdicionados = criarItemLista({ valor: 0, descricao: 'Adicionados', total: stats.userStats.totalMoviesAdded, iconClass: 'fa-solid fa-film' });
     liAdicionados.classList.add('ativo'); // Marca como ativo
     lista.appendChild(liAdicionados);
 
@@ -121,7 +121,7 @@ function criarListaVotos(usuario, stats, votosDados, filmes) {
         lista.appendChild(criarItemLista({ valor: v.type.id, descricao: v.type.description, total: v.totalVotes, emoji: v.type.emoji }));
     });
 
-    lista.appendChild(criarItemLista({ valor: -1, descricao: 'Todos', total: stats.userStats.totalVotesGiven }));
+    lista.appendChild(criarItemLista({ valor: -1, descricao: 'Todos', total: stats.userStats.totalVotesGiven, iconClass: 'fa-solid fa-star' }));
 
     criarCardsFilmes(true, usuario, 0, filmes);
 }
@@ -191,14 +191,14 @@ function criarCardsFilmes(filmesUsuario, usuario, votoId, filmes) {
 }
 
 async function carregarPagina() {
-    requireLogin();
+    authService.requireLogin();
 
     const discordId = getQueryParam('id');
-    const usuario = await getUsuarioById(discordId);
-    const stats = await buscarStatisticasUsuario(usuario.discordId);
-    const votosRecebidos = await buscarStatisticasVotosRecebidosUsuario(usuario.discordId);
-    const votosDados = await buscarStatisticasVotosDadosUsuario(usuario.discordId);
-    const filmes = await buscarFilmes();
+    const usuario = await usuarioService.getUsuarioById(discordId);
+    const stats = await usuarioService.buscarStatisticasUsuario(usuario.discordId);
+    const votosRecebidos = await votoService.buscarStatisticasVotosRecebidosUsuario(usuario.discordId);
+    const votosDados = await votoService.buscarStatisticasVotosDadosUsuario(usuario.discordId);
+    const filmes = await filmeService.buscarFilmes();
 
     criarPainelPerfilUsuario(usuario, stats, votosRecebidos, votosDados);
     criarListaVotos(usuario, stats, votosDados, filmes.movies);

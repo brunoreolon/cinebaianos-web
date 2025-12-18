@@ -1,5 +1,5 @@
-import { buscarTiposVotos, votar, alterarVoto } from '../services/voto-service.js';
-import { buscarFilmePorId } from '../services/filme-service.js';
+import { votoService } from '../services/voto-service.js';
+import { filmeService } from '../services/filme-service.js';
 import { form, criarFooter } from '../global.js';
 import { ApiError } from '../exception/api-error.js';
 import { criarMensagem } from '../components/mensagens.js';
@@ -14,7 +14,7 @@ export async function abrirModalAvaliacao(filme, usuario, atualizarTelaDetalhes 
     opcoesContainer.innerHTML = '';
 
     try {
-        const votos = await buscarTiposVotos();
+        const votos = await votoService.buscarTiposVotos();
 
         votos.forEach(v => {
             const li = document.createElement('li');
@@ -30,16 +30,16 @@ export async function abrirModalAvaliacao(filme, usuario, atualizarTelaDetalhes 
 
                     const usuarioVotou = filme.votes.some(v => v.voter.discordId === usuario.discordId);
                     if (usuarioVotou) {
-                        resultado = await alterarVoto(filme.id, usuario.discordId, votoId);
+                        resultado = await votoService.alterarVoto(filme.id, usuario.discordId, votoId);
                         criarMensagem(`Voto alterado para ${resultado.vote.description} no filme "${filme.title}"!`, MensagemTipo.SUCCESS);
                     } else {
-                        resultado = await votar(filme.id, usuario.discordId, votoId);
+                        resultado = await votoService.votar(filme.id, usuario.discordId, votoId);
                         criarMensagem(`Voto ${resultado.vote.description} registrado para "${filme.title}"!`, MensagemTipo.SUCCESS);
                     }
 
                     fecharModal(modal);
 
-                    const filmeAtualizado = await buscarFilmePorId(filme.id);
+                    const filmeAtualizado = await filmeService.buscarFilmePorId(filme.id);
                     filme.votes = filmeAtualizado.votes;
 
                     if (atualizarTelaDetalhes) {

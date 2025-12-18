@@ -1,6 +1,6 @@
-import { requireLogin, getUsuarioLogado } from '../auth.js';
+import { authService } from '../services/auth-service.js';
+import { usuarioService } from '../services/usuario-service.js';
 import { formatarDataExtenso } from '../global.js';
-import { alterarDadosUsuario } from '../services/usuario-service.js';
 import { ApiError } from '../exception/api-error.js';
 import { criarMensagem } from '../components/mensagens.js';
 import { MensagemTipo } from '../components/mensagem-tipo.js';
@@ -11,9 +11,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (loader) loader.style.display = 'block';
 
     try {
-        requireLogin();
+        authService.requireLogin();
 
-        const usuario = await getUsuarioLogado();
+        const usuario = await authService.getUsuarioLogado();
         if (!usuario) {
             window.location.href = "./login.html";
             return;
@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 dados.password = novaSenha;
             }
 
-            const response = await alterarDadosUsuario(usuario.discordId, dados);
+            const response = await usuarioService.alterarDadosUsuario(usuario.discordId, dados);
 
             inputNovaSenha.value = '';
             inputConfirmacaoSenha.value = '';
@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         document.querySelector('.btn-cancelar').addEventListener('click', async () => {
-            const usuario = await getUsuarioLogado();
+            const usuario = await authService.getUsuarioLogado();
             window.location.href = `perfil.html?id=${usuario.discordId}`;
         });
     } catch (err) {

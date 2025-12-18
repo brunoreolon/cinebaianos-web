@@ -1,24 +1,24 @@
-import { ApiError } from '../../exception/api-error.js';
-import { criarMensagem } from '../../components/mensagens.js';
-import { MensagemTipo } from '../../components/mensagem-tipo.js';
-import { getUsuarioLogado, requireLogin, requireAdmin } from '../../auth.js';
+import { authService } from '../../services/auth-service.js';
+import { usuarioService } from '../../services/usuario-service.js';
+import { votoService } from '../../services/voto-service.js';
 import { formatarData, ordenarVotosPorDescricao, ordenarUsuariosPorNome } from '../../global.js';
 import { abrirModalVoto } from '../../pages/admin/modal-cadastrar-voto.js';
 import { abrirModalRedefinirSenha } from '../../pages/admin/modal-redefinir-senha.js';
 import { abrirModalPermissoes } from '../../pages/admin/modal-permissoes.js';
-import { buscarUsuarios, buscarStatisticasUsuario } from '../../services/usuario-service.js';
-import { buscarTiposVotos, excluirTipoVoto } from '../../services/voto-service.js';
+import { ApiError } from '../../exception/api-error.js';
+import { criarMensagem } from '../../components/mensagens.js';
+import { MensagemTipo } from '../../components/mensagem-tipo.js';
 
 async function renderUsuarios(usuarios) {
     const tabelaUsuarios = document.querySelector("#usuarios tbody");
     const tabelaBots = document.querySelector("#bots tbody");
-    const usuarioLogado = await getUsuarioLogado();
+    const usuarioLogado = await authService.getUsuarioLogado();
 
     tabelaUsuarios.innerHTML = "";
     tabelaBots.innerHTML = "";
 
     for (const usuario of usuarios) {
-        const usuarioStats = await buscarStatisticasUsuario(usuario.discordId);
+        const usuarioStats = await usuarioService.buscarStatisticasUsuario(usuario.discordId);
 
         const tr = document.createElement("tr");
         tr.dataset.discordId = usuario.discordId;
@@ -125,7 +125,7 @@ export function renderVotos(votos) {
         div.querySelector('.btn-excluir').onclick = async () => {
             if (confirm(`Deseja realmente excluir o voto "${voto.name}"?`)) {
                 try{
-                    const excluir = await excluirTipoVoto(voto.id);
+                    const excluir = await votoService.excluirTipoVoto(voto.id);
                     criarMensagem(`Voto ${voto.description} excluido com sucesso!`, MensagemTipo.SUCCESS);
 
                     votos = votos.filter(v => v.id !== voto.id);
@@ -178,8 +178,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (loader) loader.style.display = 'block';
 
     try {
-        requireLogin();
-        await requireAdmin();
+        authService.requireLogin();
+        await authService.requireAdmin();
 
         // Tabs
         document.querySelectorAll('.btn-menu').forEach((btn, index) => {
@@ -191,8 +191,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             };
         });
 
-        const usuarios = ordenarUsuariosPorNome(await buscarUsuarios(true));
-        const votos = ordenarVotosPorDescricao(await buscarTiposVotos());
+        const usuarios = ordenarUsuariosPorNome(await usuarioService.buscarUsuarios(true));
+        const votos = ordenarVotosPorDescricao(await votoService.buscarTiposVotos());
 
         renderUsuarios(usuarios);
         renderVotos(votos);

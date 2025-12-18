@@ -1,6 +1,6 @@
-import { requireLogin, getUsuarioLogado } from '../auth.js';
-import { buscarFilmes, buscarFilmesAguardandoAvaliacao, buscarFilmesPorTitulo, adicionarFilme } from '../services/filme-service.js';
-import { buscarUsuarios } from '../services/usuario-service.js';
+import { authService } from '../services/auth-service.js';
+import { filmeService } from '../services/filme-service.js';
+import { usuarioService } from '../services/usuario-service.js';
 import { criarFigure, criarElemento, form, ordenarUsuariosPorNome } from '../global.js';
 import { ApiError } from '../exception/api-error.js';
 import { criarMensagem } from '../components/mensagens.js';
@@ -57,7 +57,7 @@ async function atualizarFilmes(page = 0) {
     const size = Number(document.querySelector('#filmes-size')?.value) || 20;
 
     try {
-        const moviePage = await buscarFilmes({
+        const moviePage = await filmeService.buscarFilmes({
             page,
             size,
             sortBy: ordenarPor || 'dateAdded',
@@ -87,11 +87,10 @@ function criarPaginacao(totalPages, currentPage) {
     container.innerHTML = '';
 
     for (let i = 0; i < totalPages; i++) {
-        const btn = document.createElement('button');
-        btn.textContent = i + 1;
+        const btn = criarElemento('button', ['btn-pagina'], i + 1);
         btn.disabled = i === currentPage;
-        btn.classList.add('btn-pagina');
         btn.onclick = () => atualizarFilmes(i);
+        
         container.appendChild(btn);
     }
 }
@@ -119,7 +118,7 @@ async function abrirModalNovoFilme() {
         if (!pesquisa) return;
 
         try {
-            const resultados = await buscarFilmesPorTitulo(pesquisa);
+            const resultados = await filmeService.buscarFilmesPorTitulo(pesquisa);
 
             dica.style.display = "none";
             containerFilmesEncontrados.style.display = "block";
@@ -150,7 +149,7 @@ async function abrirModalNovoFilme() {
                             return;
                         }
 
-                        const filmeAdicionado = await adicionarFilme(movie.id, usuarioLogado.discordId);
+                        const filmeAdicionado = await filmeService.adicionarFilme(movie.id, usuarioLogado.discordId);
 
                         const textoAgAvaliacao = document.querySelector('.sem-filmes-ag-avaliacao');
                         textoAgAvaliacao?.remove();
@@ -215,22 +214,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (loader) loader.style.display = 'block';
     
     try {
-        requireLogin();
+        authService.requireLogin();
 
-        usuarioLogado = await getUsuarioLogado();
+        usuarioLogado = await authService.getUsuarioLogado();
         if (!usuarioLogado) window.location.href = "./login.html";
 
-        const filmesAguardandoAvaliacao = await buscarFilmesAguardandoAvaliacao({ discordId: usuarioLogado.discordId });
-        const usuarios = ordenarUsuariosPorNome(await buscarUsuarios());
+        const filmesAguardandoAvaliacao = await filmeService.buscarFilmesAguardandoAvaliacao({ discordId: usuarioLogado.discordId });
+        const usuarios = ordenarUsuariosPorNome(await usuarioService.buscarUsuarios());
 
         criarCardsAguardandoAvaliacao(usuarioLogado, filmesAguardandoAvaliacao);
 
         // Popular filtro de usuários
         const filtroUsuarioSelect = document.querySelector('#filtro-usuario');
         usuarios.forEach(u => {
-            const option = document.createElement('option');
+            const option = criarElemento('option', [], u.name);
             option.value = u.discordId;
-            option.textContent = u.name;
             filtroUsuarioSelect?.appendChild(option);
         });
 

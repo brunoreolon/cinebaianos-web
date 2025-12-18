@@ -1,5 +1,5 @@
 import { montarMenuUsuario, exibirMenuUsuario } from './components/dropdown.js';
-import { getUsuarioLogado } from './auth.js';
+import { authService } from './services/auth-service.js';
 
 
 async function incluirHeader() {
@@ -10,7 +10,7 @@ async function incluirHeader() {
     const html = await resposta.text();
 
     container.innerHTML = html;
-    const usuario = await getUsuarioLogado();
+    const usuario = await authService.getUsuarioLogado();
     if (!usuario) {
         window.location.href = "./login.html";
         return;
@@ -24,7 +24,7 @@ async function incluirFooter() {
     const container = document.getElementById('footer-container');
     if (!container) return;
 
-    const resposta = await fetch('./partial/footer.html');
+    const resposta = await authService.fetch('./partial/footer.html');
     const html = await resposta.text();
 
     container.innerHTML = html;

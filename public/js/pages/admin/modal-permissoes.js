@@ -1,8 +1,8 @@
+import { adminService } from '../../services/admin-service.js';
+import { MY_DISCORD_ID } from '../../../config.js';
 import { ApiError } from '../../exception/api-error.js';
 import { criarMensagem } from '../../components/mensagens.js';
 import { MensagemTipo } from '../../components/mensagem-tipo.js';
-import { atualizarAtivacaoConta, atualizarAdmin } from '../../services/admin-service.js';
-import { MY_DISCORD_ID } from '../../../config.js';
 
 export function abrirModalPermissoes(dados, usuarioLogado) {
     const modal = document.getElementById('modal-gerenciar-permissoes');
@@ -64,11 +64,11 @@ export function abrirModalPermissoes(dados, usuarioLogado) {
             const promises = [];
 
             if (dados.isAtivo !== estadoInicial.ativo) {
-                promises.push(atualizarAtivacaoConta(dados.discordId, dados.isAtivo));
+                promises.push(adminService.atualizarAtivacaoConta(dados.discordId, dados.isAtivo));
             }
 
             if (dados.isAdmin !== estadoInicial.admin) {
-                promises.push(atualizarAdmin(dados.discordId, dados.isAdmin));
+                promises.push(adminService.atualizarAdmin(dados.discordId, dados.isAdmin));
             }
 
             if (promises.length === 0) {

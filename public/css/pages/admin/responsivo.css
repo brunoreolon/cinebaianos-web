@@ -193,6 +193,10 @@
 }
 
 @media (max-width: 300px) {
+    .secao-header h1 {
+        display: none;
+    }
+
     /* tab votos */
     .lista-votos {
         display: flex;

@@ -1,7 +1,7 @@
+import { adminService } from '../../services/admin-service.js';
 import { ApiError } from '../../exception/api-error.js';
 import { criarMensagem } from '../../components/mensagens.js';
 import { MensagemTipo } from '../../components/mensagem-tipo.js';
-import { redefinirSenha } from '../../services/admin-service.js';
 
 export function abrirModalRedefinirSenha(dados) {
     const modal = document.getElementById('modal-redefinir-senha');
@@ -26,7 +26,7 @@ export function abrirModalRedefinirSenha(dados) {
             return;
         }
         try {
-            const novaSenha = await redefinirSenha(modal.dataset.discordId, senha.value);
+            const novaSenha = await adminService.redefinirSenha(modal.dataset.discordId, senha.value);
             fecharModal(modal);
             criarMensagem(`Senha redefinida com sucesso para o usuário ${dados.nome}. Um email será enviado para o usuário contendo a nova senha`, MensagemTipo.SUCCESS);
         } catch(err) {

@@ -134,6 +134,25 @@
 }
 
 @media(max-width: 600px) {
+    #avaliacoes > div > span > span {
+        display: block;
+        margin-right: 0;
+        margin-bottom: 8px;
+    }
+
+    .voto-usuario .descricao {
+        display: none;
+    }
+
+    .topo-detalhes {
+        display: block;
+    }
+
+    .btn-remover-filme {
+        margin: 14px auto;
+        display: block;
+    }
+
     #detalhes-filme {
         flex-direction: column;
         gap: 20px;
@@ -168,8 +187,10 @@
     }
 }
 
-@media (max-width: 400px) {
-    
+@media (max-width: 350px) {
+    .dados-usuario {
+        display: none;
+    }
 }
 
 .diretor p:first-child {

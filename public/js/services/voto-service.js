@@ -1,128 +1,183 @@
-import { apiFetch } from '../auth.js';
-
-/** Retorna a lista de tipos de voto disponíveis */
-export async function buscarTiposVotos() {
-    const url = new URL(`/api/vote-types`, window.location.origin);
-    const response = await apiFetch(url);
-
-    return await response.json();
-}
-
-/** 
- * Retorna os votos que o usuário recebeu 
- * @param {string} discordId - ID do usuário
- * */
-export async function buscarStatisticasVotosRecebidosUsuario(discordId) {
-    const url = new URL(`/api/users/${discordId}/votes/received`, window.location.origin);
-    const response = await apiFetch(url);
-
-    return await response.json();
-}
-
-/** 
- * Retorna os votos que o usuário deu 
- * @param {string} discordId - ID do usuário
- * */
-export async function buscarStatisticasVotosDadosUsuario(discordId) {
-    const url = new URL(`/api/users/${discordId}/votes/given`, window.location.origin);
-    const response = await apiFetch(url);
-
-    return await response.json();
-}
+import { authService } from './auth-service.js';
 
 /**
- * Registra o voto de um usuário em um filme
- * @param {number|string} movieId - ID do filme
- * @param {string} discordId - ID do usuário
- * @param {number|string} votoId - ID do voto escolhido
+ * Serviço para gerenciamento de votos via API.
+ * Todas as chamadas usam `authService.apiFetch` para lidar com autenticação e refresh automático.
  */
-export async function votar(movieId, discordId, votoId) {
-    const corpo = {
-        voter: { discordId },
-        movie: { id: Number(movieId) },
-        vote: Number(votoId)
-    };
+export class VotoService {
 
-    const url = new URL(`/api/votes`, window.location.origin);
+    /**
+     * Retorna a lista de tipos de voto disponíveis.
+     *
+     * @returns {Promise<Array>} - Lista de tipos de voto
+     * @throws {ApiError} - Se a requisição falhar
+     */
+    async buscarTiposVotos() {
+        const url = new URL(`/api/vote-types`, window.location.origin);
+        const response = await authService.apiFetch(url);
 
-    const response = await apiFetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(corpo)
-    });
-
-    return await response.json();
-}
-
-/**
- * Altera o voto de um usuário em um filme
- * @param {number|string} movieId - ID do filme
- * @param {string} discordId - ID do usuário
- * @param {number|string} votoId - ID do voto escolhido
- */
-export async function alterarVoto(movieId, discordId, votoId) {
-    const corpo = { id: Number(votoId) };
-
-    const url = new URL(`/api/votes/users/${discordId}/movies/${movieId}`, window.location.origin);
-
-    const response = await apiFetch(url, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(corpo)
-    });
-
-    return await response.json();
-}
-
-export async function criarTipoVoto(voto) {
-    const corpo = { 
-        name: voto.name, 
-        description: voto.description, 
-        color: voto.color,
-        emoji: voto.emoji
-    };
-
-    const url = new URL(`/api/vote-types`, window.location.origin);
-
-    const response = await apiFetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(corpo)
-    });
-
-    return await response.json();
-}
-
-export async function atualizarTipoVoto(voto) {
-    const corpo = { 
-        name: voto.name, 
-        description: voto.description, 
-        color: voto.color,
-        emoji: voto.emoji
-    };
-
-    const url = new URL(`/api/vote-types/${voto.id}`, window.location.origin);
-
-    const response = await apiFetch(url, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(corpo)
-    });
-
-    return await response.json();
-}
-
-export async function excluirTipoVoto(id) {
-    const url = new URL(`/api/vote-types/${id}`, window.location.origin);
-
-    const response = await apiFetch(url, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' }
-    });
-
-    if (!response.ok) {
         return await response.json();
     }
 
-    return true;
+    /**
+     * Retorna os votos que o usuário recebeu.
+     *
+     * @param {string} discordId - ID do usuário
+     * @returns {Promise<Array>} - Lista de votos recebidos
+     * @throws {ApiError} - Se a requisição falhar
+     */
+    async buscarStatisticasVotosRecebidosUsuario(discordId) {
+        const url = new URL(`/api/users/${discordId}/votes/received`, window.location.origin);
+        const response = await authService.apiFetch(url);
+
+        return await response.json();
+    }
+
+    /**
+     * Retorna os votos que o usuário deu.
+     *
+     * @param {string} discordId - ID do usuário
+     * @returns {Promise<Array>} - Lista de votos dados
+     * @throws {ApiError} - Se a requisição falhar
+     */
+    async buscarStatisticasVotosDadosUsuario(discordId) {
+        const url = new URL(`/api/users/${discordId}/votes/given`, window.location.origin);
+        const response = await authService.apiFetch(url);
+
+        return await response.json();
+    }
+
+    /**
+     * Registra o voto de um usuário em um filme.
+     *
+     * @param {number|string} movieId - ID do filme
+     * @param {string} discordId - ID do usuário
+     * @param {number|string} votoId - ID do voto escolhido
+     * @returns {Promise<Object>} - Objeto do voto registrado
+     * @throws {ApiError} - Se a requisição falhar
+     */
+    async votar(movieId, discordId, votoId) {
+        const corpo = {
+            voter: { discordId },
+            movie: { id: Number(movieId) },
+            vote: Number(votoId)
+        };
+
+        const url = new URL(`/api/votes`, window.location.origin);
+
+        const response = await authService.apiFetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(corpo)
+        });
+
+        return await response.json();
+    }
+
+    /**
+     * Altera o voto de um usuário em um filme.
+     *
+     * @param {number|string} movieId - ID do filme
+     * @param {string} discordId - ID do usuário
+     * @param {number|string} votoId - ID do voto escolhido
+     * @returns {Promise<Object>} - Objeto do voto atualizado
+     * @throws {ApiError} - Se a requisição falhar
+     */
+    async alterarVoto(movieId, discordId, votoId) {
+        const corpo = { id: Number(votoId) };
+
+        const url = new URL(`/api/votes/users/${discordId}/movies/${movieId}`, window.location.origin);
+
+        const response = await authService.apiFetch(url, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(corpo)
+        });
+
+        return await response.json();
+    }
+
+    /**
+     * Cria um novo tipo de voto.
+     *
+     * @param {Object} voto - Dados do voto
+     * @param {string} voto.name
+     * @param {string} voto.description
+     * @param {string} voto.color
+     * @param {string} voto.emoji
+     * @returns {Promise<Object>} - Tipo de voto criado
+     * @throws {ApiError} - Se a requisição falhar
+     */
+    async criarTipoVoto(voto) {
+        const corpo = { 
+            name: voto.name, 
+            description: voto.description, 
+            color: voto.color,
+            emoji: voto.emoji
+        };
+
+        const url = new URL(`/api/vote-types`, window.location.origin);
+
+        const response = await authService.apiFetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(corpo)
+        });
+
+        return await response.json();
+    }
+
+    /**
+     * Atualiza um tipo de voto existente.
+     *
+     * @param {Object} voto - Dados do voto
+     * @param {number|string} voto.id - ID do tipo de voto
+     * @param {string} voto.name
+     * @param {string} voto.description
+     * @param {string} voto.color
+     * @param {string} voto.emoji
+     * @returns {Promise<Object>} - Tipo de voto atualizado
+     * @throws {ApiError} - Se a requisição falhar
+     */
+    async atualizarTipoVoto(voto) {
+        const corpo = { 
+            name: voto.name, 
+            description: voto.description, 
+            color: voto.color,
+            emoji: voto.emoji
+        };
+
+        const url = new URL(`/api/vote-types/${voto.id}`, window.location.origin);
+
+        const response = await authService.apiFetch(url, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(corpo)
+        });
+
+        return await response.json();
+    }
+
+    /**
+     * Exclui um tipo de voto.
+     *
+     * @param {number|string} id - ID do tipo de voto
+     * @returns {Promise<boolean|Object>} - true se sucesso, ou objeto de erro se falhar
+     */
+    async excluirTipoVoto(id) {
+        const url = new URL(`/api/vote-types/${id}`, window.location.origin);
+
+        const response = await authService.apiFetch(url, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (!response.ok) {
+            return await response.json();
+        }
+
+        return true;
+    }
 }
+
+export const votoService = new VotoService();

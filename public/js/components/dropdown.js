@@ -1,5 +1,5 @@
 import { form, criarElemento } from '../global.js';
-import { logout } from '../auth.js';
+import { authService } from '../services/auth-service.js';
 
 export function montarMenuUsuario(usuario) {
     const avatarContainer = form.avatarContainer();
@@ -57,8 +57,8 @@ export function montarMenuUsuario(usuario) {
 
     const logoutLink = menu.querySelector('#logout-link');
     logoutLink.addEventListener('click', (e) => {
-        e.preventDefault(); // previne o comportamento padrão do link
-        logout();           // função do auth.js que remove tokens e redireciona
+        e.preventDefault();
+        authService.logout();
     });
 }
 

@@ -1,4 +1,4 @@
-import { login, recuperarLogin,redefinirSenha } from '../auth.js';
+import {  authService } from '../services/auth-service.js';
 import { criarMensagem } from '../components/mensagens.js';
 import { MensagemTipo } from '../components/mensagem-tipo.js';
 import { ApiError } from '../exception/api-error.js';
@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             try {
-                await login(loginEmail.value, loginSenha.value, remember.checked);
+                await authService.login(loginEmail.value, loginSenha.value, remember.checked);
                 window.location.href = "./index.html";
             } catch (err) {
                 if (err instanceof ApiError) {
@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             try {
-                await recuperarLogin(recoverEmail.value);
+                await authService.recuperarLogin(recoverEmail.value);
                 criarMensagem("Se o email existir, enviaremos instruções para redefinir sua senha.", MensagemTipo.SUCCESS);
                 showLoginView();
             } catch (err) {
@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             try {
-                await redefinirSenha(tokenValue, password);
+                await authService.redefinirSenha(tokenValue, password);
                 criarMensagem('Senha redefinida com sucesso!', MensagemTipo.SUCCESS);
                 showLoginView();
             } catch (err) {

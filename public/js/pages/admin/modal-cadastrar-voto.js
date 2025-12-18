@@ -1,10 +1,10 @@
-import { ApiError } from '../../exception/api-error.js';
-import { criarMensagem } from '../../components/mensagens.js';
-import { MensagemTipo } from '../../components/mensagem-tipo.js';
-import { criarTipoVoto, atualizarTipoVoto } from '../../services/voto-service.js';
+import { votoService } from '../../services/voto-service.js';
 import { renderVotos } from '../../pages/admin/painel-admin.js';
 import { ordenarVotosPorDescricao } from '../../global.js';
 import { emojis } from '../../emojis.js';
+import { ApiError } from '../../exception/api-error.js';
+import { criarMensagem } from '../../components/mensagens.js';
+import { MensagemTipo } from '../../components/mensagem-tipo.js';
 
 export async function abrirModalVoto(voto = null, votos) {
     const modal = document.getElementById("modal-cadastrar-voto");
@@ -72,7 +72,7 @@ export async function abrirModalVoto(voto = null, votos) {
                 voto.color = inputCor.value;
                 voto.emoji = inputEmoji.value;
 
-                const tipoVotoAtualizado = await atualizarTipoVoto(voto);
+                const tipoVotoAtualizado = await votoService.atualizarTipoVoto(voto);
                 criarMensagem(`Voto ${voto.description} atualizado com sucesso!`, MensagemTipo.SUCCESS);
 
                 const index = votos.findIndex(v => v.id === voto.id);
@@ -87,7 +87,7 @@ export async function abrirModalVoto(voto = null, votos) {
                     active: true
                 };
                 
-                const tipoVotoNovo = await criarTipoVoto(novoVoto);
+                const tipoVotoNovo = await votoService.criarTipoVoto(novoVoto);
                 criarMensagem(`Voto ${novoVoto.description} criado com sucesso!`, MensagemTipo.SUCCESS);
 
                 votos.push(tipoVotoNovo);
