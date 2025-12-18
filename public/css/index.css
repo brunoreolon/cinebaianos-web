@@ -348,9 +348,6 @@
     transition: background 0.2s, transform 0.2s;
 }
 
-#ordenar-direcao:hover {
-    background-color: var(--cor-cinza-2);
-}
 
 #ordenar-direcao svg {
     height: 14px; 

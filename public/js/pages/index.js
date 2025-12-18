@@ -259,7 +259,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         selectSize.addEventListener('change', () => atualizarFilmes(0)); 
 
         filtroUsuarioSelect?.addEventListener('change', () => atualizarFilmes(0));
-        document.querySelector('#buscar-titulo')?.addEventListener('input', debounce(atualizarFilmes(0)));
+        const inputTitulo = document.querySelector('#buscar-titulo');
+        inputTitulo?.addEventListener('input', debounce(() => atualizarFilmes(0)));
 
         await atualizarFilmes(); 
 
