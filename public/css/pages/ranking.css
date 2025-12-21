@@ -54,12 +54,14 @@
     transition: 0.2s;
     padding: 6px 12px;
     white-space: nowrap;
+    font-size: 14px;
 }
 
 .filtro i {
     display: flex;
     align-items: center;
-    font-size: 14px;
+    font-size: 22px;
+    font-style: normal !important;
 }
 
 .filtro span {
