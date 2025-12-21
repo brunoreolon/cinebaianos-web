@@ -114,18 +114,28 @@
 #header nav ul li {
     list-style: none;
     border-radius: 8px;
-    padding: 8px 6px;
+    padding: 0;
 }
 
 #header nav ul li:not(.separator):hover {
     background-color: var(--cor-branco-2);
 }
 
-#header nav ul li a {
+/* #header nav ul li a {
     text-decoration: none;
     color: var(--cor-branco-1);
     display: flex;
     align-items: center;
+    padding: 8px 6px;
+} */
+
+#header nav ul li a {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    padding: 8px 6px; /* move o padding do li para o a */
+    box-sizing: border-box;
 }
 
 #header nav ul li:not(.separator):hover a {
