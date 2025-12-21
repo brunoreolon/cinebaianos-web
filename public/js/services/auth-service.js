@@ -106,10 +106,23 @@ export class AuthService {
      *
      * @returns {void}
      */
-    requireLogin() {
-        if (!this.isLoggedIn()) {
-            window.location.href = "./login.html";
+    // AuthService.js
+    async requireLogin() {
+        const storage = this._getStorage();
+        let token = storage.getItem(STORAGE_KEYS.ACCESS);
+        const expiry = storage.getItem(STORAGE_KEYS.EXPIRY);
+
+        if (!token || Date.now() > Number(expiry)) {
+            try {
+                token = await this.refreshToken();
+            } catch (err) {
+                console.warn("Não foi possível renovar o token:", err);
+                window.location.href = "./login.html";
+                return;
+            }
         }
+
+        return true;
     }
 
     /**
@@ -151,7 +164,25 @@ export class AuthService {
             body: JSON.stringify({ refreshToken })
         });
 
-        if (!response.ok) throw new Error("Falha ao renovar token");
+        if (!response.ok) {
+            // se o refresh token expirou ou é inválido
+            if (response.status === 401 ) {
+                storage.removeItem(STORAGE_KEYS.ACCESS);
+                storage.removeItem(STORAGE_KEYS.REFRESH);
+                storage.removeItem(STORAGE_KEYS.EXPIRY);
+                sessionStorage.removeItem(STORAGE_KEYS.USE_SESSION);
+
+                sessionStorage.setItem("flashMessage", JSON.stringify({
+                    texto: "Sua sessão expirou, faça login novamente!",
+                    tipo: "ALERT"
+                }));
+
+                window.location.href = "./login.html";
+                return; // garante que não continua
+            }
+
+            throw new Error("Falha ao renovar token");
+        }
 
         const data = await response.json();
         storage.setItem(STORAGE_KEYS.ACCESS, data.accessToken);

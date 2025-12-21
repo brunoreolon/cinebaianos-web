@@ -214,7 +214,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (loader) loader.style.display = 'block';
     
     try {
-        authService.requireLogin();
+        await authService.requireLogin();
 
         usuarioLogado = await authService.getUsuarioLogado();
         if (!usuarioLogado) window.location.href = "./login.html";
