@@ -164,6 +164,33 @@ function criarPosicaoRanking(posicaoRanking) {
     return container;
 }
 
+async function criarResumoVencedores() {
+    const containerMain = document.querySelector('.cards');
+
+    const resumoAntigo = document.querySelector('.resumo-vencedores');
+    if (resumoAntigo) resumoAntigo.remove();
+
+    const votos = await votoService.buscarTiposVotos();
+    const usuariosStatsVotosRecebidos = await votoService.buscarStatisticasVotosRecebidosUsuarios();
+
+    const resumoContainer = criarElemento('div', ['resumo-vencedores']);
+
+    votos.forEach(voto => {
+        const usuariosOrdenados = ordenarUsuariosPorVoto(usuariosStatsVotosRecebidos, voto);
+        const vencedor = usuariosOrdenados[0];
+        const totalVotos = vencedor.votes.find(v => v.type.id === voto.id)?.totalVotes ?? 0;
+
+        const itemResumo = criarElemento('div', ['resumo-item']);
+        const emoji = criarElemento('i', [], voto.emoji);
+        const texto = criarElemento('span', [], `${vencedor.user.name} (${totalVotos} votos)`);
+
+        itemResumo.append(emoji, texto);
+        resumoContainer.appendChild(itemResumo);
+    });
+
+    containerMain.prepend(resumoContainer);
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     const container = document.getElementById('container');
     const loader = document.getElementById('loader');
@@ -177,6 +204,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const votos = await votoService.buscarTiposVotos();
         criarFiltroVotos(votos, usuarioLogado);
+        criarResumoVencedores();
         criarCardRanking(votos[0], usuarioLogado);
     } catch (err) {
         if (err instanceof ApiError) {

@@ -204,6 +204,33 @@
     margin: 0px;
 }
 
+.resumo-vencedores {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 26px;
+    padding: 16px;
+    border-radius: 10px;
+    background-color: var(--cor-roxo-3);
+    color: var(--cor-branco-1);
+    font-weight: bold;
+}
+
+.resumo-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    background-color: var(--cor-roxo-2);
+}
+
+.resumo-item i {
+    font-size: 22px;
+    font-style: normal !important;
+}
+
 /* ================= RESPONSIVO ================= */
 
 @media (max-width: 768px) {
