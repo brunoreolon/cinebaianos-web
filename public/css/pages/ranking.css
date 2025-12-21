@@ -42,17 +42,33 @@
 }
 
 .filtro {
+    display: flex;
+    align-items: center;      
+    justify-content: center;  
+    gap: 6px; 
     padding: 10px 14px;
     border-radius: 10px;
     border: none;
     cursor: pointer;
     box-shadow: 0 4px 6px oklch(var(--cor-preto-1-params) / 0.15);
     transition: 0.2s;
+    padding: 6px 12px;
+    white-space: nowrap;
+}
+
+.filtro i {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+}
+
+.filtro span {
+    line-height: 1;
 }
 
 .filtro.ativo,
 .filtro:hover {
-    background: var(--cor-roxo-3);
+    /* background: var(--cor-roxo-3); */
     color: var(--cor-branco-1);
 }
 

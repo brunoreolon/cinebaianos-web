@@ -8,22 +8,36 @@ import { MensagemTipo } from '../components/mensagem-tipo.js';
 
 async function criarFiltroVotos(votos, usuarioLogado) {
     const divFiltro = document.querySelector('.filtro-ordem .filtros');
-
+    
     votos.forEach((v, index) => {
         const classes = ['filtro'];
+        if (index === 0) classes.push('ativo');
 
-        if (index === 0) {
-            classes.push('ativo');
-        }
+        const botaoVoto = criarElemento('button', classes, '');
+        
+        const icone = criarElemento('i', [], v.emoji);
+        const texto = criarElemento('span', [], v.description);
+        botaoVoto.append(icone, texto);
 
-        const botaoVoto = criarElemento('button', classes, v.description);
+        botaoVoto.style.backgroundColor = v.color;
+        botaoVoto.dataset.color = v.color; 
+
         const containerMain = document.querySelector('.cards');
+
         botaoVoto.addEventListener('click', () => {
             document.querySelectorAll('.filtro-ordem .filtro').forEach(btn => btn.classList.remove('ativo'));
             botaoVoto.classList.add('ativo');
 
             containerMain.innerHTML = '';
             criarCardRanking(v, usuarioLogado);
+        });
+
+        botaoVoto.addEventListener('mouseenter', () => {
+            botaoVoto.style.filter = 'brightness(85%)'; 
+        });
+
+        botaoVoto.addEventListener('mouseleave', () => {
+            botaoVoto.style.filter = 'brightness(100%)';
         });
 
         divFiltro.appendChild(botaoVoto);
