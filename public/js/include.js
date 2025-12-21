@@ -16,6 +16,11 @@ async function incluirHeader() {
         return;
     }
 
+    const btnRanking = document.querySelector('.btn-ranking');
+    btnRanking.addEventListener('click', () => {
+        window.location.href = './ranking.html';
+    });
+
     montarMenuUsuario(usuario);
     exibirMenuUsuario();
 }
@@ -24,7 +29,7 @@ async function incluirFooter() {
     const container = document.getElementById('footer-container');
     if (!container) return;
 
-    const resposta = await authService.fetch('./partial/footer.html');
+    const resposta = await fetch('./partial/footer.html');
     const html = await resposta.text();
 
     container.innerHTML = html;

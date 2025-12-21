@@ -31,6 +31,19 @@
     #logo-descricao > p {
         display: none;
     }
+
+    .btn-ranking .btn-text {
+        display: none;
+    }
+
+    .btn-ranking {
+        padding: 4px;
+        justify-content: center;
+    }
+
+    .links {
+        gap: 10px !important;
+    }
 }
 
 .logo a {
@@ -150,10 +163,21 @@
     align-items: center;
 }
 
+
+.btn-ranking .ranking-icone {
+    font-size: 24px;            /* tamanho do ícone */
+    line-height: 1;             /* evita que o ícone empurre o texto */
+}
+
 .btn-ranking {
+    display: inline-flex; 
     padding: 6px 16px;
+    gap: 8px; 
+    align-items: center;
+    justify-content: center;
     border-radius: 10px;
     color: var(--cor-roxo-3);
+    font-size: 14px;
     border: 1px solid var(--cor-roxo-3);
     box-shadow: 0 4px 6px oklch(var(--cor-preto-1-params) / 0.15);
     transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
@@ -163,4 +187,9 @@
     background: var(--cor-roxo-3);
     color: var(--cor-branco-1);
     cursor: pointer;
+}
+
+.btn-ranking .ranking-icone {
+    font-size: 18px;            /* tamanho do ícone */
+    line-height: 1;             /* evita que o ícone empurre o texto */
 }

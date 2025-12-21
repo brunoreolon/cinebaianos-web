@@ -73,6 +73,35 @@ export class UsuarioService {
 
         return await response.json();
     }
+
+    /**
+     * Retorna os votos que o usuário recebeu.
+     *
+     * @param {string} discordId - ID do usuário
+     * @returns {Promise<Array>} - Lista de votos recebidos
+     * @throws {ApiError} - Se a requisição falhar
+     */
+    async buscarStatisticasVotosRecebidosUsuario(discordId) {
+        const url = new URL(`/api/users/${discordId}/votes/received`, window.location.origin);
+        const response = await authService.apiFetch(url);
+
+        return await response.json();
+    }
+
+    /**
+     * Retorna os votos que o usuário deu.
+     *
+     * @param {string} discordId - ID do usuário
+     * @returns {Promise<Array>} - Lista de votos dados
+     * @throws {ApiError} - Se a requisição falhar
+     */
+    async buscarStatisticasVotosDadosUsuario(discordId) {
+        const url = new URL(`/api/users/${discordId}/votes/given`, window.location.origin);
+        const response = await authService.apiFetch(url);
+
+        return await response.json();
+    }
+
 }
 
 export const usuarioService = new UsuarioService();

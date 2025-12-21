@@ -196,8 +196,8 @@ async function carregarPagina() {
     const discordId = getQueryParam('id');
     const usuario = await usuarioService.getUsuarioById(discordId);
     const stats = await usuarioService.buscarStatisticasUsuario(usuario.discordId);
-    const votosRecebidos = await votoService.buscarStatisticasVotosRecebidosUsuario(usuario.discordId);
-    const votosDados = await votoService.buscarStatisticasVotosDadosUsuario(usuario.discordId);
+    const votosRecebidos = await usuarioService.buscarStatisticasVotosRecebidosUsuario(usuario.discordId);
+    const votosDados = await usuarioService.buscarStatisticasVotosDadosUsuario(usuario.discordId);
     const filmes = await filmeService.buscarFilmes();
 
     criarPainelPerfilUsuario(usuario, stats, votosRecebidos, votosDados);
