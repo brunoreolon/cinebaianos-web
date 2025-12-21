@@ -115,7 +115,7 @@ async function criarCardRanking(votoSelecionado, usuarioLogado) {
 
         parte1.append(posicao, containerAvatar, containerUsuarioInfo, containerInfo);
 
-        const separator = criarElemento('div', ['separator']);
+        const separator = criarElemento('div', ['separador']);
 
         const contaienerVotos = criarElemento('div', ['votos']);
         usuarioVotos.forEach(v => {
