@@ -18,6 +18,7 @@ app.get('/config.js', (req, res) => {
   res.send(`
     export const API_URL = '/api';
     export const MY_DISCORD_ID = '${process.env.MY_DISCORD_ID}';
+    export const FILME_RECENTE_DIAS = '${process.env.FILME_RECENTE_DIAS}';
   `);
 });
 

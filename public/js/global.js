@@ -1,3 +1,5 @@
+import { FILME_RECENTE_DIAS } from '../../../config.js';
+
 export function getQueryParam(param) {
     const parametros = new URLSearchParams(location.search);
     return parametros.get(param);
@@ -23,7 +25,7 @@ function foiAdicionadoRecentemente(filme) {
     const diffMs = agora - dataAdicionado;
     const diffDias = diffMs / (1000 * 60 * 60 * 24);
 
-    return diffDias <= 30;
+    return diffDias <= FILME_RECENTE_DIAS;
 }
 
 function criarBadgeFilmeRecente(filme) {
