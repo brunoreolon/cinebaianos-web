@@ -19,7 +19,7 @@ export class FilmeService {
      * @returns {Promise<Object>} - Objeto com filmes e informações de paginação
      * @throws {ApiError} - Se a requisição falhar
      */
-    async buscarFilmes({ page = 0, size = 100, sortBy = 'dateAdded', sortDir = 'desc', discordId, title } = {}) {
+    async buscarFilmes({ page = 0, size = 100, sortBy = 'dateAdded', sortDir = 'desc', discordId, voteTypeId, genreId, title } = {}) {
         const url = new URL(`/api/movies`, window.location.origin);
         url.searchParams.append('page', page);
         url.searchParams.append('size', size);
@@ -28,6 +28,8 @@ export class FilmeService {
 
         if (discordId) url.searchParams.append('chooserDiscordId', discordId);
         if (title) url.searchParams.append('title', title);
+        if (voteTypeId) url.searchParams.append('voteTypeId', voteTypeId);
+        if (genreId) url.searchParams.append('genreId', genreId);
 
         const response = await authService.apiFetch(url);
 
@@ -134,6 +136,13 @@ export class FilmeService {
         await authService.apiFetch(url, { method: 'DELETE' });
 
         return true;
+    }
+
+    async buscarGeneros() {
+        const url = new URL(`/api/genres`, window.location.origin);
+        const response = await authService.apiFetch(url);
+
+        return await response.json();
     }
 }
 

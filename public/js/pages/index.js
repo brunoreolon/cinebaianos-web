@@ -1,6 +1,7 @@
 import { authService } from '../services/auth-service.js';
 import { filmeService } from '../services/filme-service.js';
 import { usuarioService } from '../services/usuario-service.js';
+import { votoService } from '../services/voto-service.js';
 import { criarFigure, criarElemento, form, ordenarUsuariosPorNome } from '../global.js';
 import { ApiError } from '../exception/api-error.js';
 import { criarMensagem } from '../components/mensagens.js';
@@ -53,6 +54,8 @@ async function atualizarFilmes(page = 0) {
     const ordenarPor = document.querySelector('#ordenar-por')?.value;
     const ordenarDirecao = document.querySelector('#ordenar-direcao')?.dataset.direction;
     const filtroUsuario = document.querySelector('#filtro-usuario')?.value;
+    const filtroVoto = document.querySelector('#filtro-voto')?.value;
+    const filtroGenero = document.querySelector('#filtro-genero')?.value;
     const buscarTitulo = document.querySelector('#buscar-titulo')?.value.trim();
     const size = Number(document.querySelector('#filmes-size')?.value) || 20;
 
@@ -63,6 +66,8 @@ async function atualizarFilmes(page = 0) {
             sortBy: ordenarPor || 'dateAdded',
             sortDir: ordenarDirecao || 'desc',
             discordId: filtroUsuario || null,
+            voteTypeId: filtroVoto ? Number(filtroVoto) : null,
+            genreId: filtroGenero ? Number(filtroGenero) : null,
             title: buscarTitulo || null,
         });
 
@@ -221,16 +226,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const filmesAguardandoAvaliacao = await filmeService.buscarFilmesAguardandoAvaliacao({ discordId: usuarioLogado.discordId });
         const usuarios = ordenarUsuariosPorNome(await usuarioService.buscarUsuarios());
+        const votos = await votoService.buscarTiposVotos();
+        const generos = await filmeService.buscarGeneros();
 
         criarCardsAguardandoAvaliacao(usuarioLogado, filmesAguardandoAvaliacao);
-
-        // Popular filtro de usuários
-        const filtroUsuarioSelect = document.querySelector('#filtro-usuario');
-        usuarios.forEach(u => {
-            const option = criarElemento('option', [], u.name);
-            option.value = u.discordId;
-            filtroUsuarioSelect?.appendChild(option);
-        });
 
         // Eventos de filtro
         document.querySelector('#ordenar-por')?.addEventListener('change', () => atualizarFilmes(0));
@@ -253,10 +252,39 @@ document.addEventListener('DOMContentLoaded', async () => {
             atualizarFilmes();
         });
 
+        // Popular filtro de usuários
+        const filtroUsuarioSelect = document.querySelector('#filtro-usuario');
+        usuarios.forEach(u => {
+            const option = criarElemento('option', [], u.name);
+            option.value = u.discordId;
+            filtroUsuarioSelect?.appendChild(option);
+        });
+
+        filtroUsuarioSelect?.addEventListener('change', () => atualizarFilmes(0));
+
+        // Popular filtro de vots
+        const filtroVotoSelect = document.querySelector('#filtro-voto');
+        votos.forEach(v => {
+            const option = criarElemento('option', [], v.description);
+            option.value = v.id;
+            filtroVotoSelect?.appendChild(option);
+        });
+
+        filtroVotoSelect?.addEventListener('change', () => atualizarFilmes(0));
+
+        // Popular filtro de generos
+        const filtroGeneroSelect = document.querySelector('#filtro-genero');
+        generos.forEach(g => {
+            const option = criarElemento('option', [], g.name);
+            option.value = g.id;
+            filtroGeneroSelect?.appendChild(option);
+        });
+
+        filtroGeneroSelect?.addEventListener('change', () => atualizarFilmes(0));
+
         const selectSize = document.querySelector('#filmes-size');
         selectSize.addEventListener('change', () => atualizarFilmes(0)); 
 
-        filtroUsuarioSelect?.addEventListener('change', () => atualizarFilmes(0));
         const inputTitulo = document.querySelector('#buscar-titulo');
         inputTitulo?.addEventListener('input', debounce(() => atualizarFilmes(0)));
 
