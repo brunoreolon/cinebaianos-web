@@ -28,29 +28,33 @@ async function renderUsuarios(usuarios) {
 
         const conteudoUsuario = usuario.bot ? `
             <td data-label="Bot">
-                <div class="bots-info">
-                    <img src="${usuario.avatar}" alt="Avatar Bot">
-                    <div class="nome">
-                        <span>${usuario.name}</span>
+                <a href="./perfil.html?id=${usuario.discordId}" class="link-perfil">
+                    <div class="bots-info">
+                        <img src="${usuario.avatar || './assets/img/placeholder-avatar.png'}" alt="Avatar Bot">
+                        <div class="nome">
+                            <span>${usuario.name}</span>
+                        </div>
                     </div>
-                </div>
+                </a>
             </td>
         ` : `
-            <td data-label="Usuário">
-                <div class="usuarios-info">
-                    <img src="${usuario.avatar}" alt="Avatar ${usuario.name}">
-                    <div class="usuario-texto">
-                        <div class="nome-badge">
-                            <span class="nome">${usuario.name}</span>
-                            ${usuario.discordId === usuarioLogado.discordId ? '<span class="badge badge-voce">Você</span>' : ""}
-                        </div>
-                        <div class="role">
-                            <span class="badge ${usuario.admin ? "badge-admin" : ""}">
-                                ${usuario.admin ? '<i class="fa-solid fa-shield"></i> Admin' : ""}
-                            </span>
+             <td data-label="Usuário">
+                <a href="./perfil.html?id=${usuario.discordId}" class="link-perfil">
+                    <div class="usuarios-info">
+                        <img src="${usuario.avatar}" alt="Avatar ${usuario.name}">
+                        <div class="usuario-texto">
+                            <div class="nome-badge">
+                                <span class="nome">${usuario.name}</span>
+                                ${usuario.discordId === usuarioLogado.discordId ? '<span class="badge badge-voce">Você</span>' : ""}
+                            </div>
+                            <div class="role">
+                                <span class="badge ${usuario.admin ? "badge-admin" : ""}">
+                                    ${usuario.admin ? '<i class="fa-solid fa-shield"></i> Admin' : ""}
+                                </span>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </td>
         `;
         
