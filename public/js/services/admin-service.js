@@ -18,7 +18,7 @@ export class AdminService {
         const url = new URL(`/api/admin/users/${discordId}/activation`, window.location.origin);
         
         const resposta = await authService.apiFetch(url, {
-            method: "PATCH",
+            method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ active: ativo })
         });
@@ -38,7 +38,7 @@ export class AdminService {
         const url = new URL(`/api/admin/users/${discordId}/admin`, window.location.origin);
 
         const resposta = await authService.apiFetch(url, {
-            method: "PATCH",
+            method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ admin: admin })
         });
