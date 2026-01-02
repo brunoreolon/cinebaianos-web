@@ -5,6 +5,7 @@
 ![JavaScript](https://img.shields.io/badge/JavaScript-ES6-yellow)
 ![Node.js](https://img.shields.io/badge/Node.js-20-green)
 
+Este é um projeto pessoal feito para organizar, votar e ranquear os filmes que assistimos juntos.
 O **Cinebaianos Web** é a interface frontend do projeto Cinebaianos, feita em **HTML, CSS e JavaScript puro**, sem frameworks.  
 Ele se conecta à **Cinebaianos API** para exibir/cadastrar filmes, votos, rankings e perfis de usuários, utilizando um **servidor Node.js como proxy**.
 
