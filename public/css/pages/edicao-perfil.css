@@ -1,0 +1,176 @@
+.perfil-edicao {
+    max-width: 980px;
+    width: 100%;
+    margin: 0 auto; 
+    border: 1px solid var(--cor-cinza-3);
+    border-radius: 10px;
+    padding: 24px;
+    background: var(--cor-preto-3);
+}
+
+.secao-header h4,
+.secao-header p {
+    margin: 0px;
+    font-weight: 100;
+}
+
+.secao-header p {
+    color: var(--cor-branco-2);
+}
+
+.perfil-foto-linha {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 28px;
+    margin-top: 28px;
+}
+
+.perfil-foto-linha .campo {
+    flex: 1; /* ocupa todo o espaço disponível */
+}
+
+.foto-atual img {
+    border-radius: 50%;
+    width: 90px;
+}
+
+.campo {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    gap: 4px;
+    margin-top: 28px;
+    min-width: 0;
+}
+
+.campo textarea {
+    width: 100%;
+    box-sizing: border-box;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    white-space: pre-wrap;
+}
+
+.perfil-edicao {
+    overflow-x: hidden;
+}
+
+.perfil-foto-linha .campo {
+    margin-top: 0; 
+}
+
+.campo label {
+    font-weight: 100;
+    font-size: 14px;
+}
+
+.campo input {
+    height: 25px;
+    padding: 4px 12px;
+}
+
+.criado-em label,
+.criado-em p {
+    margin: 0px;
+    font-weight: 100;
+}
+
+.criado-em p {
+    color: var(--cor-branco-2);
+}
+
+.campo textarea {
+    resize: vertical;
+    padding: 8px 12px;
+}
+
+.campo textarea::placeholder {
+    font-size: 16px;
+}
+
+.campo input, 
+.campo textarea {
+    outline: none;
+    border: 1px solid var(--cor-cinza-3); 
+    border-radius: 6px;
+    background: var(--cor-preto-7);
+    color: var(--cor-branco-1); /* opcional, mas melhora muito a leitura */
+}
+
+@keyframes foco-brilhando {
+    0%   { box-shadow: 0 0 6px 2px oklch(var(--cor-roxo-2-params) / 0.5); }
+    50%  { box-shadow: 0 0 10px 3px oklch(var(--cor-roxo-2-params) / 0.8); }
+    100% { box-shadow: 0 0 6px 2px oklch(var(--cor-roxo-2-params) / 0.5); }
+}
+
+.campo input:focus,
+.campo textarea:focus {
+    border-color: var(--cor-roxo-2);
+    animation: foco-brilhando 1.4s ease-in-out infinite;
+}
+
+.perfil-botoes {
+    margin-top: 38px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 32px;
+    width: 100%;
+}
+
+.perfil-botoes button {
+    flex: 1;           
+    max-width: 100%;   
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    box-shadow: 0 4px 6px oklch(var(--cor-preto-1-params) / 0.15);
+    transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+
+.perfil-botoes button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px oklch(var(--cor-preto-1-params) / 0.2);
+}
+
+.perfil-botoes button:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 6px oklch(var(--cor-preto-1-params) / 0.15);
+}
+
+.btn-salvar {
+    background: var(--cor-roxo-3);
+    color: var(--cor-branco-1);
+    border: none;
+    transition: background 0.3s;
+}
+
+.btn-salvar:hover {
+    background: var(--cor-roxo-4);
+}
+
+@media (max-width: 600px) {
+    .perfil-foto-linha {
+        flex-direction: column; /* empilha verticalmente */
+        align-items: flex-start; /* ou center se preferir */
+    }
+
+    .perfil-foto-linha .campo {
+        width: 100%; /* ocupa toda a largura disponível */
+        margin-top: 28px; /* espaço entre imagem e input */
+    }
+
+    .foto-atual img {
+        width: 80px; /* opcional: reduzir um pouco a imagem */
+        height: 80px;
+    }
+
+    .perfil-botoes {
+        flex-direction: column;
+        gap: 16px;
+    }
+}

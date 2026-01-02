@@ -1,0 +1,117 @@
+.emoji-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.emoji-container input[type="text"] {
+    flex: 1;
+    width: auto;
+    height: 36px; 
+    padding: 4px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--cor-cinza-3);
+    background: var(--cor-preto-7);
+    color: var(--cor-branco-1);
+    box-sizing: border-box;
+}
+
+.emoji-container button {
+    height: 36px;
+    padding: 0 12px;
+    border-radius: 6px;
+    border: 1px solid var(--cor-cinza-3);
+    background: var(--cor-roxo-3);
+    color: var(--cor-branco-1);
+    cursor: pointer;
+}
+
+.emoji-voto {
+    font-size: 40px;
+}
+
+.emoji-picker {
+    position: absolute;
+    top: 100%; 
+    left: 0;
+    background: var(--cor-preto-3);
+    border: 1px solid var(--cor-branco-1);
+    padding: 10px;
+    border-radius: 10px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    max-width: 300px;
+     max-height: 300px;
+    overflow-y: auto;
+    z-index: 2000;
+}
+
+.emoji-picker span {
+    cursor: pointer;
+    font-size: 24px;
+}
+
+.emoji-picker.inativo {
+    display: none;
+}
+
+#preview {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+    padding: 16px;
+    border: 1px solid var(--cor-cinza-3);
+    border-radius: 10px;
+    background: var(--cor-preto-7);
+}
+
+.descricao {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.cadastro-acoes {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 30px;
+}
+
+.cadastro-acoes button {
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: none; 
+    font-size: 14px;
+    font-weight: 600;
+    transition: background 0.3s;
+    cursor: pointer;
+}
+
+.cadastro-acoes button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px oklch(var(--cor-preto-1-params) / 0.2);
+}
+
+.cadastro-acoes button:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 6px oklch(var(--cor-preto-1-params) / 0.15);
+}
+
+.btn-criar-voto {
+    color: var(--cor-branco-1);
+    background: var(--cor-roxo-3);
+}
+
+.btn-criar-voto:hover {
+    background: var(--cor-roxo-4);
+}
+
+#btn-emoji:hover {
+    background: var(--cor-roxo-4);
+}

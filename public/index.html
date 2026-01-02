@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8" />
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+        <link rel="stylesheet" href="./css/components/mensagem-container.css" type="text/css">
+        <link rel="stylesheet" href="./css/global.css" type="text/css">
+        <link rel="stylesheet" href="./css/components/header.css" type="text/css">
+        <link rel="stylesheet" href="./css/components/footer.css" type="text/css">
+        <link rel="stylesheet" href="./css/pages/modal-avaliar.css" type="text/css">
+        <link rel="stylesheet" href="./css/pages/index.css" type="text/css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+        <link rel="icon" type="image/png" href="assets/icons/favicon.png" />
+
+        <title>CineBaianos</title>
+    </head>
+    <body>
+        <div id="loader">
+            <div class="spinner">
+                <p>Carregando página...</p>
+            </div>
+        </div>
+
+        <div id="container" class="inativo-js">
+            <div id="header-container"></div>
+            <div class="mensagem-container"></div>
+            <div id="adicionar-filme">
+                <button type="button" class="adicionar">
+                    <i class="fa-solid fa-plus"></i>
+                    Adicionar Filme
+                </button>
+            </div>
+            <div id="modal-novo-filme" class="modal inativo">
+                <div class="modal-content">
+                    <header>
+                        <h3>Adicionar Novo Filme</h3>
+                        <span class="close">&times;</span>
+                    </header>
+                    <section class="dados">
+                        <div class="campo">
+                            <input id="titulo" type="text" placeholder="Digite o nome do filme...">
+                            <button class="btn-pesquisar">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </button>
+                        </div>
+                        <div class="dica">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <span>Busque por um filme para adicionar</span>
+                        </div>
+                        <div class="filmes-encontrados" style="display: none;">
+                            <ul></ul>
+                        </div>
+                    </section>
+                </div>
+            </div>
+            <main>
+                <!-- <section class="recentes">
+                    <header><h2>Adicionados Recentemente</h2></header>
+                    <div class="inline"></div>
+                </section> -->
+                <section class="aguardando-avaliacao">
+                    <header><h2>Aguardando Sua Avaliação</h2></header>
+                    <div class="inline"></div>
+                </section>
+                <section class="todos">
+                    <header><h2>Todos os Filmes</h2></header>
+
+                    <!-- FILTROS -->
+                    <div id="filtro">
+                        <div class="filtros-superiores">
+                            <!-- Ordenar por -->
+                            <div class="filtro-ordenar">
+                                <span>Ordenar por:</span>
+
+                                <select id="ordenar-por">
+                                    <option value="dateAdded" selected>Adicionado em</option>
+                                    <option value="title">Título</option>
+                                    <option value="chooser.name">Usuário</option>
+                                </select>
+
+                                <div class="ordenacao-direcao">
+                                    <button id="ordenar-direcao" type="button" data-direction="desc"
+                                        class="inline-flex items-center justify-center h-8 rounded-md gap-1.5 px-3
+                                            bg-slate-700 border border-slate-600 hover:bg-slate-600 text-white"
+                                        aria-label="Alternar direção da ordenação">
+                                        <!-- Ícone -->
+                                        <svg
+                                            id="icone-direcao"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            class="w-4 h-4"
+                                        >
+                                            <path d="m21 16-4 4-4-4"></path>
+                                            <path d="M17 20V4"></path>
+                                            <path d="m3 8 4-4 4 4"></path>
+                                            <path d="M7 4v16"></path>
+                                        </svg>
+                                    </button>
+                                    <span id="texto-direcao" class="texto-direcao">Z - A</span>
+                                </div>
+                            </div>
+
+                            <div class="divisao"></div>
+
+                            <!-- Filtrar por usuário -->
+                            <div class="filtro-usuario">
+                                <span>Usuário:</span>
+                                <select id="filtro-usuario">
+                                    <option value="">Todos</option>
+                                </select>
+                            </div>
+
+                            <div class="divisao"></div>
+
+                            <div class="filtro-voto">
+                                <span>Voto:</span>
+                                <select id="filtro-voto">
+                                    <option value="">Todos</option>
+                                </select>
+                            </div>
+
+                            <div class="divisao"></div>
+
+                            <div class="filtro-genero">
+                                <span>Gênero:</span>
+                                <select id="filtro-genero">
+                                    <option value="">Todos</option>
+                                </select>
+                            </div>
+
+                            <div class="divisao"></div>
+
+                            <!-- Quantidade por página -->
+                            <div class="filtro-size">
+                                <span>Itens por página:</span>
+                                <select id="filmes-size">
+                                    <option value="10">10</option>
+                                    <option value="20" selected>20</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Buscar por título -->
+                        <div class="filtro-busca">
+                            <input type="text" id="buscar-titulo" placeholder="Buscar por título" />
+                        </div>
+                    </div>
+
+                    <div class="inline"></div>
+
+                    <div class="paginacao"></div>
+                </section>
+            </main>
+            <div id="footer-container"></div>
+        </div>
+        <div id="modal-avaliar" class="modal inativo">
+            <div class="modal-content">
+                <h3>Como você avalia este filme?</h3>
+                <span>Escolha uma das opções abaixo</span>
+                <span class="close">&times;</span>
+                <div id="opcoes-voto">
+                    <ul></ul>
+                </div>
+            </div>
+        </div>
+
+        <script type="module" src="./js/include.js"></script>
+        <script type="module" src="./js/pages/index.js"></script>
+    </body>
+</html>

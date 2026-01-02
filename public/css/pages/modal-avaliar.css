@@ -1,0 +1,105 @@
+.modal.inativo {
+    pointer-events: none;
+    opacity: 0;
+}
+
+.modal.ativo {
+    pointer-events: auto;
+    opacity: 1;
+}
+
+.modal {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--cor-preto-1) / 0.6;
+    display: flex;            
+    justify-content: center;
+    align-items: center; 
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.modal-content {
+    background-color: var(--cor-preto-3);
+    padding: 24px;
+    border: 1px solid var(--cor-branco-1);
+    border-radius: 10px;
+    width: 50%;          
+    max-width: 600px;   
+    position: relative;
+    transform: translateY(-20px);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.modal-content h3 {
+    margin: 0px 0px 4px 0px;
+} 
+
+.modal-content span {
+    color: var(--cor-branco-2);
+    font-size: 14px;
+}
+
+.modal-content ul {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 0px;
+    margin: 16px 0 0 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.modal-content li {
+    list-style: none;
+    width: 100%;
+    padding: 20px;
+    border-radius: 10px;
+    box-sizing: border-box;
+    text-align: left;
+    font-size: 24px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    border: 2px solid transparent;
+}
+
+.modal-content li:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 8px 12px oklch(var(--cor-preto-1-params) / 0.25);
+    border-color: var(--cor-branco-1); 
+}
+
+.modal-content li:focus {
+    outline: none;
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 8px 12px oklch(var(--cor-preto-1-params) / 0.25);
+    border-color: var(--cor-branco-1);
+}
+
+.modal-content li:active {
+    transform: scale(0.98);
+    box-shadow: 0 4px 6px oklch(var(--cor-preto-1-params) / 0.2);
+}
+
+.modal .close {
+    position: absolute;
+    right: 10px;
+    top: 5px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.modal.inativo .modal-content {
+    transform: translateY(-20px);
+    opacity: 0;
+}
+
+.modal.ativo .modal-content {
+    transform: translateY(0);
+    opacity: 1;
+}

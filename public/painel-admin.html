@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+        <link rel="stylesheet" href="./css/components/mensagem-container.css" type="text/css">
+        <link rel="stylesheet" href="./css/global.css" type="text/css">
+        <link rel="stylesheet" href="./css/components/header.css" type="text/css">
+        <link rel="stylesheet" href="./css/components/footer.css" type="text/css">
+        <link rel="stylesheet" href="./css/pages/admin/modal-global.css" type="text/css">
+        <link rel="stylesheet" href="./css/pages/admin/modal-cadastrar-voto.css" type="text/css">
+        <link rel="stylesheet" href="./css/pages/admin/modal-redefinir-senha.css" type="text/css">
+        <link rel="stylesheet" href="./css/pages/admin/modal-permissoes.css" type="text/css">
+        <link rel="stylesheet" href="./css/pages/admin/painel-admin.css" type="text/css">
+        <link rel="stylesheet" href="./css/pages/admin/responsivo.css" type="text/css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+        <link rel="icon" type="image/png" href="assets/icons/favicon.png" />
+
+        <title>Painel de Administração</title>
+    </head>
+    <body>
+        <div id="loader">
+            <div class="spinner">
+                <p>Carregando tela...</p>
+            </div>
+        </div>
+
+        <div id="container" class="inativo-js">
+            <div id="header-container"></div>
+            <div class="mensagem-container"></div>
+
+            <main>
+                <section class="administracao">
+                    <div class="secao-header">
+                        <i class="fa-solid fa-shield fa-3x"></i>
+                        <h1>Painel de Administração</h1>
+                    </div>
+
+                    <div class="sub-menus">
+                        <button class="btn-menu ativo">Tipos de Votos</button>
+                        <button class="btn-menu">Usuários</button>
+                        <button class="btn-menu">Bots</button>
+                    </div>
+                    
+                    <div class="tab-content">
+                        <div class="tab-pane ativo" id="votos">
+                            <div class="secao-topo">
+                                <div class="secao-titulo">
+                                    <h4>Tipos de Votos</h4>
+                                    <p>Gerencie os tipos de avaliações que os usuários podem dar aos filmes</p>
+                                </div>
+                                <button class="btn-novo">
+                                    <i class="fa-solid fa-plus"></i>
+                                    Novo Tipo de Voto
+                                </button>
+                            </div>
+                            <div class="lista-votos">
+                                
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="usuarios">
+                            <div class="secao-topo">
+                                <div class="secao-titulo">
+                                    <h4>Gerenciamento de Usuários</h4>
+                                    <p>Visualize e gerencie permissões dos usuários do sistema</p>
+                                </div>
+                            </div>
+                            <div class="tabela-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Usuário</th>
+                                            <th>Email</th>
+                                            <th>Membro Desde</th>
+                                            <th>Status</th>
+                                            <th>Estatísticas</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="bots">
+                            <div class="secao-topo">
+                                <div class="secao-titulo">
+                                    <h4>Gerenciamento de Bots</h4>
+                                    <p>Visualize e gerencie permissões dos bots do sistema</p>
+                                </div>
+                            </div>
+                            <div class="tabela-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Bot</th>
+                                            <th>Email</th>
+                                            <th>Membro Desde</th>
+                                            <th>Status</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                       
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+            <div id="footer-container"></div>
+        </div>
+        <div id="modal-cadastrar-voto" class="modal inativo">
+            <div class="modal-content">
+                <header>
+                    <h2>Novo Tipo de Voto</h2>
+                    <p class="secundario">Crie um novo tipo de avaliação para os filmes</p>
+                    <span class="close">&times;</span>
+                </header>
+                <section class="dados">
+                    <div class="campo">
+                        <label>Nome *</label>
+                        <input type="text" placeholder="Ex: Amei">
+                    </div>
+                    <div class="campo">
+                        <label>Descrição *</label>
+                        <input type="text" placeholder="Ex: Esse fime foi incrível!">
+                    </div>
+                    <div class="campo campo-cor">
+                        <label>Cor *</label>
+                        <div class="campo-cor-inputs">
+                            <input type="color" value="#8b5cf6">
+                            <input type="text" placeholder="#8b5cf6">
+                        </div>
+                    </div>
+                    <div class="campo">
+                        <label>Emoji *</label>
+                        <div class="emoji-container" style="position: relative; display: flex; align-items: center; gap: 8px;">
+                            <input type="text" id="emoji-input" placeholder="Escolha um emoji" readonly>
+                            <button type="button" id="btn-emoji">😀</button>
+                            <div id="emoji-picker" class="emoji-picker inativo"></div>
+                        </div>
+                    </div>
+                    <div id="preview">
+                        <div class="emoji-voto">💩</div>
+                        <div class="descricao">
+                            <div>Nome do Voto</div>
+                            <div class="secundario">Descrição do voto</div>
+                        </div>
+                    </div>
+                </section>
+                <footer class="cadastro-acoes">
+                    <button class="btn-cancelar">Cancelar</button>
+                    <button class="btn-criar-voto"></button>
+                </footer>
+            </div>
+        </div>
+        <div id="modal-redefinir-senha" class="modal inativo">
+            <div class="modal-content">
+                <header>
+                    <h2>Redefinir Senha</h2>
+                    <p class="secundario">Defina uma nova senha para <span class="nome-usuario"></span></p>
+                    <p class="secundario">Email: <span class="email-usuario"></span></p>
+                    <span class="close">&times;</span>
+                </header>
+                <section class="dados">
+                    <div class="campo">
+                        <label>Nova Senha</label>
+                        <input id="senha" type="password" placeholder="Mínimo de 6 caracteres">
+                    </div>
+                    <p>O usuário receberá um email com a nova senha e será solicitado a alterá-la no próximo login.</p>
+                </section>
+                <footer class="redefinicao-acoes">
+                    <button class="btn-cancelar">Cancelar</button>
+                    <button class="btn-redefinir-senha">Redefinir Senha</button>
+                </footer>
+            </div>
+        </div>
+        <div id="modal-gerenciar-permissoes" class="modal inativo">
+            <div class="modal-content">
+                <header>
+                    <h2>Gerenciar Permissões</h2>
+                    <p class="secundario">Altere as permissões e status de Bruno Reolon</p>
+                    <span class="close">&times;</span>
+                </header>
+                <section class="dados">
+                    <div class="dados-usuario">
+                        <img src="" alt="Avatar">
+                        <div class="usuario-info">
+                            <div class="nome"></div>
+                            <div class="email"></div>
+                        </div>
+                    </div>
+                    <div class="permissoes">
+                        <div class="conta-ativa">
+                            <div class="info-conta">
+                                <i class="fa-regular fa-circle-check"></i>
+                                <div class="info">
+                                    <div class="titulo-permissao">Conta Ativa</div>
+                                    <div class="descricao-permissao">Usuário pode acessar o sistema</div>
+                                </div>
+                            </div>
+                            <div class="toggle">
+                                <input type="checkbox" id="toggle-ativo" />
+                                <label for="toggle-ativo"></label>
+                            </div>
+                        </div>
+                        <div class="administrador">
+                            <div class="info-administrador">
+                                <i class="fa-solid fa-shield"></i>
+                                <div class="info">
+                                    <div class="titulo-permissao">Administrador</div>
+                                    <div class="descricao-permissao">Acesso ao painel administrativo</div>
+                                </div>
+                            </div>
+                            <div class="toggle">
+                                <input type="checkbox" id="toggle-admin" />
+                                <label for="toggle-admin"></label>
+                            </div>
+                        </div>
+                        <p class="alerta-permissao">⚠️ Você não pode remover suas próprias permissões de administrador.</p>
+                    </div>
+                </section>
+                <footer class="gerenciamento-acoes">
+                    <button class="btn-concluir">Concluído</button>
+                </footer>
+            </div>
+        </div>
+        
+        <script type="module" src="./js/include.js"></script>
+        <script type="module" src="./js/pages/admin/painel-admin.js"></script>
+    </body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+        <link rel="stylesheet" href="./css/components/mensagem-container.css" type="text/css">
+        <link rel="stylesheet" href="./css/global.css" type="text/css">
+        <link rel="stylesheet" href="./css/components/header.css" type="text/css">
+        <link rel="stylesheet" href="./css/components/footer.css" type="text/css">
+        <link rel="stylesheet" href="./css/pages/modal-avaliar.css" type="text/css">
+        <link rel="stylesheet" href="./css/pages/detalhes-filme.css" type="text/css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+        <link rel="icon" type="image/png" href="assets/icons/favicon.png" />
+
+        <title>Detalhes do Filme</title>
+    </head>
+    <body>
+        <div id="loader">
+            <div class="spinner">
+                <p>Carregando página...</p>
+            </div>
+        </div>
+
+        <div id="container" class="inativo-js">
+            <div id="header-container"></div>
+            <div class="mensagem-container"></div>
+            <main>
+                <article id="detalhes-filme">
+                    <figure id="poster">
+                        <img src="" alt="Poster do filme">
+                    </figure>
+                    <section id="detalhes">
+                        <div class="topo-detalhes">
+                            <div class="info-filme">
+                                <header class="parte1">
+                                    <p></p>
+                                    <p></p>
+                                </header >
+
+                                <section class="parte2">
+                                    <ul>
+                                        <li></li>
+                                    </ul>
+                                </section>
+                            </div>
+
+                            <button class="btn-remover-filme disable">
+                                <i class="fa-solid fa-trash"></i>
+                                Remover
+                            </button>
+                        </div>
+                        
+                        <section class="parte3">
+                            <div class="diretor">
+                                <p>Diretor</p>
+                                <p></p>
+                            </div>
+                            <div class="duracao">
+                                <i class="fa-regular fa-clock"></i>
+                                <p>2h 2m</p>
+                            </div>
+                            <div class="responsavel">
+                                <i class="fa-regular fa-user"></i>
+                                Adicionado por <span class="nome"><a href="" class="link-perfil"></a></span>
+                            </div>
+                            <div class="data-adicionado">
+                                <i class="fa-regular fa-calendar"></i>
+                                <p></p>
+                            </div>
+                        </section>
+                    </section >
+                    <section id="sinopse">
+                        <h3 class="fonte-primaria">Sinopse</h3>
+                        <p class="fonte-secundaria"></p>
+                    </section >
+                    <section id="avaliacao">
+                        <section id="botao-avaliar">
+                            <button type="button"></button>
+                        </section>
+                        <section id="minha-avaliacao" class="inativo">
+                            <h3>Sua avaliação</h3>
+                            <div>
+                                <!-- <i class="fa-regular fa-thumbs-up"></i> -->
+                                <span></span>
+                            </div>
+                        </section>
+                        <section id="avaliacoes">
+                            <div>
+                                <!-- <i class="fa-regular fa-thumbs-up"></i> -->
+                                <span></span>
+                            </div>
+                        </section>
+                        <section id="avaliacoes-recebidas">
+                            <h3></h3>
+                            <ul></ul>
+                        </section>
+                    </section>
+                </article >
+                <div id="modal-avaliar" class="modal inativo">
+                    <div class="modal-content">
+                        <h3>Como você avalia este filme?</h3>
+                        <span>Escolha uma das opções abaixo</span>
+                        <span class="close">&times;</span>
+                        <div id="opcoes-voto">
+                            <ul></ul>
+                        </div>
+                    </div>
+                </div>
+            </main>
+            <div id="footer-container"></div>
+            </div>
+
+            <script type="module" src="./js/include.js"></script>
+            <script type="module" src="./js/pages/detalhes-filme.js"></script>
+    </body>
+</html>

@@ -1,0 +1,236 @@
+@media (max-width: 600px) {
+    .sub-menus {
+        flex-wrap: wrap;
+    }
+
+    .btn-menu {
+        flex: 1 1 100%;
+    }
+
+    .secao-topo {
+        flex-direction: column; 
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+
+    /* tab votos */
+    .btn-novo {
+        width: 100%;
+        text-align: center; 
+        padding: 10px;
+    }
+
+    .voto {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .detalhes-voto {
+        margin: 10px 0px 20px 0px;
+    }
+
+    .voto-acoes {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+    }
+
+
+    /* tabs usuarios e bots */
+    .tabela-container table,
+    .tabela-container thead,
+    .tabela-container tbody,
+    .tabela-container th,
+    .tabela-container td,
+    .tabela-container tr {
+        display: block;
+    }
+
+    .tabela-container thead {
+        display: none;
+    }
+
+    .tabela-container tr {
+        margin-bottom: 15px;
+        border: 1px solid #444;
+        border-radius: 10px;
+        padding: 10px;
+        background: #222;
+    }
+
+    .tabela-container td {
+        padding-left: 50%;
+        position: relative;
+        text-align: left;
+    }
+
+    .tabela-container td::before {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        content: attr(data-label);
+        font-weight: bold;
+        font-size: 12px;
+    }
+
+    .usuario-info {
+        flex-direction: row;
+        gap: 8px;
+    }
+
+    .acoes-usuario,
+    .acoes-usuario {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .btn-acoes {
+        width: 100%;
+        justify-content: center;
+    }
+
+
+    /* modal-cadastrar-voto */
+    .campo-cor-inputs {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .campo-cor-inputs input[type="text"] {
+        width: 100%;
+        height: 36px;  
+        min-height: 36px;
+    }
+
+    .campo-cor-inputs input[type="color"] {
+        height: 36px; 
+    }
+
+    .emoji-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px; 
+    }
+
+    .emoji-container input[type="text"],
+    .emoji-container button {
+        width: 100%; 
+    }
+
+    .emoji-picker {
+        top: auto; 
+        left: 0;
+        margin-top: 4px; 
+    }
+
+    #preview {
+        flex-direction: column; 
+        align-items: center; 
+        text-align: center;
+    }
+
+    #preview .emoji-voto {
+        font-size: 40px;
+        margin-bottom: 8px;
+    }
+
+    #preview .descricao {
+        width: 100%; 
+    }
+
+    .cadastro-acoes {
+        flex-direction: column; 
+        gap: 10px; 
+        width: 100%;
+    }
+
+    .cadastro-acoes button {
+        width: 100%; 
+        text-align: center;
+    }
+
+
+    /* 
+    modal-redefinir-senha 
+    modal-gerenciar-permissoes
+    */
+    .redefinicao-acoes,
+    .gerenciamento-acoes {
+        flex-direction: column;
+        gap: 10px; 
+        width: 100%;
+    }
+
+
+    /* modal-gerenciar-permissoes */
+    .dados-usuario,
+    .usuario-info {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px; 
+    }
+
+    .conta-ativa,
+    .administrador {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px; 
+    }
+
+    .info {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px; 
+    }
+
+    .info .descricao-permissao {
+        display: none; 
+    }
+}
+
+@media (max-width: 300px) {
+    .secao-header h1 {
+        display: none;
+    }
+
+    /* tab votos */
+    .lista-votos {
+        display: flex;
+        flex-direction: column;
+        gap: 12px; 
+    }
+
+    .voto {
+        flex-direction: column; 
+        align-items: center; 
+        gap: 12px;
+        width: 100%; 
+    }
+
+    .voto-conteudo {
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+    }
+
+    .detalhes-voto {
+        margin: 10px 0px 20px 0px;
+    }
+
+    .voto-acoes {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .info .titulo-permissao,
+    .info .descricao-permissao {
+        display: none; 
+    }
+}

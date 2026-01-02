@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link rel="stylesheet" href="./css/components/mensagem-container.css">
+        <link rel="stylesheet" href="./css/global.css">
+        <link rel="stylesheet" href="./css/components/header.css">
+        <link rel="stylesheet" href="./css/components/footer.css">
+        <link rel="stylesheet" href="./css/pages/ranking.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+        <link rel="icon" type="image/png" href="assets/icons/favicon.png" />
+
+        <title>Ranking</title>
+    </head>
+    <body>
+
+        <div id="loader">
+            <div class="spinner">
+                <p>Carregando página...</p>
+            </div>
+        </div>
+
+        <div id="container" class="inativo-js">
+            <div id="header-container"></div>
+            <div class="mensagem-container"></div>
+
+            <main class="main-ranking">
+
+                <div class="cabecalho">
+                    <div class="titulo">
+                        <i class="fa-solid fa-trophy fa-3x"></i>
+                        <h1>Ranking de Usuários</h1>
+                    </div>
+                    <p class="fonte-secundaria">
+                        Classificação baseada nos votos recebidos nos filmes adicionados
+                    </p>
+                </div>
+
+                <div class="filtro-ordem">
+                    <span class="fonte-secundaria">Ordenar por:</span>
+                    <div class="filtros">
+                    </div>
+                </div>
+
+                <div class="cards"></div>
+            </main>
+
+            <div id="footer-container"></div>
+        </div>
+
+        <script type="module" src="./js/include.js"></script>
+        <script type="module" src="./js/pages/ranking.js"></script>
+    </body>
+</html>

@@ -1,0 +1,305 @@
+ :root {
+    --cor-branco-1: oklch(100% 0.00011 271.152);
+    --cor-branco-2: oklch(.869 .022 252.894); /*cor da fonte secundaria*/
+    --cor-branco-3: oklch(90.67% 0.0001 271.152); /* gerenciar permissoes toogle fundo */
+    --cor-branco-4: oklch(80.78% 0.00009 271.152); /* gerenciar permissoes toogle bolinha */
+
+    --cor-cinza-1: oklch(84.522% 0.0001 271.152);
+    --cor-cinza-2: oklch(.50 .044 257.287); /* icones e textos detalhes dos filmes */ 
+    --cor-cinza-3: oklch(.446 .043 257.281); /*borda 1*/
+
+    --cor-preto-1: oklch(0% 0 0);
+    --cor-preto-1-params: 0% 0 0;
+    --cor-preto-2: oklch(0.21 0.04 264.1); /* body */
+    --cor-preto-3: oklch(.279 .041 260.031); /* background de modal e div editar perfil */
+    --cor-preto-4: oklch(.150 .042 265.755); /* background li */
+    --cor-preto-5: oklch(.120 .042 265.755); /* background li hover */
+    --cor-preto-6: oklch(0.22 0.04 264.1); /* footer */
+    --cor-preto-7: oklch(.208 .042 265.755); /* permissoes do ususario  e background de inputs*/
+
+    --cor-roxo-1: oklch(.714 .203 305.504); /* badge voce, icone header admin, botao permissoes, borda e botao card */
+    --cor-roxo-2: oklch(.627 .265 303.9); /* borda dos campos editar perfil */
+    --cor-roxo-2-params: .627 .265 303.9; /* borda dos campos editar perfil */
+    --cor-roxo-3: oklch(.558 .288 302.321); /* botoes */
+    --cor-roxo-4: oklch(.496 .265 301.924); /* botoes hover*/
+    --cor-roxo-5: oklch(.381 .176 304.987); /* generos */
+
+    --cor-vermelho-1: oklch(62.793% 0.25768 29.223); /* usuario inativo */
+    --cor-vermelho-2: oklch(54.743% 0.19327 26.418); /* badge novo*/
+
+    --cor-azul-1: oklch(0.75 0.1 250);
+    --cor-azul-2: oklch(.5 .2 250);
+
+    --cor-rosa-1: oklch(73.13% 0.22324 340.953);
+    --cor-rosa-2: oklch(.6 .3 0);
+    
+    --cor-verde-1: oklch(80.036% 0.18204 151.736);
+    --cor-verde-2: oklch(.792 .209 151.711);
+    --cor-verde-3: oklch(86.645% 0.29481 142.511);
+    --cor-verde-4: oklch(.627 .194 149.214);
+
+    --cor-ouro-1: oklch(.852 .199 91.936);
+}
+
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--cor-preto-2);
+    color: var(--cor-branco-1);
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.inativo-js {
+    display: none;
+}
+
+#loader {
+    position: fixed;           
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;             
+    align-items: center;       
+    justify-content: center;   
+    z-index: 9999;            
+}
+
+#loader .spinner {
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+#loader .spinner::after {
+    content: '';
+    display: block;
+    margin: 10px auto 0;
+    width: 30px;
+    height: 30px;
+    border: 4px solid var(--cor-cinza-3);
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+#container {
+    margin: 0px 160px;
+}
+
+.border-botton {
+    border-bottom: 1px solid var(--cor-cinza-3);
+}
+
+.flex {
+    display: flex;
+}
+
+.logo {
+    gap: 15px;
+}
+
+main section header h2 {
+    margin-top: 40px;
+}
+
+.recentes header h2 {
+    margin-top: 0px;
+}
+
+.inline {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    justify-content: flex-center;
+    gap: 24px;
+}
+
+.card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.card {
+    position: relative;
+    width: 100%;
+    margin: 0px;
+    border: 1px solid var(--cor-cinza-3);
+    border-radius: 10px;
+    overflow: hidden;
+    padding-bottom: 8px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+@media(max-width: 1200px) {
+    #container {
+        margin: 0px 100px;
+    }
+
+    .inline {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media(max-width: 900px) {
+    #container {
+        margin: 0px 10px;
+    }
+
+    .inline {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media(max-width: 600px) {
+    /* #container {
+        margin: 10px;
+    } */
+
+    .inline {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 400px) {
+    #logo-descricao {
+        display: none;
+    }
+
+    .inline {
+        grid-template-columns: 1fr;
+    }
+}
+
+.card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 15px oklch(var(--cor-preto-1-params) / 0.3);
+    border: 1px solid var(--cor-roxo-1);
+    z-index: 1;
+}
+
+.card img {
+    width: 100%;
+    aspect-ratio: 2/3;
+    object-fit: cover; 
+    display: block;
+}
+
+.destaque {
+    font-size: 18px;
+    font-weight: 500;
+    margin: 10px 0px 0px 0px;
+}
+
+.card-titulo {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1; /* máximo de 2 linhas */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.thin {
+    font-weight: 100 !important;
+    font-size: 14px;
+}
+
+.detalhes > p {
+    margin-left: 10px;
+}
+
+.ano {
+    font-weight: 100 !important;
+    margin: 4px 0px 12px 0px;
+    font-size: 16px;
+    color: var(--cor-cinza-2);
+}
+
+.link-perfil {
+    text-decoration: none;
+    color: var(--cor-branco-1);
+}
+
+.link-perfil:hover {
+    color: var(--cor-cinza-2);
+}
+
+.responsavel {
+    margin-left: 8px;
+    margin-bottom: 6px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px; 
+}
+
+.responsavel > p {
+    margin: 0;
+}
+
+.card-footer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0px 6px 0px 4px;
+    margin-top: 8px;
+}
+
+.gap {
+    display: flex;
+    gap: 6px;
+}
+
+.btn-avaliar {
+    padding: 2px 10px;
+    background: var(--cor-branco-1);
+    color: var(--cor-roxo-3);
+    border: 1px solid var(--cor-roxo-1);
+    border-radius: 6px;
+    display: block;
+    transition: 
+        background 0.3s ease,  /* transição suave do background */
+        color 0.3s ease,        /* transição suave da cor do texto */
+        transform 0.3s ease,    /* mantém o efeito de scale suave */
+        box-shadow 0.3s ease;   /* mantém sombra suave */
+}
+
+.btn-avaliar:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px oklch(var(--cor-preto-1-params) / 0.664);
+    cursor: pointer;
+    background: var(--cor-roxo-3);
+    color: var(--cor-branco-1);
+}
+
+.badge-novo {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: linear-gradient(145deg, var(--cor-vermelho-1), var(--cor-vermelho-2)); 
+    color: var(--cor-branco-1);
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    clip-path: polygon(0 0, 100% 0, 100% 70%, 50% 100%, 0 70%);
+    box-shadow: 0 4px 8px oklch(var(--cor-preto-1-params) / 0.4);
+    filter: drop-shadow(0 2px 2px oklch(var(--cor-preto-1-params) / 0.5));
+    z-index: 10;
+}
+
+.fonte-primaria {
+    font-weight: 600;
+}
+
+.fonte-secundaria {
+    color: var(--cor-branco-2);
+}

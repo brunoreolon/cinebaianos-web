@@ -1,0 +1,81 @@
+import { authService } from '../services/auth-service.js';
+import { usuarioService } from '../services/usuario-service.js';
+import { formatarDataExtenso } from '../global.js';
+import { ApiError } from '../exception/api-error.js';
+import { criarMensagem } from '../components/mensagens.js';
+import { MensagemTipo } from '../components/mensagem-tipo.js';
+
+document.addEventListener('DOMContentLoaded', async () => {
+    const container = document.getElementById('container');
+    const loader = document.getElementById('loader');
+    if (loader) loader.style.display = 'block';
+
+    try {
+        authService.requireLogin();
+
+        const usuario = await authService.getUsuarioLogado();
+        if (!usuario) {
+            window.location.href = "./login.html";
+            return;
+        }
+
+        document.getElementById("fotoUrl").value = usuario.avatar || "";
+        document.querySelector(".foto-atual img").src = usuario.avatar || "./assets/img/placeholder-avatar.png";
+        document.getElementById("nome").value = usuario.name || "";
+        document.getElementById("email").value = usuario.email || "";
+        document.getElementById("bio").value = usuario.biography || "";
+        document.getElementById("criado-em").textContent = formatarDataExtenso(usuario.joined) || "";
+
+        document.querySelector('.btn-salvar').addEventListener('click', async () => {
+            const inputNovaSenha = document.getElementById("nova-senha");
+            const inputConfirmacaoSenha = document.getElementById("confirmacao-senha");
+
+            const novaSenha = inputNovaSenha.value;
+            const confirmacaoSenha = inputConfirmacaoSenha.value;
+
+            if (novaSenha || confirmacaoSenha) {
+                if (!novaSenha || !confirmacaoSenha) {
+                    criarMensagem("Para trocar a senha, preencha os dois campos.", MensagemTipo.ERROR);
+                    return;
+                }
+
+                if (novaSenha !== confirmacaoSenha) {
+                    criarMensagem("As senhas não coincidem.", MensagemTipo.ERROR);
+                    return;
+                }
+            }
+
+            const dados = {
+                avatar: document.getElementById("fotoUrl").value,
+                name: document.getElementById("nome").value,
+                email: document.getElementById("email").value,
+                biography: document.getElementById("bio").value
+            };
+
+            if (novaSenha) {
+                dados.password = novaSenha;
+            }
+
+            const response = await usuarioService.alterarDadosUsuario(usuario.discordId, dados);
+
+            inputNovaSenha.value = '';
+            inputConfirmacaoSenha.value = '';
+
+            criarMensagem("Dados atualizados com sucesso!", MensagemTipo.SUCCESS);
+        });
+
+        document.querySelector('.btn-cancelar').addEventListener('click', async () => {
+            const usuario = await authService.getUsuarioLogado();
+            window.location.href = `perfil.html?id=${usuario.discordId}`;
+        });
+    } catch (err) {
+        if (err instanceof ApiError) {
+            criarMensagem(err.detail || "Erro ao carregar dados do usuário.", MensagemTipo.ERROR);
+        } else {
+            criarMensagem(err.message || "Erro ao carregar dados do usuário.", MensagemTipo.ERROR);
+        }
+    } finally {
+        if (container) container.classList.remove('inativo-js'); 
+        if (loader) loader.style.display = 'none';
+    }
+});
