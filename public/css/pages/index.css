@@ -405,8 +405,4 @@
         flex-direction: column;
     }
 
-    .btn-pesquisar {
-        display: none; /* esconder botão */
-    }
-    
 }
