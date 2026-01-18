@@ -123,7 +123,7 @@ async function abrirModalNovoFilme() {
         if (!pesquisa) return;
 
         try {
-            const resultados = await filmeService.buscarFilmesPorTitulo(pesquisa);
+            const resultados = await filmeService.buscarFilmesComDetalhesPorTitulo(pesquisa);
 
             dica.style.display = "none";
             containerFilmesEncontrados.style.display = "block";
