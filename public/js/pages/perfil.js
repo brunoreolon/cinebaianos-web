@@ -109,7 +109,7 @@ function criarPainelInformacoesVotosDoUsuarioNosFilmes(stats, votosStats) {
     divDadosFilmes.appendChild(totalVotos);
 }
 
-function criarListaVotos(usuario, stats, votosDados, filmes) {
+function criarListaVotos(usuarioPerfil, usuarioLogado, stats, votosDados, filmes) {
     const lista = form.lista();
     lista.innerHTML = '';
 
@@ -123,7 +123,7 @@ function criarListaVotos(usuario, stats, votosDados, filmes) {
 
     lista.appendChild(criarItemLista({ valor: -1, descricao: 'Todos', total: stats.userStats.totalVotesGiven, iconClass: 'fa-solid fa-star' }));
 
-    criarCardsFilmes(true, usuario, 0, filmes);
+    criarCardsFilmes(true, usuarioPerfil, usuarioLogado, 0, filmes);
 }
 
 function criarItemLista({ valor, descricao, total, emoji = null, iconClass = null }) {
@@ -143,7 +143,7 @@ function criarItemLista({ valor, descricao, total, emoji = null, iconClass = nul
     return li;
 }
 
-function selecionaItemLista(usuario, filmes) {
+function selecionaItemLista(usuarioPerfil, usuarioLogado, filmes) {
     const lista = form.lista();
 
     lista.addEventListener('click', (e) => {
@@ -154,7 +154,7 @@ function selecionaItemLista(usuario, filmes) {
 
             const valor = parseInt(li.dataset.valor);
             const filmesUsuario = valor === 0;
-            criarCardsFilmes(filmesUsuario, usuario, valor, filmes);
+            criarCardsFilmes(filmesUsuario, usuarioPerfil, usuarioLogado, valor, filmes);
 
             lista.classList.remove('mostrar');
         }
@@ -171,13 +171,13 @@ function filtrarFilmes(filmes, usuario, votoId, filmesUsuario) {
     });
 }
 
-function criarCardsFilmes(filmesUsuario, usuario, votoId, filmes) {
+function criarCardsFilmes(filmesUsuario, usuarioPerfil, usuarioLogado, votoId, filmes) {
     const container = form.divPai();
 
     container.classList.remove('borda-padrao', 'mensagem');
     container.innerHTML = '';
 
-    const filmesFiltrados = filtrarFilmes(filmes, usuario, votoId, filmesUsuario);
+    const filmesFiltrados = filtrarFilmes(filmes, usuarioPerfil, votoId, filmesUsuario);
 
     if (filmesFiltrados.length === 0) {
         container.classList.add('borda-padrao', 'mensagem');
@@ -186,7 +186,7 @@ function criarCardsFilmes(filmesUsuario, usuario, votoId, filmes) {
     }
 
     const fragment = document.createDocumentFragment();
-    filmesFiltrados.forEach(f => fragment.appendChild(criarFigure(f, usuario)));
+    filmesFiltrados.forEach(f => fragment.appendChild(criarFigure(f, usuarioLogado)));
     container.appendChild(fragment);
 }
 
@@ -194,15 +194,16 @@ async function carregarPagina() {
     authService.requireLogin();
 
     const discordId = getQueryParam('id');
-    const usuario = await usuarioService.getUsuarioById(discordId);
-    const stats = await usuarioService.buscarStatisticasUsuario(usuario.discordId);
-    const votosRecebidos = await usuarioService.buscarStatisticasVotosRecebidosUsuario(usuario.discordId);
-    const votosDados = await usuarioService.buscarStatisticasVotosDadosUsuario(usuario.discordId);
+    const usuarioPerfil = await usuarioService.getUsuarioById(discordId);
+    const usuariologado = await authService.getUsuarioLogado();
+    const stats = await usuarioService.buscarStatisticasUsuario(usuarioPerfil.discordId);
+    const votosRecebidos = await usuarioService.buscarStatisticasVotosRecebidosUsuario(usuarioPerfil.discordId);
+    const votosDados = await usuarioService.buscarStatisticasVotosDadosUsuario(usuarioPerfil.discordId);
     const filmes = await filmeService.buscarFilmes();
 
-    criarPainelPerfilUsuario(usuario, stats, votosRecebidos, votosDados);
-    criarListaVotos(usuario, stats, votosDados, filmes.movies);
-    selecionaItemLista(usuario, filmes.movies);
+    criarPainelPerfilUsuario(usuarioPerfil, stats, votosRecebidos, votosDados);
+    criarListaVotos(usuarioPerfil, usuariologado, stats, votosDados, filmes.movies);
+    selecionaItemLista(usuarioPerfil, usuariologado, filmes.movies);
 }
 
 function configurarMenuMobile() {
