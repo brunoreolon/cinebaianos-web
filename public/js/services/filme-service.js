@@ -95,6 +95,21 @@ export class FilmeService {
     }
 
     /**
+     * Busca filmes com detalhes pelo título na TMDB.
+     *
+     * @param {string} titulo - Título do filme
+     * @returns {Promise<Object>} - Resultado da busca na TMDB
+     * @throws {ApiError} - Se a requisição falhar
+     */
+    async buscarFilmesComDetalhesPorTitulo(titulo) {
+        const url = new URL(`/api/tmdb/search/movies-details`, window.location.origin);
+        url.searchParams.append('title', titulo);
+
+        const response = await authService.apiFetch(url);
+        return await response.json();
+    }
+
+    /**
      * Adiciona um filme ao sistema.
      *
      * @param {number|string} tmdbId - ID do filme na TMDB
