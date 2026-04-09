@@ -61,7 +61,7 @@ function preencherDetalhes(filme, usuario) {
     });
 
     // Parte3: Diretor, duração, usuário e data
-    document.querySelector('.diretor p:last-child').textContent = filme.director || 'Peter Jackson';
+    document.querySelector('.diretor .nome-diretor').textContent = filme.director || 'Peter Jackson';
     document.querySelector('.duracao p').textContent = filme.duration || '2 horas';
     const linkPerfil = document.querySelector('.responsavel .link-perfil');
     linkPerfil.textContent = filme.chooser.name;
@@ -88,7 +88,7 @@ export function atualizarBotaoEMinhaAvaliacao(filme, usuario, botao, minhaAvalia
     const usuarioVotou = isUsuarioVotouNoFilme(votosDeduplicados, usuario.discordId);
 
     if (usuarioVotou) {
-        botao.textContent = 'Alterar Avaliação';
+        botao.innerHTML = '<i class="fa-solid fa-pen"></i><span>Alterar avaliação</span>';
         minhaAvaliacao.style.display = 'block';
 
         const voto = getVotoDoUsuarioNoFilme(filme, usuario.discordId);
@@ -99,7 +99,7 @@ export function atualizarBotaoEMinhaAvaliacao(filme, usuario, botao, minhaAvalia
         const aviso = document.querySelector('#avaliacoes-recebidas .sem-avaliacoes');
         if (aviso) aviso.textContent = '';
     } else {
-        botao.textContent = 'Avaliar Filme';
+        botao.innerHTML = '<i class="fa-solid fa-star"></i><span>Avaliar filme</span>';
         minhaAvaliacao.style.display = 'none';
     }
 
@@ -135,7 +135,6 @@ export function renderizarResumoVotos(votos) {
     votosOrdenados.forEach(data => {
         const span = criarElemento('span', [], `${data.emoji} ${data.qtd} ${data.descricao}`);
         span.style.color = data.color;
-        span.style.marginRight = '15px';
         container.appendChild(span);
     });
 }
@@ -145,13 +144,13 @@ export function renderizarAvaliacoesRecebidas(votos) {
     const listaAvaliacoes = document.querySelector('#avaliacoes-recebidas');
     const h3 = listaAvaliacoes.querySelector('h3');
     const ul = listaAvaliacoes.querySelector('ul');
+    listaAvaliacoes.querySelector('.sem-avaliacoes')?.remove();
 
     h3.textContent = `Avaliações (${votosDeduplicados.length})`;
     ul.innerHTML = '';
 
     if (votosDeduplicados.length === 0) {
         const p = criarElemento('p', ['fonte-secundaria', 'sem-avaliacoes'], 'Nenhuma avaliação recebida ainda.');
-        p.style.textAlign = 'center';
         listaAvaliacoes.appendChild(p);
         return;
     }
@@ -181,6 +180,7 @@ export function renderizarAvaliacoesRecebidas(votos) {
         const divVoto = criarElemento('div');
         const spanVoto = criarElemento('span', ['voto-usuario']);
         spanVoto.style.color = v.vote.color;
+        spanVoto.title = v.vote.description;
 
         const emoji = document.createTextNode(v.vote.emoji);
         const descVoto = criarElemento('span', ['descricao'], v.vote.description);
