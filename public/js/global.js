@@ -73,27 +73,45 @@ export function criarFigure(filme, usuario = '', options = {}) {
     const figure = criarElemento('figure', ['card']);
     figure.dataset.tmdbId = filme.tmdbId;
 
-    const poster = criarElemento('img');
-    poster.src = filme.posterPath || './assets/img/placeholder-poster.png';
-    poster.alt = filme.title;
-    figure.appendChild(poster);
+    const usuarioJaVotou = usuario?.discordId ? isUsuarioVotouNoFilme(filme.votes || [], usuario.discordId) : false;
+    if (usuarioJaVotou) {
+        figure.classList.add('card-has-user-vote');
+    }
 
-    const divFilho = criarElemento('div', ['detalhes']);
+    const posterWrapper = criarElemento('div', ['card-poster']);
+    const posterPath = filme.posterPath || './assets/img/placeholder-poster.png';
+    if (!filme.posterPath) {
+        posterWrapper.classList.add('card-poster--placeholder');
+    }
+
+    const poster = criarElemento('img');
+    poster.classList.add('card-poster-image');
+    if (!filme.posterPath) {
+        poster.classList.add('is-placeholder');
+    }
+    poster.src = posterPath;
+    poster.alt = filme.title;
+    posterWrapper.appendChild(poster);
+    figure.appendChild(posterWrapper);
+
+    const divFilho = criarElemento('div', ['detalhes', 'card-body']);
     const titulo = criarElemento('p', ['destaque', 'card-titulo'], filme.title);
     const anoLancamento = criarElemento('p', ['ano'], filme.year);
+    const metaList = criarElemento('div', ['card-meta-list']);
 
-    const divUsuario = criarElemento('div', ['responsavel']);
+    const divUsuario = criarElemento('div', ['responsavel', 'card-meta-item']);
     const iconeUsuario = criarElemento('i', ['fa-regular', 'fa-user']);
     const linkPerfil = criarElemento('a', ['link-perfil'], filme.chooser.name);
     linkPerfil.href = `./perfil.html?id=${filme.chooser.discordId}`;
     divUsuario.append(iconeUsuario, linkPerfil);
 
-    const divDataAdicionado = criarElemento('div', ['responsavel']);
+    const divDataAdicionado = criarElemento('div', ['responsavel', 'card-meta-item']);
     const iconeCalendario = criarElemento('i', ['fa-regular', 'fa-calendar']);
     const dataAdicionado = criarElemento('p', ['thin'], formatarData(filme.dateAdded));
     divDataAdicionado.append(iconeCalendario, dataAdicionado);
 
-    divFilho.append(titulo, anoLancamento, divUsuario, divDataAdicionado);
+    metaList.append(divUsuario, divDataAdicionado);
+    divFilho.append(titulo, anoLancamento, metaList);
     figure.appendChild(divFilho);
 
     const footer = criarFooter(filme, usuario);
@@ -115,8 +133,8 @@ export function criarFigure(filme, usuario = '', options = {}) {
 export function criarFooter(filme, usuario) {
     const votos = deduplicarVotosPorUsuario(filme.votes || []);
     const footer = criarElemento('footer', ['card-footer']);
-    const divVotos = criarElemento('div', ['gap']);
-    const divMeuVoto = criarElemento('div');
+    const divVotos = criarElemento('div', ['gap', 'card-votes-summary']);
+    const divMeuVoto = criarElemento('div', ['card-user-vote']);
 
     const contagem = votos.reduce((acc, v) => {
         const emoji = v.vote.emoji;
@@ -126,9 +144,12 @@ export function criarFooter(filme, usuario) {
 
     // Ordenar do maior para o menor
     const votosOrdenados = Object.entries(contagem).sort(([, a], [, b]) => b - a);
+    if (votosOrdenados.length > 3) {
+        divVotos.classList.add('card-votes-summary--dense');
+    }
 
     votosOrdenados.forEach(([emoji, total]) => {
-        const span = criarElemento('span', ['gap']);
+        const span = criarElemento('span', ['gap', 'card-vote-chip']);
         span.textContent = `${emoji}${total}`;
         divVotos.appendChild(span);
     });
@@ -137,8 +158,10 @@ export function criarFooter(filme, usuario) {
         const botao = criarBotaoAvaliar(filme);
         divMeuVoto.appendChild(botao);
     } else {
+        divMeuVoto.classList.add('has-vote');
         const voto = getVotoDoUsuarioFilme(usuario.discordId, votos);
-        const v = criarElemento('span', [], voto.vote.emoji);
+        const v = criarElemento('span', ['card-user-vote-emoji', 'card-user-vote-emoji--active'], voto.vote.emoji);
+        v.title = `Seu voto: ${voto.vote.description || voto.vote.name || voto.vote.emoji}`;
         divMeuVoto.appendChild(v);
     }
 
@@ -155,6 +178,7 @@ function getVotoDoUsuarioFilme(discordId, votos) {
 function criarBotaoAvaliar(filme) {
     const btnAvaliar = criarElemento('button', ['btn-avaliar'], 'Avaliar');
     btnAvaliar.type = 'button';
+    btnAvaliar.innerHTML = '<i class="fa-regular fa-star"></i><span>Avaliar</span>';
 
     // só na página de cards (home) previne redirecionamento
     btnAvaliar.addEventListener('click', (e) => {

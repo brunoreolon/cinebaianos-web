@@ -246,7 +246,7 @@
 .membros-grid,
 .filmes-grupo-grid {
     display: grid;
-    gap: 20px;
+    gap: 22px;
 }
 
 .membros-sections-grid {
@@ -261,7 +261,8 @@
 }
 
 .filmes-grupo-grid {
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    margin-top: 10px;
 }
 
 .membro-card {
@@ -554,7 +555,15 @@
 }
 
 .filmes-grupo-grid .card-link {
-    display: block;
+    display: flex;
+    height: 100%;
+    max-width: 260px;
+    justify-self: start;
+}
+
+.filmes-grupo-grid.catalog-grid-updating {
+    opacity: 0.38;
+    transform: translateY(4px);
 }
 
 .filmes-grupo-grid .card {

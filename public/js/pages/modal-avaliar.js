@@ -8,6 +8,7 @@ import { MensagemTipo } from '../components/mensagem-tipo.js';
 export async function abrirModalAvaliacao(filme, usuario, atualizarTelaDetalhes = false, index, groupId = null) {
     const modal = document.querySelector('#modal-avaliar');
     modal.classList.remove('inativo');
+    modal.classList.remove('fechando');
     modal.classList.add('ativo');
 
     const opcoesContainer = modal.querySelector('#opcoes-voto ul');
@@ -19,9 +20,14 @@ export async function abrirModalAvaliacao(filme, usuario, atualizarTelaDetalhes 
         votos.forEach(v => {
             const li = document.createElement('li');
             li.dataset.votoId = v.id;
-            li.textContent = v.emoji + v.description;
             li.style.background = v.color;
-            li.style.cursor = 'pointer';
+            li.innerHTML = `
+                <span class="modal-vote-emoji">${v.emoji}</span>
+                <span class="modal-vote-text">
+                    <span class="modal-vote-title">${v.description}</span>
+                    <span class="modal-vote-subtitle">Selecionar esta avaliação</span>
+                </span>
+            `;
 
             li.addEventListener('click', async () => {
                 try {
@@ -90,14 +96,18 @@ export async function abrirModalAvaliacao(filme, usuario, atualizarTelaDetalhes 
     }
 
     modal.querySelector('.close').onclick = () => fecharModal(modal);
-    modal.addEventListener('click', e => {
+    modal.onclick = e => {
         if (e.target === modal) fecharModal(modal);
-    });
+    };
 }
 
 function fecharModal(modal) {
+    if (!modal || modal.classList.contains('fechando') || modal.classList.contains('inativo')) return;
+
     modal.classList.remove('ativo');
+    modal.classList.add('fechando');
     setTimeout(() => {
+        modal.classList.remove('fechando');
         modal.classList.add('inativo');
-    }, 300); 
+    }, 280);
 }
