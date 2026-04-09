@@ -2,7 +2,9 @@
     width: 100%;
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     justify-content: space-between;
+    align-items: center;
     margin-top: 20px;
     margin-bottom: 40px;
     padding-bottom: 10px;
@@ -32,11 +34,17 @@
         display: none;
     }
 
-    .btn-ranking .btn-text {
+    #header {
+        gap: 14px;
+    }
+
+    .btn-ranking .btn-text,
+    .btn-admin-header .btn-text {
         display: none;
     }
 
-    .btn-ranking {
+    .btn-ranking,
+    .btn-admin-header {
         padding: 4px;
         justify-content: center;
     }
@@ -169,14 +177,218 @@
 .links {
     display: flex;
     flex-direction: row;
-    gap: 50px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 18px;
     align-items: center;
+}
+
+.group-switcher {
+    position: relative;
+}
+
+.group-selector-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-group-selector,
+.btn-group-selector:visited,
+.btn-group-selector:link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 38px;
+    padding: 6px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--cor-cinza-3);
+    background: var(--cor-preto-3);
+    color: var(--cor-branco-1);
+    box-shadow: 0 4px 6px oklch(var(--cor-preto-1-params) / 0.15);
+    transition: background 0.3s, border-color 0.3s, transform 0.2s;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.btn-group-selector:hover {
+    background: var(--cor-preto-7);
+    border-color: var(--cor-roxo-1);
+}
+
+.btn-group-current,
+.btn-group-current:visited,
+.btn-group-current:link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    min-width: 32px;
+    min-height: 32px;
+    padding: 0;
+    border-radius: 9px;
+    border: 1px solid var(--cor-cinza-3);
+    background: transparent;
+    color: var(--cor-branco-1);
+    font-size: 13px;
+    box-shadow: 0 4px 6px oklch(var(--cor-preto-1-params) / 0.12);
+    transition: background 0.3s, border-color 0.3s, transform 0.2s;
+    text-decoration: none;
+}
+
+.btn-group-current:hover {
+    background: var(--cor-preto-7);
+    border-color: var(--cor-roxo-1);
+}
+
+.btn-group-selector-text {
+    max-width: 180px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.btn-group-selector .is-selected {
+    color: var(--cor-ouro-1);
+}
+
+.btn-group-selector-empty {
+    color: var(--cor-branco-1) !important;
+}
+
+.group-dropdown {
+    opacity: 0;
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    min-width: 280px;
+    background: var(--cor-preto-3);
+    border: 1px solid var(--cor-cinza-3);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px oklch(var(--cor-preto-1-params) / 0.45);
+    padding: 8px;
+    z-index: 1000;
+    transform: translateY(-8px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+}
+
+.group-dropdown.active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.group-dropdown-header {
+    padding: 6px 8px 10px;
+    color: var(--cor-branco-2);
+    font-size: 14px;
+}
+
+.group-dropdown-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.group-dropdown-item {
+    border-radius: 10px;
+}
+
+.group-dropdown-button {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 8px;
+    border: none;
+    background: transparent;
+    color: var(--cor-branco-1);
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.group-dropdown-button:hover:not(:disabled) {
+    background: var(--cor-preto-7);
+}
+
+.group-dropdown-button:disabled {
+    cursor: default;
+    opacity: 0.95;
+}
+
+.group-dropdown-main {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.group-dropdown-labels {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 0;
+}
+
+.group-dropdown-labels strong,
+.group-dropdown-labels small {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.group-dropdown-labels small {
+    color: var(--cor-branco-2);
+}
+
+.group-dropdown-star.is-selected,
+.group-dropdown-current {
+    color: var(--cor-ouro-1);
+}
+
+.group-dropdown-link {
+    display: flex !important;
+    align-items: center;
+    padding: 10px 8px !important;
+    border-radius: 10px;
+}
+
+.group-dropdown-link:hover {
+    background: var(--cor-preto-7);
 }
 
 
 .btn-ranking .ranking-icone {
     font-size: 24px;            /* tamanho do ícone */
     line-height: 1;             /* evita que o ícone empurre o texto */
+}
+
+.btn-admin-header {
+    display: inline-flex;
+    padding: 6px 16px;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    color: var(--cor-rosa-1);
+    font-size: 14px;
+    font-weight: 700;
+    border: 1px solid var(--cor-rosa-1);
+    background: transparent;
+    box-shadow: 0 4px 6px oklch(var(--cor-preto-1-params) / 0.15);
+    transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-admin-header:hover {
+    background: var(--cor-rosa-1);
+    color: var(--cor-branco-1);
+    cursor: pointer;
 }
 
 .btn-ranking {
@@ -202,4 +414,59 @@
 .btn-ranking .ranking-icone {
     font-size: 18px;            /* tamanho do ícone */
     line-height: 1;             /* evita que o ícone empurre o texto */
+}
+
+@media (max-width: 900px) {
+    .links {
+        width: 100%;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    .group-dropdown {
+        right: auto;
+        left: 0;
+    }
+}
+
+@media (max-width: 600px) {
+    .btn-group-selector-text {
+        max-width: 120px;
+    }
+
+    .links {
+        align-items: stretch;
+    }
+
+    .group-switcher,
+    .group-selector-actions,
+    #group-selector-container,
+    #group-selector-container > a,
+    .btn-ranking,
+    .btn-admin-header {
+        width: 100%;
+    }
+
+    .btn-group-selector,
+    .btn-ranking,
+    .btn-admin-header {
+        justify-content: center;
+    }
+
+    .group-selector-actions {
+        display: grid;
+        gap: 8px;
+    }
+
+    .btn-group-current {
+        width: 36px;
+        min-width: 36px;
+        min-height: 36px;
+        justify-self: end;
+    }
+
+    .group-dropdown {
+        min-width: auto;
+        width: 100%;
+    }
 }

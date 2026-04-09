@@ -1,5 +1,53 @@
 import { authService } from './auth-service.js';
 
+function normalizarVotos(votes = []) {
+    const votosPorUsuario = new Map();
+
+    votes.forEach(vote => {
+        const discordId = vote?.voter?.discordId;
+        if (!discordId) return;
+
+        const key = String(discordId);
+        const atual = votosPorUsuario.get(key);
+        if (!atual) {
+            votosPorUsuario.set(key, vote);
+            return;
+        }
+
+        const atualData = new Date(atual?.vote?.votedAt || 0).getTime();
+        const novaData = new Date(vote?.vote?.votedAt || 0).getTime();
+        if (novaData >= atualData) {
+            votosPorUsuario.set(key, vote);
+        }
+    });
+
+    return [...votosPorUsuario.values()];
+}
+
+function normalizarFilme(movie) {
+    if (!movie) return movie;
+
+    return {
+        ...movie,
+        votes: normalizarVotos(movie.votes || [])
+    };
+}
+
+function normalizarFilmes(movies = []) {
+    return movies.map(normalizarFilme);
+}
+
+function normalizarRespostaComMovies(payload) {
+    if (!payload || !Array.isArray(payload.movies)) {
+        return payload;
+    }
+
+    return {
+        ...payload,
+        movies: normalizarFilmes(payload.movies)
+    };
+}
+
 /**
  * Serviço para gerenciamento de filmes via API.
  * Todas as chamadas usam `authService.apiFetch` para lidar com autenticação e refresh automático.
@@ -33,7 +81,8 @@ export class FilmeService {
 
         const response = await authService.apiFetch(url);
 
-        return await response.json();
+        const data = await response.json();
+        return normalizarRespostaComMovies(data);
     }
 
     /**
@@ -62,7 +111,7 @@ export class FilmeService {
         const response = await authService.apiFetch(url);
         const data = await response.json();
 
-        return data.movies || [];
+        return normalizarFilmes(data.movies || []);
     }
 
     /**
@@ -76,7 +125,8 @@ export class FilmeService {
         const url = new URL(`/api/movies/${id}`, window.location.origin);
         const response = await authService.apiFetch(url);
 
-        return await response.json();
+        const data = await response.json();
+        return normalizarFilme(data);
     }
 
     /**
@@ -121,7 +171,8 @@ export class FilmeService {
             body: JSON.stringify(corpo)
         });
 
-        return await response.json();
+        const data = await response.json();
+        return normalizarFilme(data);
     }
 
     /**
@@ -143,6 +194,71 @@ export class FilmeService {
         const response = await authService.apiFetch(url);
 
         return await response.json();
+    }
+
+    /**
+     * Busca todos os filmes de um grupo.
+     *
+     * @param {number|string} groupId - ID do grupo
+     * @returns {Promise<Object>} - GroupDetailResponse com campo `movies`
+     * @throws {ApiError} - Se a requisição falhar
+     */
+    async buscarFilmesDoGrupo(groupId) {
+        const url = new URL(`/api/groups/${groupId}/movies`, window.location.origin);
+        const response = await authService.apiFetch(url);
+        const data = await response.json();
+        return normalizarRespostaComMovies(data);
+    }
+
+    /**
+     * Busca um filme específico dentro de um grupo pelo ID do filme.
+     *
+     * @param {number|string} groupId - ID do grupo
+     * @param {number|string} movieId - ID do filme
+     * @returns {Promise<Object|null>} - MovieWithChooserResponse ou null
+     * @throws {ApiError} - Se a requisição falhar
+     */
+    async buscarFilmeDoGrupo(groupId, movieId) {
+        const groupDetail = await this.buscarFilmesDoGrupo(groupId);
+        const movie = groupDetail.movies?.find(m => m.id === Number(movieId)) || null;
+        return normalizarFilme(movie);
+    }
+
+    /**
+     * Adiciona um filme ao grupo pelo ID do TMDb.
+     *
+     * @param {number|string} groupId - ID do grupo
+     * @param {number|string} tmdbId - ID do filme no TMDb
+     * @param {number|string} userId - ID interno do usuário (chooser)
+     * @returns {Promise<Object>} - GroupDetailResponse atualizado
+     * @throws {ApiError} - Se a requisição falhar
+     */
+    async adicionarFilmeAoGrupo(groupId, tmdbId, userId) {
+        const url = new URL(`/api/groups/${groupId}/movies`, window.location.origin);
+        const response = await authService.apiFetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                movie: { id: tmdbId },
+                chooser: { id: userId }
+            })
+        });
+        const data = await response.json();
+        return normalizarRespostaComMovies(data);
+    }
+
+    /**
+     * Remove um filme de um grupo.
+     *
+     * @param {number|string} groupId - ID do grupo
+     * @param {number|string} movieId - ID do filme
+     * @returns {Promise<boolean>} - true se removido com sucesso
+     * @throws {ApiError} - Se a requisição falhar
+     */
+    async removerFilmeDoGrupo(groupId, movieId) {
+        const url = new URL(`/api/groups/${groupId}/movies/${movieId}`, window.location.origin);
+        await authService.apiFetch(url, { method: 'DELETE' });
+        return true;
     }
 }
 

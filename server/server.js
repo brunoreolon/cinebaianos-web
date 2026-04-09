@@ -14,11 +14,17 @@ app.use(express.static(path.join(process.cwd(), 'public')));
 // Gerar config.js dinamicamente para o front-end
 app.get('/config.js', (req, res) => {
   res.type('application/javascript');
+  const donationPixKey = JSON.stringify(process.env.DONATION_PIX_KEY || '');
+  const donationPixName = JSON.stringify(process.env.DONATION_PIX_NAME || '');
+  const donationPixCity = JSON.stringify(process.env.DONATION_PIX_CITY || '');
   // O front-end sempre acessa via '/api', que é o proxy
   res.send(`
     export const API_URL = '/api';
     export const MY_DISCORD_ID = '${process.env.MY_DISCORD_ID}';
     export const FILME_RECENTE_DIAS = '${process.env.FILME_RECENTE_DIAS}';
+    export const DONATION_PIX_KEY = ${donationPixKey};
+    export const DONATION_PIX_NAME = ${donationPixName};
+    export const DONATION_PIX_CITY = ${donationPixCity};
   `);
 });
 
