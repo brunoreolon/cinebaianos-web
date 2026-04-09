@@ -11,7 +11,10 @@
         <link rel="stylesheet" href="./css/components/footer.css" type="text/css">
         <link rel="stylesheet" href="./css/pages/modal-avaliar.css" type="text/css">
         <link rel="stylesheet" href="./css/pages/index.css" type="text/css">
+        <link rel="stylesheet" href="./css/components/movie-filters.css" type="text/css">
+        <link rel="stylesheet" href="./css/components/donation-modal.css" type="text/css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 
         <link rel="icon" type="image/png" href="assets/icons/favicon.png" />
 
@@ -28,7 +31,7 @@
             <div id="header-container"></div>
             <div class="mensagem-container"></div>
             <div id="adicionar-filme">
-                <button type="button" class="adicionar">
+                <button type="button" class="adicionar index-add-action">
                     <i class="fa-solid fa-plus"></i>
                     Adicionar Filme
                 </button>
@@ -37,6 +40,7 @@
                 <div class="modal-content">
                     <header>
                         <h3>Adicionar Novo Filme</h3>
+                        <p id="grupo-destino-modal" class="modal-group-context">Grupo de destino: —</p>
                         <span class="close">&times;</span>
                     </header>
                     <section class="dados">
@@ -69,7 +73,12 @@
                     <header><h2>Todos os Filmes</h2></header>
 
                     <!-- FILTROS -->
-                    <div id="filtro">
+                    <div id="filtro" class="movie-filters">
+                        <div class="movie-filters-toolbar">
+                            <span id="filtro-resultados" class="movie-filters-results">0 resultados</span>
+                            <button id="limpar-filtros" type="button" class="movie-filters-clear">Limpar filtros</button>
+                        </div>
+
                         <div class="filtros-superiores">
                             <!-- Ordenar por -->
                             <div class="filtro-ordenar">
@@ -82,10 +91,7 @@
                                 </select>
 
                                 <div class="ordenacao-direcao">
-                                    <button id="ordenar-direcao" type="button" data-direction="desc"
-                                        class="inline-flex items-center justify-center h-8 rounded-md gap-1.5 px-3
-                                            bg-slate-700 border border-slate-600 hover:bg-slate-600 text-white"
-                                        aria-label="Alternar direção da ordenação">
+                                    <button id="ordenar-direcao" type="button" data-direction="desc" aria-label="Alternar direção da ordenação">
                                         <!-- Ícone -->
                                         <svg
                                             id="icone-direcao"
@@ -170,6 +176,82 @@
                 <span class="close">&times;</span>
                 <div id="opcoes-voto">
                     <ul></ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Doação -->
+        <div id="donation-modal" class="donation-modal">
+            <div class="donation-modal-overlay"></div>
+            <div class="donation-modal-content">
+                <div class="donation-header">
+                    <h2>
+                        <i class="fa-solid fa-heart"></i>
+                        Apoie o CineBaianos
+                    </h2>
+                    <p>Ajude a manter o site funcionando</p>
+                </div>
+
+                <div class="donation-body">
+                    <div class="donation-info">
+                        <strong>Por que doar?</strong>
+                        Suas contribuições nos ajudam a cobrir custos de servidor, manutenção e desenvolvimento de novas funcionalidades para toda a comunidade.
+                    </div>
+
+                    <div class="donation-qrcode-section">
+                        <h3>Escanear com PIX</h3>
+                        <canvas id="donation-qrcode-canvas" style="display: none;"></canvas>
+                        <img id="donation-qrcode-img" alt="QR Code PIX" class="donation-qrcode" />
+                        <p style="font-size: 12px; color: #999; margin-top: 10px;">
+                            <i class="fa-solid fa-smartphone"></i> Abra o app do seu banco e escaneie
+                        </p>
+                    </div>
+
+                    <div class="donation-qrcode-section donation-section-divider">
+                        <h3>Copiar PIX (copia e cola)</h3>
+                        <div class="donation-copy-pix">
+                            <div class="donation-copy-pix-text" id="pix-key-display">00020126580014br.gov.bcb.pix0136</div>
+                            <button type="button" class="donation-copy-btn" id="btn-copy-pix">
+                                <i class="fa-solid fa-copy"></i> Copiar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="donation-values">
+                        <label class="donation-values-label">Escolha um valor ou digite o seu:</label>
+                        <div class="donation-values-grid" id="donation-values-buttons"></div>
+
+                        <div class="donation-custom-section">
+                            <div class="currency">R$</div>
+                            <input
+                                type="number"
+                                id="donation-custom-input"
+                                placeholder="Valor personalizado"
+                                min="1"
+                                step="0.01"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="donation-benefits">
+                        <h4>Seu apoio mantém:</h4>
+                        <ul>
+                            <li>Servidor funcionando 24/7</li>
+                            <li>Novas funcionalidades e melhorias</li>
+                            <li>Suporte da comunidade</li>
+                            <li>Banco de dados de filmes atualizado</li>
+                        </ul>
+                    </div>
+
+                    <div class="donation-actions">
+                        <button type="button" class="donation-actions button donation-btn-secondary" id="close-donation-modal">
+                            Fechar
+                        </button>
+                        <button type="button" class="donation-actions button donation-btn-primary">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            Abrir PIX no Banco
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

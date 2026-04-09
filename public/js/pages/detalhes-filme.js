@@ -1,13 +1,18 @@
 import { authService } from '../services/auth-service.js';
 import { filmeService } from '../services/filme-service.js';
 import { abrirModalAvaliacao } from './modal-avaliar.js';
-import { getQueryParam, formatarData, isUsuarioVotouNoFilme, criarElemento, ordenarVotosPorNomeUsuario } from '../global.js';
+import { getQueryParam, formatarData, isUsuarioVotouNoFilme, criarElemento, ordenarVotosPorNomeUsuario, deduplicarVotosPorUsuario } from '../global.js';
 import { ApiError } from '../exception/api-error.js';
 import { criarMensagem } from '../components/mensagens.js';
 import { MensagemTipo } from '../components/mensagem-tipo.js';
+import { getCurrentGroup, setFlashMessage } from '../services/group-context.js';
+
+// ID do grupo atual — preenchido na inicialização
+let currentGroupId = null;
 
 function getVotoDoUsuarioNoFilme(filme, usuarioId) {
-    return filme.votes.find(v => v.voter.discordId === usuarioId);
+    const votos = deduplicarVotosPorUsuario(filme.votes || []);
+    return votos.find(v => v.voter.discordId === usuarioId);
 }
 
 function preencherDetalhes(filme, usuario) {
@@ -21,7 +26,7 @@ function preencherDetalhes(filme, usuario) {
         if (!confirmar) return;
 
         try {
-            await filmeService.excluirFilme(filme.id);
+            await filmeService.removerFilmeDoGrupo(currentGroupId, filme.id);
             sessionStorage.setItem("flashMessage", JSON.stringify({
                 texto: "Filme removido com sucesso.",
                 tipo: "SUCCESS"
@@ -74,12 +79,13 @@ function preencherAvaliacoes(filme, usuario) {
     atualizarBotaoEMinhaAvaliacao(filme, usuario, botao, minhaAvaliacao);
 
     botao.addEventListener('click', () => {
-        abrirModalAvaliacao(filme, usuario, true, false);
+        abrirModalAvaliacao(filme, usuario, true, false, currentGroupId);
     });
 }
 
 export function atualizarBotaoEMinhaAvaliacao(filme, usuario, botao, minhaAvaliacao) {
-    const usuarioVotou = isUsuarioVotouNoFilme(filme.votes, usuario.discordId);
+    const votosDeduplicados = deduplicarVotosPorUsuario(filme.votes || []);
+    const usuarioVotou = isUsuarioVotouNoFilme(votosDeduplicados, usuario.discordId);
 
     if (usuarioVotou) {
         botao.textContent = 'Alterar Avaliação';
@@ -97,16 +103,17 @@ export function atualizarBotaoEMinhaAvaliacao(filme, usuario, botao, minhaAvalia
         minhaAvaliacao.style.display = 'none';
     }
 
-    const votosOrdenadosPorUsuario = ordenarVotosPorNomeUsuario(filme.votes);
+    const votosOrdenadosPorUsuario = ordenarVotosPorNomeUsuario(votosDeduplicados);
 
-    renderizarResumoVotos(filme.votes);
+    renderizarResumoVotos(votosDeduplicados);
     renderizarAvaliacoesRecebidas(votosOrdenadosPorUsuario);
 }
 
 export function renderizarResumoVotos(votos) {
+    const votosDeduplicados = deduplicarVotosPorUsuario(votos || []);
     const contagem = {};
 
-    votos.forEach(voto => {
+    votosDeduplicados.forEach(voto => {
         const key = `${voto.vote.emoji} ${voto.vote.description}`;
         if (contagem[key]) {
             contagem[key].qtd++;
@@ -134,21 +141,22 @@ export function renderizarResumoVotos(votos) {
 }
 
 export function renderizarAvaliacoesRecebidas(votos) {
+    const votosDeduplicados = deduplicarVotosPorUsuario(votos || []);
     const listaAvaliacoes = document.querySelector('#avaliacoes-recebidas');
     const h3 = listaAvaliacoes.querySelector('h3');
     const ul = listaAvaliacoes.querySelector('ul');
 
-    h3.textContent = `Avaliações (${votos.length})`;
+    h3.textContent = `Avaliações (${votosDeduplicados.length})`;
     ul.innerHTML = '';
 
-    if (votos.length === 0) {
+    if (votosDeduplicados.length === 0) {
         const p = criarElemento('p', ['fonte-secundaria', 'sem-avaliacoes'], 'Nenhuma avaliação recebida ainda.');
         p.style.textAlign = 'center';
         listaAvaliacoes.appendChild(p);
         return;
     }
 
-    votos.forEach(v => {
+    votosDeduplicados.forEach(v => {
         const li = criarElemento('li');
 
         const a = criarElemento('a', ['item-voto']);
@@ -202,15 +210,32 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const filmeId = getQueryParam('id');
+        const groupIdFromQuery = Number(getQueryParam('groupId'));
+        const grupo = getCurrentGroup();
+        currentGroupId = groupIdFromQuery || grupo?.id || null;
 
-        if (!filmeId) throw new Error('ID do filme não encontrado na URL');
+        if (!filmeId) {
+            setFlashMessage('Filme inválido para exibir detalhes.', 'ALERT');
+            window.location.href = './index.html';
+            return;
+        }
 
-        const filme = await filmeService.buscarFilmePorId(filmeId);
-        if (!filme) throw new Error('Filme não encontrado');
+        if (!currentGroupId) {
+            setFlashMessage('Selecione um grupo para visualizar os detalhes do filme.', 'ALERT');
+            window.location.href = './meus-grupos.html';
+            return;
+        }
+
+        const filme = await filmeService.buscarFilmeDoGrupo(currentGroupId, filmeId);
+        if (!filme) {
+            setFlashMessage('Filme não encontrado no grupo informado.', 'ALERT');
+            window.location.href = './index.html';
+            return;
+        }
 
         const deveAvaliar = getQueryParam('avaliar');
         if (deveAvaliar === '1') {
-            abrirModalAvaliacao(filme, usuario, true, false);
+            abrirModalAvaliacao(filme, usuario, true, false, currentGroupId);
 
             const novaURL = window.location.pathname + window.location.search.replace(/(&)?avaliar=1/, '');
             window.history.replaceState({}, '', novaURL);

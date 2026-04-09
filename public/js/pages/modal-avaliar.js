@@ -5,7 +5,7 @@ import { ApiError } from '../exception/api-error.js';
 import { criarMensagem } from '../components/mensagens.js';
 import { MensagemTipo } from '../components/mensagem-tipo.js';
 
-export async function abrirModalAvaliacao(filme, usuario, atualizarTelaDetalhes = false, index) {
+export async function abrirModalAvaliacao(filme, usuario, atualizarTelaDetalhes = false, index, groupId = null) {
     const modal = document.querySelector('#modal-avaliar');
     modal.classList.remove('inativo');
     modal.classList.add('ativo');
@@ -30,23 +30,29 @@ export async function abrirModalAvaliacao(filme, usuario, atualizarTelaDetalhes 
 
                     const usuarioVotou = filme.votes.some(v => v.voter.discordId === usuario.discordId);
                     if (usuarioVotou) {
-                        resultado = await votoService.alterarVoto(filme.id, usuario.discordId, votoId);
+                        resultado = await votoService.alterarVotoNoGrupo(groupId, usuario.id, filme.id, votoId);
                         criarMensagem(`Voto alterado para ${resultado.vote.description} no filme "${filme.title}"!`, MensagemTipo.SUCCESS);
                     } else {
-                        resultado = await votoService.votar(filme.id, usuario.discordId, votoId);
+                        resultado = await votoService.votarNoGrupo(groupId, usuario.id, filme.id, votoId);
                         criarMensagem(`Voto ${resultado.vote.description} registrado para "${filme.title}"!`, MensagemTipo.SUCCESS);
                     }
 
                     fecharModal(modal);
 
-                    const filmeAtualizado = await filmeService.buscarFilmePorId(filme.id);
-                    filme.votes = filmeAtualizado.votes;
+                    // Atualiza dados do filme a partir do grupo
+                    let filmeAtualizado = filme;
+                    if (groupId) {
+                        const atualizado = await filmeService.buscarFilmeDoGrupo(groupId, filme.id);
+                        if (atualizado) {
+                            filmeAtualizado = atualizado;
+                            filme.votes = atualizado.votes;
+                        }
+                    }
 
                     if (atualizarTelaDetalhes) {
-                        const evento = new CustomEvent('filmeAtualizado', {
+                        window.dispatchEvent(new CustomEvent('filmeAtualizado', {
                             detail: filmeAtualizado
-                        });
-                        window.dispatchEvent(evento);
+                        }));
                     }
 
                     if (index) {
