@@ -113,6 +113,25 @@ function formatarDataOrDash(value) {
     return value ? formatarData(value) : '—';
 }
 
+function getJoinPolicyLabel(joinPolicy) {
+    const labels = {
+        OPEN: 'Aberto',
+        REQUEST: 'Solicitação',
+        INVITE_ONLY: 'Somente convite'
+    };
+
+    return labels[joinPolicy] || joinPolicy || 'Não informado';
+}
+
+function getVisibilityLabel(visibility) {
+    const labels = {
+        PUBLIC: 'Público',
+        PRIVATE: 'Privado'
+    };
+
+    return labels[visibility] || visibility || 'Não informado';
+}
+
 function obterIniciais(texto) {
     if (!texto) return '--';
     const partes = texto.trim().split(/\s+/).filter(Boolean);
@@ -177,14 +196,24 @@ function initTabs() {
     const buttons = document.querySelectorAll('.btn-menu[data-tab]');
     const panes = document.querySelectorAll('.tab-pane');
 
+    const ativarTab = (tab) => {
+        buttons.forEach(button => {
+            const isActive = button.dataset.tab === tab;
+            button.classList.toggle('ativo', isActive);
+            button.setAttribute('aria-selected', String(isActive));
+        });
+
+        panes.forEach(pane => {
+            pane.classList.toggle('ativo', pane.id === tab);
+        });
+    };
+
+    const initialActiveButton = document.querySelector('.btn-menu.ativo[data-tab]');
+    ativarTab(initialActiveButton?.dataset.tab || 'grupos');
+
     buttons.forEach(button => {
         button.addEventListener('click', () => {
-            const tab = button.dataset.tab;
-            buttons.forEach(b => b.classList.remove('ativo'));
-            panes.forEach(p => p.classList.remove('ativo'));
-
-            button.classList.add('ativo');
-            document.getElementById(tab)?.classList.add('ativo');
+            ativarTab(button.dataset.tab);
         });
     });
 }
@@ -194,7 +223,7 @@ function atualizarKpis() {
     const gruposBanidos = state.groups.filter(g => g.banned === true).length;
     const totalUsuarios = state.users.filter(u => !u.bot).length;
     const usuariosBanidos = state.users.filter(u => u.banned === true).length;
-    const usuariosAdmin = state.users.filter(u => u.admin === true).length;
+    const usuariosAdmin = state.users.filter(u => u.admin === true || u.isAdmin === true || u.superAdmin === true).length;
     const totalBots = state.bots.length;
 
     const gruposEl = document.getElementById('kpi-total-grupos');
@@ -238,24 +267,37 @@ function renderGroups() {
 
     grupos.forEach(group => {
         const card = document.createElement('article');
-        card.className = 'grupo-admin-card';
 
         const banned = group.banned === true;
         const ownerName = group.owner?.name || 'Sem dono';
         const groupInitials = obterIniciais(group.name);
         const isExpanded = state.expandedGroupIds.has(group.id);
+        const visibilityLabel = getVisibilityLabel(group.visibility);
+        const joinPolicyLabel = getJoinPolicyLabel(group.joinPolicy);
+
+        card.className = `grupo-admin-card ${isExpanded ? 'is-expanded' : 'is-collapsed'}`;
 
         card.innerHTML = `
-            <div class="grupo-admin-head">
+            <div class="grupo-admin-head grupo-admin-hero">
                 <div class="grupo-admin-brand">
                     <div class="grupo-admin-avatar">${groupInitials}</div>
-                    <div>
-                        <h3>${group.name}</h3>
-                        <p class="grupo-admin-identificador">#${group.tag} • /${group.slug}</p>
+                    <div class="grupo-admin-title-wrap">
+                        <div class="grupo-admin-title-row">
+                            <h3>${group.name}</h3>
+                            <div class="grupo-admin-badges">
+                                ${getStatusBadge(group.active, banned)}
+                            </div>
+                        </div>
+                        <div class="grupo-admin-identificadores">
+                            <span class="grupo-admin-identificador-linha">#${group.tag} • /${group.slug}</span>
+                        </div>
+                        <div class="grupo-admin-owner-line">
+                            <i class="fa-regular fa-user"></i>
+                            <span>Dono do grupo: <strong>${ownerName}</strong></span>
+                        </div>
                     </div>
                 </div>
-                <div class="grupo-admin-head-right">
-                    ${getStatusBadge(group.active, banned)}
+                <div class="grupo-admin-head-right grupo-admin-actions">
                     <button type="button" class="btn-acoes ${banned ? 'btn-permissoes' : 'btn-excluir'}" data-action="ban-toggle">
                         <i class="fa-solid ${banned ? 'fa-unlock' : 'fa-ban'}"></i>
                         ${banned ? 'Desbanir grupo' : 'Banir grupo'}
@@ -263,29 +305,23 @@ function renderGroups() {
                 </div>
             </div>
 
-            <div class="grupo-admin-resumo">
-                <div class="grupo-admin-meta-linha">
-                    <div class="grupo-admin-owner">
-                        <i class="fa-regular fa-user"></i>
-                        <span>Dono: <strong>${ownerName}</strong></span>
-                    </div>
-                    <span class="grupo-admin-pill"><strong>Criado em:</strong> ${formatarDataOrDash(group.createdAt)}</span>
-                </div>
+            <div class="grupo-admin-resumo grupo-admin-footer">
                 <button type="button" class="btn-toggle-detalhes" data-action="toggle-details">
                     <i class="fa-solid ${isExpanded ? 'fa-chevron-up' : 'fa-chevron-down'}"></i>
-                    ${isExpanded ? 'Ocultar detalhes' : 'Ver detalhes'}
+                    ${isExpanded ? 'Ocultar configurações avançadas' : 'Ver configurações avançadas'}
                 </button>
             </div>
 
             <div class="grupo-admin-detalhes ${isExpanded ? '' : 'inativo'}">
                 <div class="grupo-admin-grid">
-                <div class="grupo-admin-item"><span>Visibilidade</span><strong>${group.visibility || '—'}</strong></div>
-                <div class="grupo-admin-item"><span>Entrada</span><strong>${group.joinPolicy || '—'}</strong></div>
-                <div class="grupo-admin-item"><span>Votos globais</span><strong>${group.allowGlobalVotes ? 'Permitidos' : 'Bloqueados'}</strong></div>
-                <div class="grupo-admin-item"><span>Somente admin adiciona</span><strong>${group.onlyAdminAddMovie ? 'Sim' : 'Não'}</strong></div>
-                <div class="grupo-admin-item"><span>Troca de voto</span><strong>${group.voteChangeDeadlineDays} dia(s)</strong></div>
-                <div class="grupo-admin-item"><span>Janela de filme novo</span><strong>${group.movieNewDays} dia(s)</strong></div>
-                <div class="grupo-admin-item"><span>Status de moderação</span><strong>${banned ? 'Banido' : 'Liberado'}</strong></div>
+                    <div class="grupo-admin-item"><span>Criado em</span><strong>${formatarDataOrDash(group.createdAt)}</strong></div>
+                    <div class="grupo-admin-item"><span>Visibilidade</span><strong>${visibilityLabel}</strong></div>
+                    <div class="grupo-admin-item"><span>Entrada</span><strong>${joinPolicyLabel}</strong></div>
+                    <div class="grupo-admin-item"><span>Votos globais</span><strong>${group.allowGlobalVotes ? 'Permitidos' : 'Bloqueados'}</strong></div>
+                    <div class="grupo-admin-item"><span>Troca de voto</span><strong>${group.voteChangeDeadlineDays} dia(s)</strong></div>
+                    <div class="grupo-admin-item"><span>Janela de filme novo</span><strong>${group.movieNewDays} dia(s)</strong></div>
+                    <div class="grupo-admin-item"><span>Somente admin adiciona</span><strong>${group.onlyAdminAddMovie ? 'Sim' : 'Não'}</strong></div>
+                    <div class="grupo-admin-item"><span>Conta do grupo</span><strong>${group.active === false ? 'Inativa' : 'Ativa'}</strong></div>
                 </div>
 
                 ${banned && (group.banReason || group.expiresAt) ? `
@@ -323,7 +359,8 @@ async function handleUserBanToggle(user) {
         targetType: 'user',
         targetLabel: 'usuário',
         name: user.name,
-        identifier: user.email || `Discord ID: ${user.discordId}`
+        identifier: user.email || `Discord ID: ${user.discordId}`,
+        avatar: user.avatar || './assets/img/placeholder-avatar.png'
     });
 
     if (!payload?.confirmed) return;
@@ -346,47 +383,63 @@ async function handleUserBanToggle(user) {
 }
 
 function buildUserRow(usuario, isBot = false) {
+    const isGlobalSuperAdmin = usuario.superAdmin === true;
+    const isSystemAdmin = usuario.admin === true || usuario.isAdmin === true || isGlobalSuperAdmin;
     const tr = document.createElement('tr');
+    tr.className = 'admin-entity-row';
     tr.dataset.discordId = usuario.discordId;
     tr.dataset.userId = String(usuario.id);
-    tr.dataset.isAdmin = String(usuario.admin);
+    tr.dataset.isAdmin = String(isSystemAdmin);
+    tr.dataset.isSuperAdmin = String(isGlobalSuperAdmin);
     tr.dataset.isAtivo = String(usuario.active);
     tr.dataset.isLogado = String(usuario.discordId === state.currentUser?.discordId);
 
     tr.innerHTML = `
-        <td data-label="${isBot ? 'Bot' : 'Usuário'}">
-            <a href="./perfil.html?id=${usuario.discordId}" class="link-perfil">
-                <div class="${isBot ? 'bots-info' : 'usuarios-info'}">
+        <td data-label="${isBot ? 'Bot' : 'Usuário'}" class="admin-entity-main-cell">
+            <a href="./perfil.html?id=${usuario.discordId}" class="link-perfil admin-entity-link">
+                <div class="${isBot ? 'bots-info' : 'usuarios-info'} admin-entity-summary">
                     <img src="${usuario.avatar || './assets/img/placeholder-avatar.png'}" alt="Avatar ${usuario.name}">
                     <div class="usuario-texto">
                         <div class="nome-badge">
                             <span class="nome">${usuario.name}</span>
                             ${usuario.discordId === state.currentUser?.discordId ? '<span class="badge badge-voce">Você</span>' : ''}
+                            ${isBot ? '<span class="badge badge-bot"><i class="fa-solid fa-robot"></i> Bot</span>' : ''}
+                            ${!isBot && isSystemAdmin ? '<span class="badge badge-admin"><i class="fa-solid fa-shield"></i> Admin</span>' : ''}
                         </div>
                         <div class="usuario-meta-secundaria">Discord ID: ${usuario.discordId}</div>
-                        ${!isBot ? `
-                            <div class="role">
-                                <span class="badge ${usuario.admin ? 'badge-admin' : ''}">
-                                    ${usuario.admin ? '<i class="fa-solid fa-shield"></i> Admin' : ''}
-                                </span>
-                            </div>
-                        ` : ''}
                         ${usuario.banned ? `<div class="banimento-info">Conta banida globalmente${usuario.active === false ? ' e inativa' : ''}.</div>` : ''}
                     </div>
                 </div>
             </a>
         </td>
-        <td data-label="Email">${usuario.email || '—'}</td>
-        <td data-label="Membro Desde">${formatarDataOrDash(usuario.joined)}</td>
-        <td data-label="Status">${getStatusBadge(usuario.active, usuario.banned === true)}</td>
-        <td data-label="Ações">
-            <div class="${isBot ? 'acoes-bot' : 'acoes-usuario'}">
+        <td data-label="Email" class="admin-table-cell">
+            <div class="admin-table-data">
+                <span>Contato</span>
+                <strong>${usuario.email || '—'}</strong>
+            </div>
+        </td>
+        <td data-label="Membro Desde" class="admin-table-cell">
+            <div class="admin-table-data">
+                <span>Membro desde</span>
+                <strong>${formatarDataOrDash(usuario.joined)}</strong>
+            </div>
+        </td>
+        <td data-label="Status" class="admin-table-cell admin-status-cell">
+            <div class="admin-table-data">
+                <span>Situação</span>
+                ${getStatusBadge(usuario.active, usuario.banned === true)}
+            </div>
+        </td>
+        <td data-label="Ações" class="admin-table-cell admin-actions-cell">
+            <div class="admin-table-data admin-table-actions-block">
+                <div class="${isBot ? 'acoes-bot' : 'acoes-usuario'}">
                 <button type="button" class="btn-acoes btn-redefinir"><i class="fa-solid fa-key"></i> Redefinir Senha</button>
                 ${isBot ? '' : '<button type="button" class="btn-acoes btn-permissoes"><i class="fa-solid fa-shield"></i> Permissões</button>'}
                 <button type="button" class="btn-acoes ${usuario.banned ? 'btn-permissoes' : 'btn-excluir'} btn-ban-toggle">
                     <i class="fa-solid ${usuario.banned ? 'fa-unlock' : 'fa-ban'}"></i>
                     ${usuario.banned ? 'Desbanir' : 'Banir'}
                 </button>
+                </div>
             </div>
         </td>
     `;
@@ -395,6 +448,7 @@ function buildUserRow(usuario, isBot = false) {
         abrirModalRedefinirSenha({
             nome: usuario.name,
             email: usuario.email,
+            avatar: usuario.avatar || './assets/img/placeholder-avatar.png',
             userId: usuario.id,
             discordId: usuario.discordId
         });
@@ -407,7 +461,8 @@ function buildUserRow(usuario, isBot = false) {
             userId: usuario.id,
             discordId: usuario.discordId,
             avatar: usuario.avatar || './assets/img/placeholder-avatar.png',
-            isAdmin: usuario.admin,
+            isAdmin: isSystemAdmin,
+            superAdmin: isGlobalSuperAdmin,
             isAtivo: usuario.active,
             isLogado: usuario.discordId === state.currentUser?.discordId
         }, state.currentUser);
@@ -450,6 +505,10 @@ export function renderVotos(votos) {
 
     containerVotos.innerHTML = '';
 
+    if (!votos?.length) {
+        containerVotos.innerHTML = '<div class="admin-empty">Nenhum tipo de voto global cadastrado.</div>';
+    }
+
     if (btnCadastrar) {
         btnCadastrar.onclick = () => abrirModalVoto(null, votos);
     }
@@ -458,18 +517,40 @@ export function renderVotos(votos) {
         const div = document.createElement('div');
         div.className = 'voto';
         div.innerHTML = `
-            <div class="voto-conteudo">
-                <div class="emoji-voto">${voto.emoji}</div>
-                <div class="detalhes-voto">
-                    <h3>${voto.name}</h3>
-                    <p>${voto.description}</p>
-                    <span style="background:${voto.color}">${voto.color}</span>
-                    <p>${voto.active === false ? 'Status: Inativo' : 'Status: Ativo'}</p>
+            <div class="voto-topo">
+                <div class="voto-conteudo">
+                    <div class="emoji-voto voto-emoji-badge">${voto.emoji}</div>
+                    <div class="detalhes-voto">
+                        <div class="voto-titulo-linha">
+                            <h3>${voto.name}</h3>
+                            <span class="badge ${voto.active === false ? 'badge-inativo' : 'badge-ativo'}">${voto.active === false ? 'Inativo' : 'Ativo'}</span>
+                        </div>
+                        <p>${voto.description}</p>
+                    </div>
+                </div>
+                <div class="voto-acoes">
+                    <button type="button" class="btn-acoes btn-editar" title="Editar tipo de voto" aria-label="Editar tipo de voto">
+                        <i class="fa-regular fa-pen-to-square"></i>
+                        Editar
+                    </button>
+                    <button type="button" class="btn-acoes btn-excluir" title="Excluir tipo de voto" aria-label="Excluir tipo de voto">
+                        <i class="fa-regular fa-trash-can"></i>
+                        Excluir
+                    </button>
                 </div>
             </div>
-            <div class="voto-acoes">
-                <button class="btn-editar"><i class="fa-regular fa-pen-to-square"></i></button>
-                <button class="btn-excluir"><i class="fa-regular fa-trash-can"></i></button>
+            <div class="voto-meta-grid">
+                <div class="voto-meta-card">
+                    <span>Cor</span>
+                    <strong class="voto-cor-valor">
+                        <span class="voto-cor-dot" style="background:${voto.color}"></span>
+                        ${voto.color}
+                    </strong>
+                </div>
+                <div class="voto-meta-card">
+                    <span>Escopo</span>
+                    <strong>Global</strong>
+                </div>
             </div>
         `;
 

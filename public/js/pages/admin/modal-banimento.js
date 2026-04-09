@@ -37,6 +37,10 @@ export function abrirModalBanimento(config) {
     const titulo = modal.querySelector('.banimento-titulo');
     const subtitulo = modal.querySelector('.banimento-subtitulo');
     const contexto = modal.querySelector('.banimento-contexto');
+    const usuarioCard = modal.querySelector('.banimento-usuario-card');
+    const usuarioAvatar = modal.querySelector('.banimento-avatar-usuario');
+    const usuarioNome = modal.querySelector('.banimento-usuario-nome');
+    const usuarioEmail = modal.querySelector('.banimento-usuario-email');
     const nome = modal.querySelector('.banimento-nome');
     const identificador = modal.querySelector('.banimento-identificador');
     const formulario = modal.querySelector('.banimento-formulario');
@@ -52,6 +56,21 @@ export function abrirModalBanimento(config) {
     const confirmButton = modal.querySelector('.btn-confirmar-banimento');
 
     titleCaseBadge(contexto, config.targetType);
+    const isUser = config.targetType === 'user';
+
+    if (usuarioCard) {
+        usuarioCard.classList.toggle('inativo', !isUser);
+    }
+    if (usuarioAvatar) {
+        usuarioAvatar.src = config.avatar || './assets/img/placeholder-avatar.png';
+    }
+    if (usuarioNome) {
+        usuarioNome.textContent = config.name || '-';
+    }
+    if (usuarioEmail) {
+        usuarioEmail.textContent = config.identifier || '';
+    }
+
     if (nome) nome.textContent = config.name || '-';
     if (identificador) identificador.textContent = config.identifier || '';
 

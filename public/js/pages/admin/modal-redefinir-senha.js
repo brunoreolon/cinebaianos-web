@@ -13,13 +13,19 @@ export function abrirModalRedefinirSenha(dados) {
      // Seleciona os elementos do modal para exibir nome e email
     const nomeEl = modal.querySelector(".nome-usuario");  // crie essa classe no span do modal
     const emailEl = modal.querySelector(".email-usuario"); // crie essa classe no span do modal
+    const avatarEl = modal.querySelector('.redefinicao-avatar-usuario');
+    const nomeCardEl = modal.querySelector('.redefinicao-nome-usuario');
+    const emailCardEl = modal.querySelector('.redefinicao-email-usuario');
     const senha = modal.querySelector("#senha");
     const btnRedefinir = modal.querySelector(".btn-redefinir-senha");
 
     // Preenche as informações
     nomeEl.textContent = dados.nome;
     emailEl.textContent = dados.email;
-    
+    if (avatarEl) avatarEl.src = dados.avatar || './assets/img/placeholder-avatar.png';
+    if (nomeCardEl) nomeCardEl.textContent = dados.nome;
+    if (emailCardEl) emailCardEl.textContent = dados.email || 'Sem email cadastrado';
+
     btnRedefinir.onclick = async () => {
         if (senha.value.length < 6) {
             alert("A senha deve ter no mínimo 6 caracteres");

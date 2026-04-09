@@ -1,10 +1,42 @@
 @media (max-width: 600px) {
+    .administracao {
+        gap: 18px;
+    }
+
+    .secao-header {
+        padding: 22px 18px;
+        border-radius: 18px;
+    }
+
+    .secao-header-main {
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .secao-header-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+    }
+
+    .secao-header h1 {
+        font-size: 28px;
+    }
+
+    .admin-kpis {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
     .sub-menus {
-        flex-wrap: wrap;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        width: 100%;
+        box-sizing: border-box;
+        border-radius: 18px;
     }
 
     .btn-menu {
-        flex: 1 1 100%;
+        width: 100%;
     }
 
     .secao-topo {
@@ -36,13 +68,26 @@
         padding: 14px;
     }
 
+    .grupo-admin-meta {
+        grid-template-columns: 1fr;
+    }
+
+    .grupo-admin-title-row {
+        gap: 8px;
+    }
+
+    .grupo-admin-badges {
+        width: 100%;
+    }
+
     .grupo-admin-head-right {
         width: 100%;
         flex-direction: column;
         align-items: stretch;
     }
 
-    .grupo-admin-head-right .btn-acoes {
+    .grupo-admin-head-right .btn-acoes,
+    .grupo-admin-actions .btn-acoes {
         width: 100%;
         justify-content: center;
     }
@@ -101,15 +146,38 @@
         gap: 12px;
     }
 
+    .voto-topo,
+    .voto-conteudo {
+        width: 100%;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .voto-emoji-badge {
+        width: 60px;
+        height: 60px;
+        min-width: 60px;
+    }
+
     .detalhes-voto {
-        margin: 10px 0px 20px 0px;
+        margin: 10px 0 20px 0;
+    }
+
+    .voto-meta-grid {
+        width: 100%;
+        grid-template-columns: 1fr;
     }
 
     .voto-acoes {
         width: 100%;
         display: flex;
         justify-content: center;
+        flex-wrap: wrap;
         gap: 8px;
+    }
+
+    .voto-acoes .btn-acoes {
+        flex: 1 1 calc(50% - 4px);
     }
 
 
@@ -129,16 +197,27 @@
 
     .tabela-container tr {
         margin-bottom: 15px;
-        border: 1px solid #444;
-        border-radius: 10px;
-        padding: 10px;
-        background: #222;
+        border: 1px solid oklch(var(--cor-preto-1-params) / 0.12);
+        border-radius: 18px;
+        padding: 14px;
+        background: linear-gradient(180deg, oklch(var(--cor-preto-1-params) / 0.12), oklch(var(--cor-preto-1-params) / 0.06));
+        box-shadow: 0 12px 24px oklch(var(--cor-preto-1-params) / 0.14);
     }
 
     .tabela-container td {
+        background: transparent;
+        border: none;
         padding-left: 50%;
         position: relative;
         text-align: left;
+        padding-top: 6px;
+        padding-bottom: 10px;
+        min-height: 28px;
+    }
+
+    .tabela-container td:first-child,
+    .tabela-container td:last-child {
+        border-radius: 0;
     }
 
     .tabela-container td::before {
@@ -164,11 +243,20 @@
     .usuarios-info,
     .bots-info {
         min-width: 0;
+        align-items: flex-start;
     }
 
     .btn-acoes {
         width: 100%;
         justify-content: center;
+    }
+
+    .admin-table-data {
+        gap: 4px;
+    }
+
+    .admin-table-data > span {
+        display: none;
     }
 
 
@@ -278,8 +366,13 @@
 }
 
 @media (max-width: 300px) {
+    .admin-kpis {
+        grid-template-columns: 1fr;
+    }
+
     .secao-header h1 {
-        display: none;
+        display: block;
+        font-size: 22px;
     }
 
     /* tab votos */
@@ -303,15 +396,24 @@
         width: 100%;
     }
 
+    .voto-topo {
+        width: 100%;
+    }
+
     .detalhes-voto {
-        margin: 10px 0px 20px 0px;
+        margin: 10px 0 20px 0;
     }
 
     .voto-acoes {
         width: 100%;
         display: flex;
         justify-content: center;
+        flex-wrap: wrap;
         gap: 8px;
+    }
+
+    .voto-acoes .btn-acoes {
+        flex: 1 1 100%;
     }
 
     .info .titulo-permissao,

@@ -35,46 +35,84 @@
             <main>
                 <section class="administracao">
                     <div class="secao-header">
-                        <i class="fa-solid fa-shield fa-3x"></i>
-                        <h1>Painel de Administração</h1>
+                        <div class="secao-header-main">
+                            <div class="secao-header-icon">
+                                <i class="fa-solid fa-shield-halved"></i>
+                            </div>
+                            <div class="secao-header-content">
+                                <p class="secao-header-eyebrow">ADMINISTRAÇÃO GLOBAL</p>
+                                <h1>Painel de Administração</h1>
+                                <p class="secao-header-description">Acompanhe indicadores do ambiente, gerencie entidades globais e mantenha grupos, usuários, votos e bots dentro do padrão visual e operacional da plataforma.</p>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="admin-kpis">
                         <article class="admin-kpi-card">
-                            <span>Total de grupos</span>
+                            <div class="admin-kpi-card-head">
+                                <span>Total de grupos</span>
+                                <i class="fa-solid fa-users"></i>
+                            </div>
                             <strong id="kpi-total-grupos">0</strong>
                         </article>
                         <article class="admin-kpi-card">
-                            <span>Grupos banidos</span>
+                            <div class="admin-kpi-card-head">
+                                <span>Grupos banidos</span>
+                                <i class="fa-solid fa-ban"></i>
+                            </div>
                             <strong id="kpi-grupos-banidos">0</strong>
                         </article>
                         <article class="admin-kpi-card">
-                            <span>Total de usuários</span>
+                            <div class="admin-kpi-card-head">
+                                <span>Total de usuários</span>
+                                <i class="fa-regular fa-user"></i>
+                            </div>
                             <strong id="kpi-total-usuarios">0</strong>
                         </article>
                         <article class="admin-kpi-card">
-                            <span>Usuários banidos</span>
+                            <div class="admin-kpi-card-head">
+                                <span>Usuários banidos</span>
+                                <i class="fa-solid fa-user-slash"></i>
+                            </div>
                             <strong id="kpi-usuarios-banidos">0</strong>
                         </article>
                         <article class="admin-kpi-card">
-                            <span>Usuários admin</span>
+                            <div class="admin-kpi-card-head">
+                                <span>Usuários admin</span>
+                                <i class="fa-solid fa-user-shield"></i>
+                            </div>
                             <strong id="kpi-usuarios-admin">0</strong>
                         </article>
                         <article class="admin-kpi-card">
-                            <span>Total de bots</span>
+                            <div class="admin-kpi-card-head">
+                                <span>Total de bots</span>
+                                <i class="fa-solid fa-robot"></i>
+                            </div>
                             <strong id="kpi-total-bots">0</strong>
                         </article>
                     </div>
 
-                    <div class="sub-menus">
-                        <button class="btn-menu ativo" data-tab="grupos">Grupos</button>
-                        <button class="btn-menu" data-tab="usuarios">Usuários</button>
-                        <button class="btn-menu" data-tab="votos">Tipos de Votos</button>
-                        <button class="btn-menu" data-tab="bots">Bots</button>
+                    <div class="sub-menus" role="tablist" aria-label="Navegação do painel de administração">
+                        <button type="button" id="tab-grupos-btn" class="btn-menu ativo" data-tab="grupos" role="tab" aria-selected="true">
+                            <i class="fa-solid fa-users"></i>
+                            Grupos
+                        </button>
+                        <button type="button" id="tab-votos-btn" class="btn-menu" data-tab="votos" role="tab" aria-selected="false">
+                            <i class="fa-solid fa-star-half-stroke"></i>
+                            Tipos de Votos
+                        </button>
+                        <button type="button" id="tab-usuarios-btn" class="btn-menu" data-tab="usuarios" role="tab" aria-selected="false">
+                            <i class="fa-regular fa-user"></i>
+                            Usuários
+                        </button>
+                        <button type="button" id="tab-bots-btn" class="btn-menu" data-tab="bots" role="tab" aria-selected="false">
+                            <i class="fa-solid fa-robot"></i>
+                            Bots
+                        </button>
                     </div>
                     
                     <div class="tab-content">
-                        <div class="tab-pane ativo" id="grupos">
+                        <div class="tab-pane ativo" id="grupos" role="tabpanel" aria-labelledby="tab-grupos-btn">
                             <div class="secao-topo">
                                 <div class="secao-titulo">
                                     <h4>Grupos cadastrados</h4>
@@ -94,7 +132,23 @@
                             <div id="lista-grupos-admin" class="lista-grupos-admin"></div>
                         </div>
 
-                        <div class="tab-pane" id="usuarios">
+                        <div class="tab-pane" id="votos" role="tabpanel" aria-labelledby="tab-votos-btn">
+                            <div class="secao-topo">
+                                <div class="secao-titulo">
+                                    <h4>Tipos de Votos</h4>
+                                    <p>Gerencie apenas os tipos de avaliações globais do sistema.</p>
+                                </div>
+                                <div id="votos-resumo" class="secao-resumo">0 votos</div>
+                                <button class="btn-novo">
+                                    <i class="fa-solid fa-plus"></i>
+                                    Novo Tipo de Voto
+                                </button>
+                            </div>
+                            <div class="lista-votos">
+                            </div>
+                        </div>
+
+                        <div class="tab-pane" id="usuarios" role="tabpanel" aria-labelledby="tab-usuarios-btn">
                             <div class="secao-topo">
                                 <div class="secao-titulo">
                                     <h4>Gerenciamento de Usuários</h4>
@@ -118,23 +172,7 @@
                             </div>
                         </div>
 
-                        <div class="tab-pane" id="votos">
-                            <div class="secao-topo">
-                                <div class="secao-titulo">
-                                    <h4>Tipos de Votos</h4>
-                                    <p>Gerencie apenas os tipos de avaliações globais do sistema.</p>
-                                </div>
-                                <div id="votos-resumo" class="secao-resumo">0 votos</div>
-                                <button class="btn-novo">
-                                    <i class="fa-solid fa-plus"></i>
-                                    Novo Tipo de Voto
-                                </button>
-                            </div>
-                            <div class="lista-votos">
-                            </div>
-                        </div>
-
-                        <div class="tab-pane" id="bots">
+                        <div class="tab-pane" id="bots" role="tabpanel" aria-labelledby="tab-bots-btn">
                             <div class="secao-topo">
                                 <div class="secao-titulo">
                                     <h4>Gerenciamento de Bots</h4>
@@ -216,6 +254,13 @@
                     <span class="close">&times;</span>
                 </header>
                 <section class="dados">
+                    <div class="dados-usuario redefinicao-usuario-card">
+                        <img src="" alt="Avatar do usuário" class="redefinicao-avatar-usuario">
+                        <div class="usuario-info">
+                            <div class="nome redefinicao-nome-usuario"></div>
+                            <div class="email redefinicao-email-usuario"></div>
+                        </div>
+                    </div>
                     <div class="campo">
                         <label>Nova Senha</label>
                         <input id="senha" type="password" placeholder="Mínimo de 6 caracteres">
@@ -287,9 +332,20 @@
                 </header>
                 <section class="dados">
                     <div class="banimento-destino">
-                        <span class="badge banimento-contexto">Grupo</span>
-                        <h3 class="banimento-nome">-</h3>
-                        <p class="secundario banimento-identificador"></p>
+                        <div class="banimento-topo">
+                            <span class="badge banimento-contexto">Grupo</span>
+                            <div class="banimento-texto">
+                                <h3 class="banimento-nome">-</h3>
+                                <p class="secundario banimento-identificador"></p>
+                            </div>
+                        </div>
+                        <div class="dados-usuario banimento-usuario-card inativo">
+                            <img src="" alt="Avatar do usuário" class="banimento-avatar-usuario">
+                            <div class="usuario-info">
+                                <div class="nome banimento-usuario-nome"></div>
+                                <div class="email banimento-usuario-email"></div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="banimento-formulario">

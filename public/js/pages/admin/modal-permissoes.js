@@ -28,7 +28,8 @@ export function abrirModalPermissoes(dados, usuarioLogado) {
     // Define estados iniciais
     const estadoInicial = {
         ativo: !!dados.isAtivo,
-        admin: !!dados.isAdmin
+        admin: !!dados.isAdmin,
+        superAdmin: !!dados.superAdmin
     };
 
     // Preenche os checkboxes
@@ -56,7 +57,7 @@ export function abrirModalPermissoes(dados, usuarioLogado) {
     const btnConcluir = modal.querySelector(".btn-concluir");
     btnConcluir.onclick = async () => {
         try {
-            if (dados.discordId === MY_DISCORD_ID && dados.discordId != usuarioLogado.discordId) {
+            if (dados.discordId === MY_DISCORD_ID && dados.discordId !== usuarioLogado.discordId) {
                 criarMensagem("Você tentou… e falhou miseravelmente 😎", MensagemTipo.ERROR);
                 return;
             }
@@ -90,16 +91,24 @@ export function abrirModalPermissoes(dados, usuarioLogado) {
                     : "<i class='fa-solid fa-ban'></i> Inativo";
 
                 // Atualiza badge de admin
-                const spanAdmin = tr.querySelector('[data-label="Usuário"] .role .badge');
-                if (spanAdmin) {
-                    if (dados.isAdmin) {
-                        spanAdmin.classList.add("badge-admin");
+                const nomeBadge = tr.querySelector('[data-label="Usuário"] .nome-badge');
+                const adminShouldBeVisible = !!dados.isAdmin || !!dados.superAdmin;
+                const badgeAdmin = nomeBadge?.querySelector('.badge-admin');
+
+                if (nomeBadge) {
+                    if (adminShouldBeVisible && !badgeAdmin) {
+                        const spanAdmin = document.createElement('span');
+                        spanAdmin.className = 'badge badge-admin';
                         spanAdmin.innerHTML = '<i class="fa-solid fa-shield"></i> Admin';
-                    } else {
-                        spanAdmin.classList.remove("badge-admin");
-                        spanAdmin.innerHTML = "";
+                        nomeBadge.appendChild(spanAdmin);
+                    }
+
+                    if (!adminShouldBeVisible && badgeAdmin) {
+                        badgeAdmin.remove();
                     }
                 }
+
+                tr.dataset.isAdmin = String(adminShouldBeVisible);
             }
 
             fecharModal(modal);
