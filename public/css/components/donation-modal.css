@@ -177,8 +177,9 @@
     display: flex;
     gap: 0;
     align-items: stretch;
-    max-width: 320px;
-    margin: 0 auto;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
 }
 
 .donation-custom-section input {
@@ -393,25 +394,24 @@
     }
 
     .donation-custom-section {
-        flex-direction: column;
+        flex-direction: row;
         align-items: stretch;
-        gap: 8px;
+        gap: 0;
         max-width: 100%;
     }
 
     .donation-custom-section .currency {
         text-align: center;
         justify-content: center;
-        margin-bottom: 0;
         height: 42px;
-        min-width: 0;
-        border-right: 2px solid #e0e0e0;
-        border-radius: 6px;
+        min-width: 52px;
+        border-right: 0;
+        border-radius: 6px 0 0 6px;
     }
 
     .donation-custom-section input {
-        border-left: 2px solid #e0e0e0;
-        border-radius: 6px;
+        border-left: 0;
+        border-radius: 0 6px 6px 0;
     }
 
 }

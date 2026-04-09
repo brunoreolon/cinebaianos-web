@@ -34,6 +34,9 @@ export const donationService = {
 };
 
 let currentPixPayload = '';
+let donationEventsBound = false;
+const QRIOUS_SCRIPT_ID = 'qrious-cdn-script';
+const QRIOUS_CDN_URL = 'https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js';
 
 function normalizePixKey(value) {
     return (value || '').trim();
@@ -42,28 +45,32 @@ function normalizePixKey(value) {
 /**
  * Inicializa o sistema de doação
  */
-export function initDonationSystem() {
-    const donationBtn = document.getElementById('btn-donate');
-    const donationModal = document.getElementById('donation-modal');
-    const closeDonationBtn = document.getElementById('close-donation-modal');
-    const modalOverlay = document.querySelector('.donation-modal-overlay');
+export async function initDonationSystem() {
+    ensureDonationModalStylesheet();
 
+    const donationBtn = document.getElementById('btn-donate');
     if (!donationBtn) return;
 
+    const donationModal = await ensureDonationModalAvailable();
+    if (!donationModal) return;
+
+    const closeDonationBtn = donationModal.querySelector('#close-donation-modal');
+    const modalOverlay = donationModal.querySelector('.donation-modal-overlay');
+
+    if (donationEventsBound) return;
+    donationEventsBound = true;
+
     // Abrir modal
-    donationBtn.addEventListener('click', () => {
-        if (donationModal) {
-            donationModal.classList.add('active');
-            disableBodyScroll();
-            renderDonationModal();
-        }
+    donationBtn.addEventListener('click', async () => {
+        donationModal.classList.add('active');
+        disableBodyScroll();
+        await renderDonationModal();
     });
 
     // Fechar modal
     if (closeDonationBtn) {
         closeDonationBtn.addEventListener('click', () => {
-            donationModal?.classList.remove('active');
-            enableBodyScroll();
+            closeDonationModal(donationModal);
         });
     }
 
@@ -72,12 +79,72 @@ export function initDonationSystem() {
         modalOverlay.addEventListener('click', (e) => {
             // Só fecha se clicou no overlay, não no modal-content
             if (e.target === modalOverlay) {
-                donationModal?.classList.remove('active');
-                enableBodyScroll();
+                closeDonationModal(donationModal);
             }
         });
     }
 
+}
+
+function closeDonationModal(donationModal) {
+    donationModal?.classList.remove('active');
+    resetDonationModalState();
+    enableBodyScroll();
+}
+
+function resetDonationModalState() {
+    const customInput = document.getElementById('donation-custom-input');
+    if (customInput) {
+        customInput.value = '';
+    }
+
+    document.querySelectorAll('.donation-value-btn.active').forEach((button) => {
+        button.classList.remove('active');
+    });
+
+    currentPixPayload = '';
+}
+
+function ensureDonationModalStylesheet() {
+    const stylesheetId = 'donation-modal-stylesheet';
+    if (document.getElementById(stylesheetId)) return;
+
+    const existingStylesheet = Array.from(document.querySelectorAll('link[rel="stylesheet"]'))
+        .some((link) => (link.getAttribute('href') || '').includes('donation-modal.css'));
+    if (existingStylesheet) return;
+
+    const link = document.createElement('link');
+    link.id = stylesheetId;
+    link.rel = 'stylesheet';
+    link.href = './css/components/donation-modal.css';
+    document.head.appendChild(link);
+}
+
+async function ensureDonationModalAvailable() {
+    const existingModal = document.getElementById('donation-modal');
+    if (existingModal) return existingModal;
+
+    try {
+        const response = await fetch('./partial/donation-modal.html');
+        if (!response.ok) {
+            throw new Error(`Falha ao carregar modal de doação: ${response.status}`);
+        }
+
+        const html = await response.text();
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = html;
+
+        const modal = wrapper.querySelector('#donation-modal');
+        if (!modal) {
+            throw new Error('Markup do modal de doação não encontrado no partial.');
+        }
+
+        document.body.appendChild(modal);
+        return modal;
+    } catch (error) {
+        console.error('Erro ao preparar modal de doação:', error);
+        return null;
+    }
 }
 
 /**
@@ -113,7 +180,7 @@ function getScrollbarWidth() {
 
     return scrollbarWidth;
 }
-function renderDonationModal() {
+async function renderDonationModal() {
     const valuesContainer = document.getElementById('donation-values-buttons');
     if (!valuesContainer) return;
 
@@ -146,20 +213,61 @@ function renderDonationModal() {
         };
     }
 
+    // Sempre reabre o modal sem seleção anterior.
+    resetDonationModalState();
+
     donationService.pixKey = resolvePixKeyFromEnvironment();
     donationService.pixOwner = resolvePixNameFromEnvironment();
     donationService.pixCity = resolvePixCityFromEnvironment();
 
     const pixText = document.getElementById('pix-key-display');
     if (pixText && !donationService.pixKey) {
-        pixText.textContent = 'Chave PIX nao configurada. Defina DONATION_PIX_KEY no ambiente.';
+        pixText.textContent = 'Chave PIX não configurada. Defina DONATION_PIX_KEY no ambiente.';
     }
 
     // Configurar botão de copiar
     setupCopyPixButton();
 
+    // Garante biblioteca de QR também fora da index.
+    await ensureQrLibraryLoaded();
+
     // Gerar QR inicial (sem valor pré-definido)
     atualizarPixComValor(null);
+}
+
+async function ensureQrLibraryLoaded() {
+    if (typeof QRious !== 'undefined') return;
+
+    let script = document.getElementById(QRIOUS_SCRIPT_ID);
+    if (!script) {
+        script = document.createElement('script');
+        script.id = QRIOUS_SCRIPT_ID;
+        script.src = QRIOUS_CDN_URL;
+        script.async = true;
+        document.head.appendChild(script);
+    }
+
+    if (typeof QRious !== 'undefined') return;
+
+    await new Promise((resolve, reject) => {
+        const onLoad = () => {
+            cleanup();
+            resolve();
+        };
+        const onError = () => {
+            cleanup();
+            reject(new Error('Falha ao carregar biblioteca de QR Code (QRious).'));
+        };
+        const cleanup = () => {
+            script.removeEventListener('load', onLoad);
+            script.removeEventListener('error', onError);
+        };
+
+        script.addEventListener('load', onLoad);
+        script.addEventListener('error', onError);
+    }).catch((error) => {
+        console.warn(error.message);
+    });
 }
 
 /**
@@ -204,7 +312,7 @@ function atualizarPixComValor(rawAmount) {
         currentPixPayload = '';
         const pixText = document.getElementById('pix-key-display');
         if (pixText) {
-            pixText.textContent = 'Chave PIX nao configurada. Defina DONATION_PIX_KEY no ambiente.';
+            pixText.textContent = 'Chave PIX não configurada. Defina DONATION_PIX_KEY no ambiente.';
         }
         generateQRCode('');
         return;
@@ -312,8 +420,8 @@ function generateQRCode(value) {
 
     try {
         if (!value) {
-            qrImg.alt = 'QR Code PIX indisponivel';
-            qrImg.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23fff" width="200" height="200"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%23999" font-size="12" font-family="Arial"%3EPIX nao configurado%3C/text%3E%3C/svg%3E';
+            qrImg.alt = 'QR Code PIX indisponível';
+            qrImg.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23fff" width="200" height="200"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%23999" font-size="12" font-family="Arial"%3EPIX não configurado%3C/text%3E%3C/svg%3E';
             qrImg.style.display = 'block';
             qrImg.style.margin = '0 auto';
             return;

@@ -17,9 +17,18 @@
             </div>
 
             <div class="donation-qrcode-section">
-                <h3>Chave PIX</h3>
+                <h3>Escanear com PIX</h3>
+                <canvas id="donation-qrcode-canvas" style="display: none;"></canvas>
+                <img id="donation-qrcode-img" alt="QR Code PIX" class="donation-qrcode" />
+                <p style="font-size: 12px; color: #999; margin-top: 10px;">
+                    <i class="fa-solid fa-smartphone"></i> Abra o app do seu banco e escaneie
+                </p>
+            </div>
+
+            <div class="donation-qrcode-section donation-section-divider">
+                <h3>Copiar PIX (copia e cola)</h3>
                 <div class="donation-copy-pix">
-                    <div class="donation-copy-pix-text" id="pix-key-display">00020126580014br.gov.bcb.pix0136</div>
+                    <div class="donation-copy-pix-text" id="pix-key-display">Carregando PIX...</div>
                     <button type="button" class="donation-copy-btn" id="btn-copy-pix">
                         <i class="fa-solid fa-copy"></i> Copiar
                     </button>
@@ -35,7 +44,7 @@
                     <input
                         type="number"
                         id="donation-custom-input"
-                        placeholder="Valor personalizado"
+                        placeholder="Outro valor"
                         min="1"
                         step="0.01"
                     />
@@ -47,8 +56,8 @@
                 <ul>
                     <li>Servidor funcionando 24/7</li>
                     <li>Novas funcionalidades e melhorias</li>
-                    <li>Suporte da comunidade</li>
-                    <li>Banco de dados de filmes atualizado</li>
+<!--                    <li>Suporte da comunidade</li>-->
+<!--                    <li>Banco de dados de filmes atualizado</li>-->
                 </ul>
             </div>
 
@@ -56,12 +65,7 @@
                 <button type="button" class="donation-actions button donation-btn-secondary" id="close-donation-modal">
                     Fechar
                 </button>
-                <button type="button" class="donation-actions button donation-btn-primary">
-                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                    Abrir PIX no Banco
-                </button>
             </div>
         </div>
     </div>
 </div>
-

@@ -62,7 +62,7 @@ async function incluirHeader() {
     exibirMenuUsuario();
 
     // Inicializar sistema de doação
-    initDonationSystem();
+    await initDonationSystem();
     updateDonationButtonVisibility(true);
 }
 
