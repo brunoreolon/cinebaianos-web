@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+        <link rel="stylesheet" href="./css/components/mensagem-container.css" type="text/css">
+        <link rel="stylesheet" href="./css/global.css" type="text/css">
+        <link rel="stylesheet" href="./css/components/header.css" type="text/css">
+        <link rel="stylesheet" href="./css/components/footer.css" type="text/css">
+        <link rel="stylesheet" href="./css/components/group-preview-card.css" type="text/css">
+        <link rel="stylesheet" href="./css/components/movie-filters.css" type="text/css">
+        <link rel="stylesheet" href="./css/pages/detalhes-grupo.css" type="text/css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+        <link rel="icon" type="image/png" href="assets/icons/favicon.png" />
+
+        <title>CineBaianos | Detalhes do Grupo</title>
+    </head>
+    <body>
+        <div id="loader">
+            <div class="spinner">
+                <p>Carregando grupo...</p>
+            </div>
+        </div>
+
+        <div id="container" class="inativo-js">
+            <div id="header-container"></div>
+            <div class="mensagem-container"></div>
+
+            <main class="grupo-detalhe-page">
+
+                <a href="./meus-grupos.html" class="grupo-voltar">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Voltar para meus grupos
+                </a>
+
+                <!-- Hero do grupo -->
+                <section class="grupo-hero" id="grupo-hero">
+                    <div class="grupo-hero-info">
+                        <p class="grupo-hero-tag" id="grupo-tag">—</p>
+                        <h1 class="grupo-hero-nome" id="grupo-nome">—</h1>
+                        <div class="grupo-hero-badges" id="grupo-badges"></div>
+                        <div class="grupo-hero-meta" id="grupo-meta"></div>
+                    </div>
+                    <div class="grupo-hero-acoes" id="grupo-hero-acoes"></div>
+                </section>
+
+                <!-- Abas -->
+                <div class="grupo-tabs">
+                    <button class="grupo-tab active" data-tab="membros">
+                        <i class="fa-solid fa-users"></i>
+                        Membros
+                    </button>
+                    <button class="grupo-tab" data-tab="filmes">
+                        <i class="fa-solid fa-film"></i>
+                        Filmes
+                    </button>
+                    <button class="grupo-tab" data-tab="votos">
+                        <i class="fa-solid fa-star-half-stroke"></i>
+                        Votos
+                    </button>
+                    <button class="grupo-tab" data-tab="gestao" id="tab-gestao-btn">
+                        <i class="fa-solid fa-user-gear"></i>
+                        Gestão
+                    </button>
+                </div>
+
+                <!-- Aba: Membros -->
+                <div id="tab-membros" class="tab-content active">
+                    <div id="membros-lista" class="membros-sections-grid"></div>
+                </div>
+
+                <!-- Aba: Filmes -->
+                <div id="tab-filmes" class="tab-content">
+                    <div id="filtro-filmes-grupo" class="movie-filters">
+                        <div class="movie-filters-toolbar">
+                            <span id="grupo-filtro-resultados" class="movie-filters-results">0 resultados</span>
+                            <button id="grupo-limpar-filtros" type="button" class="movie-filters-clear">Limpar filtros</button>
+                        </div>
+
+                        <div class="filtros-superiores">
+                            <div class="filtro-ordenar">
+                                <span>Ordenar por:</span>
+                                <select id="grupo-ordenar-por">
+                                    <option value="dateAdded" selected>Adicionado em</option>
+                                    <option value="title">Título</option>
+                                    <option value="chooser.name">Usuário</option>
+                                </select>
+
+                                <div class="ordenacao-direcao" id="grupo-ordenacao-direcao-wrap">
+                                    <button id="grupo-ordenar-direcao" type="button" data-direction="desc" aria-label="Alternar direção da ordenação">
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            class="w-4 h-4"
+                                        >
+                                            <path d="m21 16-4 4-4-4"></path>
+                                            <path d="M17 20V4"></path>
+                                            <path d="m3 8 4-4 4 4"></path>
+                                            <path d="M7 4v16"></path>
+                                        </svg>
+                                    </button>
+                                    <span id="grupo-texto-direcao" class="texto-direcao">Z - A</span>
+                                </div>
+                            </div>
+
+                            <div class="divisao"></div>
+
+                            <div class="filtro-usuario">
+                                <span>Usuário:</span>
+                                <select id="grupo-filtro-usuario">
+                                    <option value="">Todos</option>
+                                </select>
+                            </div>
+
+                            <div class="divisao"></div>
+
+                            <div class="filtro-voto">
+                                <span>Voto:</span>
+                                <select id="grupo-filtro-voto">
+                                    <option value="">Todos</option>
+                                </select>
+                            </div>
+
+                            <div class="divisao"></div>
+
+                            <div class="filtro-genero">
+                                <span>Gênero:</span>
+                                <select id="grupo-filtro-genero">
+                                    <option value="">Todos</option>
+                                </select>
+                            </div>
+
+                            <div class="divisao"></div>
+
+                            <div class="filtro-size">
+                                <span>Itens por página:</span>
+                                <select id="grupo-filmes-size">
+                                    <option value="10">10</option>
+                                    <option value="20" selected>20</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="filtro-busca">
+                            <input type="text" id="grupo-buscar-titulo" placeholder="Buscar por título" />
+                        </div>
+                    </div>
+
+                    <div id="filmes-lista" class="filmes-grupo-grid"></div>
+                    <div id="grupo-filmes-paginacao" class="paginacao"></div>
+                </div>
+
+                <!-- Aba: Votos -->
+                <div id="tab-votos" class="tab-content">
+                    <section class="gestao-grid">
+                        <article class="gestao-card">
+                            <header class="gestao-card-header">
+                                <h3>Votos do grupo</h3>
+                                <p>Cadastre, edite e remova tipos de voto específicos deste grupo.</p>
+                            </header>
+                            <div class="gestao-item-acoes votes-actions-top">
+                                <button type="button" id="btn-novo-voto-grupo" class="btn-membro-action">
+                                    <i class="fa-solid fa-plus"></i>
+                                    Novo voto do grupo
+                                </button>
+                            </div>
+                            <div id="votos-grupo-lista" class="gestao-list"></div>
+                        </article>
+
+                        <article class="gestao-card">
+                            <header class="gestao-card-header">
+                                <h3>Votos globais</h3>
+                                <p>Tipos de voto disponíveis globalmente na aplicação.</p>
+                            </header>
+                            <div id="votos-globais-lista" class="gestao-list"></div>
+                        </article>
+                    </section>
+                </div>
+
+                <!-- Aba: Gestão -->
+                <div id="tab-gestao" class="tab-content">
+                    <section class="gestao-grid">
+                        <article class="gestao-card">
+                            <header class="gestao-card-header">
+                                <h3>Solicitações de entrada</h3>
+                                <p>Aprove ou rejeite pedidos pendentes para este grupo.</p>
+                            </header>
+                            <div id="solicitacoes-lista" class="gestao-list"></div>
+                        </article>
+
+                        <article class="gestao-card">
+                            <header class="gestao-card-header">
+                                <h3>Convites pendentes</h3>
+                                <p>Gerencie convites específicos e genéricos ativos.</p>
+                            </header>
+                            <div id="convites-lista" class="gestao-list"></div>
+                        </article>
+                    </section>
+
+                    <section class="gestao-grid mt-16">
+                        <article class="gestao-card gestao-card-full">
+                            <header class="gestao-card-header">
+                                <h3>Banimentos ativos</h3>
+                                <p>Membros atualmente banidos deste grupo. Remova um banimento para permitir que o usuário entre novamente.</p>
+                            </header>
+                            <div id="banimentos-lista" class="gestao-list"></div>
+                        </article>
+                    </section>
+
+                    <section class="gestao-grid mt-16">
+                        <article class="gestao-card">
+                            <header class="gestao-card-header">
+                                <h3>Convidar usuário específico</h3>
+                                <p>Cria convite individual para um usuário não membro.</p>
+                            </header>
+
+                            <form id="form-convite-usuario">
+                                <div class="campo">
+                                    <label for="convite-user-id">Usuário</label>
+                                    <select id="convite-user-id" required></select>
+                                </div>
+                                <div class="modal-acoes">
+                                    <button type="submit" class="btn-modal-salvar">
+                                        <i class="fa-solid fa-user-plus"></i>
+                                        Criar convite específico
+                                    </button>
+                                </div>
+                            </form>
+                        </article>
+
+                        <article class="gestao-card">
+                            <header class="gestao-card-header">
+                                <h3>Convite genérico</h3>
+                                <p>Cria token reutilizável para compartilhar com qualquer usuário.</p>
+                            </header>
+
+                            <form id="form-convite-generico">
+                                <div class="form-grid-2">
+                                    <div class="campo">
+                                        <label for="convite-generico-max-uses">Máx. usos (opcional)</label>
+                                        <input id="convite-generico-max-uses" type="number" min="1" />
+                                    </div>
+                                    <div class="campo">
+                                        <label for="convite-generico-expires">Expira em (opcional)</label>
+                                        <input id="convite-generico-expires" type="datetime-local" />
+                                    </div>
+                                </div>
+                                <div class="modal-acoes">
+                                    <button type="submit" class="btn-modal-salvar">
+                                        <i class="fa-solid fa-ticket"></i>
+                                        Criar convite genérico
+                                    </button>
+                                </div>
+                            </form>
+
+                            <div id="convite-gerado-resultado" class="convite-gerado-resultado inativo"></div>
+                        </article>
+                    </section>
+                </div>
+
+            </main>
+
+            <!-- Modal: Editar Grupo -->
+            <div id="modal-editar-grupo" class="modal inativo">
+                <div class="modal-content grupo-modal-content">
+                    <h3>Editar Grupo</h3>
+                    <p class="modal-subtitle">Atualize os dados do grupo e acompanhe a prévia do card em tempo real.</p>
+                    <span class="close" id="fechar-modal-editar">&times;</span>
+                    <form id="form-editar-grupo">
+                        <div class="form-grid-2">
+                            <div class="campo">
+                                <label for="edit-nome">Nome *</label>
+                                <input id="edit-nome" type="text" required />
+                                <span id="edit-nome-helper" class="field-helper">Informe um nome claro para o grupo.</span>
+                            </div>
+                            <div class="campo">
+                                <div class="field-label-row">
+                                    <label for="edit-tag">Tag *</label>
+                                    <span id="edit-tag-counter" class="field-counter">0/6</span>
+                                </div>
+                                <input id="edit-tag" type="text" minlength="4" maxlength="6" />
+                                <span id="edit-tag-helper" class="field-helper">Use de 4 a 6 caracteres alfanuméricos ou _.</span>
+                            </div>
+                        </div>
+                        <div class="campo">
+                            <div class="field-label-row">
+                                <label for="edit-slug">Slug *</label>
+                                <span id="edit-slug-counter" class="field-counter">0/50</span>
+                            </div>
+                            <input id="edit-slug" type="text" maxlength="50" required />
+                            <span id="edit-slug-helper" class="field-helper">Use de 4 a 50 caracteres minúsculos, números e hífen.</span>
+                        </div>
+                        <div class="form-grid-2">
+                            <div class="campo">
+                                <label for="edit-visibility">Visibilidade *</label>
+                                <select id="edit-visibility">
+                                    <option value="PUBLIC">Público</option>
+                                    <option value="PRIVATE">Privado</option>
+                                </select>
+                            </div>
+                            <div class="campo">
+                                <label for="edit-join-policy">Política de entrada *</label>
+                                <select id="edit-join-policy">
+                                    <option value="OPEN">Aberto</option>
+                                    <option value="REQUEST">Solicitação</option>
+                                    <option value="INVITE_ONLY">Somente convite</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-grid-3">
+                            <div class="campo">
+                                <label for="edit-vote-deadline">Prazo troca voto (dias)</label>
+                                <input id="edit-vote-deadline" type="number" min="0" />
+                            </div>
+                            <div class="campo">
+                                <label for="edit-movie-new-days">Dias "novo" do filme</label>
+                                <input id="edit-movie-new-days" type="number" min="0" />
+                            </div>
+                            <div class="campo">
+                                <label for="edit-invite-max">Máx. usos convite</label>
+                                <input id="edit-invite-max" type="number" min="0" />
+                            </div>
+                        </div>
+                        <div class="form-checkboxes">
+                            <label class="checkbox-label">
+                                <input id="edit-only-admin-movie" type="checkbox" />
+                                Somente admin adiciona filmes
+                            </label>
+                            <label class="checkbox-label">
+                                <input id="edit-allow-global-votes" type="checkbox" />
+                                Permitir votos globais
+                            </label>
+                        </div>
+                        <div class="group-preview-wrapper edit-group-preview-wrapper">
+                            <span class="group-preview-label">Prévia do card</span>
+                            <div id="edit-group-preview-card" class="edit-group-preview-card-shell"></div>
+                        </div>
+                        <div class="modal-acoes">
+                            <button type="button" id="btn-cancelar-editar" class="btn-modal-cancelar">Cancelar</button>
+                            <button type="submit" id="btn-salvar-editar-grupo" class="btn-modal-salvar">
+                                <i class="fa-regular fa-floppy-disk"></i>
+                                Salvar alterações
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Modal: Banir Membro -->
+            <div id="modal-banir-membro" class="modal inativo">
+                <div class="modal-content grupo-modal-content">
+                    <h3>Banir Membro</h3>
+                    <p class="modal-subtitle" id="ban-membro-nome">—</p>
+                    <span class="close" id="fechar-modal-ban">&times;</span>
+                    <form id="form-banir-membro">
+                        <div class="campo">
+                            <label for="ban-reason">Motivo *</label>
+                            <textarea id="ban-reason" rows="3" required placeholder="Descreva o motivo do banimento..."></textarea>
+                        </div>
+                        <div class="campo">
+                            <label for="ban-expires">
+                                Expira em
+                                <span class="label-opcional">(opcional — deixe vazio para banimento permanente)</span>
+                            </label>
+                            <input id="ban-expires" type="datetime-local" />
+                        </div>
+                        <div class="modal-acoes">
+                            <button type="button" id="btn-cancelar-ban" class="btn-modal-cancelar">Cancelar</button>
+                            <button type="submit" class="btn-modal-danger">
+                                <i class="fa-solid fa-ban"></i>
+                                Confirmar banimento
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Modal: Confirmar Expulsão -->
+            <div id="modal-expulsar-membro" class="modal inativo">
+                <div class="modal-content grupo-modal-content modal-content-sm">
+                    <h3>Expulsar Membro</h3>
+                    <p class="modal-subtitle" id="expulsar-membro-nome">—</p>
+                    <span class="close" id="fechar-modal-expulsar">&times;</span>
+                    <p class="modal-confirm-text">Tem certeza que deseja expulsar este membro do grupo? Esta ação pode ser desfeita reativando o membro.</p>
+                    <div class="modal-acoes">
+                        <button type="button" id="btn-cancelar-expulsar" class="btn-modal-cancelar">Cancelar</button>
+                        <button type="button" id="btn-confirmar-expulsar" class="btn-modal-danger">
+                            <i class="fa-solid fa-user-slash"></i>
+                            Confirmar expulsão
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal: Cadastro de voto do grupo -->
+            <div id="modal-voto-grupo" class="modal inativo">
+                <div class="modal-content grupo-modal-content">
+                    <header>
+                        <h3 id="voto-grupo-modal-title">Novo voto do grupo</h3>
+                        <p class="modal-subtitle">Cadastre um novo tipo de voto para este grupo</p>
+                        <span class="close" id="fechar-modal-voto-grupo">&times;</span>
+                    </header>
+                    <form id="form-voto-grupo">
+                        <section class="dados">
+                            <div class="campo">
+                                <label for="voto-grupo-name">Nome *</label>
+                                <input id="voto-grupo-name" type="text" placeholder="Ex: Amei" required>
+                            </div>
+                            <div class="campo">
+                                <label for="voto-grupo-description">Descrição *</label>
+                                <input id="voto-grupo-description" type="text" placeholder="Ex: Esse filme foi incrível!" required>
+                            </div>
+                            <div class="campo campo-cor">
+                                <label for="voto-grupo-color-hex">Cor *</label>
+                                <div class="campo-cor-inputs">
+                                    <input id="voto-grupo-color-picker" type="color" value="#9810fa">
+                                    <input id="voto-grupo-color-hex" type="text" value="#9810fa" pattern="^#[A-Fa-f0-9]{6}$">
+                                </div>
+                            </div>
+                            <div class="campo">
+                                <label for="voto-grupo-emoji-input">Emoji *</label>
+                                <div class="emoji-container">
+                                    <input id="voto-grupo-emoji-input" type="text" placeholder="Escolha um emoji" readonly>
+                                    <button type="button" id="voto-grupo-btn-emoji">😀</button>
+                                    <div id="voto-grupo-emoji-picker" class="emoji-picker inativo"></div>
+                                </div>
+                            </div>
+                            <div id="preview-voto-grupo">
+                                <div class="emoji-voto">⭐</div>
+                                <div class="descricao">
+                                    <div>Nome do Voto</div>
+                                    <div class="secundario">Descrição do voto</div>
+                                </div>
+                            </div>
+                        </section>
+                        <footer class="cadastro-acoes">
+                            <button type="button" id="btn-cancelar-voto-grupo" class="btn-cancelar">Cancelar</button>
+                            <button type="submit" id="btn-salvar-voto-grupo" class="btn-criar-voto">Criar Tipo de Voto</button>
+                        </footer>
+                    </form>
+                </div>
+            </div>
+
+            <div id="footer-container"></div>
+        </div>
+
+        <script type="module" src="./js/include.js"></script>
+        <script type="module" src="./js/pages/detalhes-grupo.js"></script>
+    </body>
+</html>
+

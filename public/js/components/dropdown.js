@@ -1,7 +1,7 @@
 import { form, criarElemento } from '../global.js';
 import { authService } from '../services/auth-service.js';
 
-export function montarMenuUsuario(usuario) {
+export function montarMenuUsuario(usuario, grupoAtual = null) {
     const avatarContainer = form.avatarContainer();
     const dropdownContainer = form.dropdownContainer();
 
@@ -20,9 +20,26 @@ export function montarMenuUsuario(usuario) {
     avatarContainer.appendChild(divAvatar);
 
     const menu = criarElemento('div', ['dropdown-menu', 'border']);
+    const currentGroupEntry = grupoAtual?.id ? `
+                <li>
+                    <a href="./detalhes-grupo.html?id=${grupoAtual.id}">
+                        <i class="fa-solid fa-people-group space"></i>
+                        Detalhes do grupo atual
+                    </a>
+                </li>
+    ` : '';
+
     menu.innerHTML = `
         <nav>
             <ul>
+                <li>
+                    <a href="./meus-grupos.html">
+                        <i class="fa-solid fa-layer-group space"></i>
+                        Meus Grupos
+                    </a>
+                </li>
+                ${currentGroupEntry}
+                <li class="separator"></li>
                 <li>
                     <a href="./perfil.html?id=${usuario.discordId}">
                         <i class="fa-regular fa-user space"></i>
@@ -33,13 +50,6 @@ export function montarMenuUsuario(usuario) {
                     <a href="./edicao-perfil.html?id=${usuario.discordId}">
                         <i class="fa-solid fa-gear space"></i>
                         Editar perfil
-                    </a>
-                </li>
-                <li class="separator"></li>
-                <li>
-                    <a href="./painel-admin.html">
-                        <i class="fa-solid fa-shield space"></i>
-                        <span class="rosa">Painel Admin</span>
                     </a>
                 </li>
                 <li class="separator"></li>

@@ -64,11 +64,11 @@ export function abrirModalPermissoes(dados, usuarioLogado) {
             const promises = [];
 
             if (dados.isAtivo !== estadoInicial.ativo) {
-                promises.push(adminService.atualizarAtivacaoConta(dados.discordId, dados.isAtivo));
+                promises.push(adminService.atualizarAtivacaoConta(dados.userId, dados.isAtivo));
             }
 
             if (dados.isAdmin !== estadoInicial.admin) {
-                promises.push(adminService.atualizarAdmin(dados.discordId, dados.isAdmin));
+                promises.push(adminService.atualizarAdmin(dados.userId, dados.isAdmin));
             }
 
             if (promises.length === 0) {

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+        <link rel="stylesheet" href="./css/components/mensagem-container.css" type="text/css">
+        <link rel="stylesheet" href="./css/global.css" type="text/css">
+        <link rel="stylesheet" href="./css/pages/cadastro.css" type="text/css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+        <link rel="icon" type="image/png" href="assets/icons/favicon.png" />
+
+        <title>Criar Conta</title>
+    </head>
+    <body>
+        <main id="container">
+            <div class="mensagem-container"></div>
+
+            <header class="cadastro-header">
+                <div class="logo">
+                    <i class="fa-solid fa-clapperboard fa-3x"></i>
+                </div>
+                <h1>CineBaianos</h1>
+                <p id="cadastro-subtitulo">Crie sua conta para entrar nos grupos</p>
+            </header>
+
+            <section class="cadastro-form-section">
+                <form id="form-cadastro" class="cadastro-form">
+                    <div class="form-group">
+                        <label for="cadastro-nome">Nome</label>
+                        <input type="text" id="cadastro-nome" minlength="3" maxlength="120" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cadastro-email">Email</label>
+                        <input type="email" id="cadastro-email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cadastro-senha">Senha</label>
+                        <input type="password" id="cadastro-senha" minlength="8" maxlength="128" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cadastro-confirmar-senha">Confirmar senha</label>
+                        <input type="password" id="cadastro-confirmar-senha" minlength="8" maxlength="128" required>
+                    </div>
+
+                    <span class="info-text fonte-secundaria">
+                        Após salvar, enviaremos um código de confirmação para seu email.
+                    </span>
+
+                    <button type="submit" id="btn-cadastrar" class="btn-cadastrar">Continuar</button>
+                </form>
+
+                <form id="form-verificacao" class="cadastro-form inativo">
+                    <div class="form-group">
+                        <label for="cadastro-codigo">Código de verificação</label>
+                        <input type="text" id="cadastro-codigo" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="000000" required>
+                    </div>
+
+                    <span class="info-text fonte-secundaria" id="verificacao-texto-email">
+                        Enviamos um código para o email informado.
+                    </span>
+
+                    <button type="submit" id="btn-verificar" class="btn-cadastrar">Confirmar cadastro</button>
+
+                    <div class="verificacao-acoes">
+                        <button type="button" id="btn-reenviar-codigo" class="link-button">Reenviar código</button>
+                        <button type="button" id="btn-alterar-email" class="link-button">Alterar dados</button>
+                    </div>
+                </form>
+
+                <p class="auth-switch">
+                    Já tem conta?
+                    <a class="auth-switch-link" href="./login.html">Entrar</a>
+                </p>
+            </section>
+        </main>
+
+        <script type="module" src="./js/pages/cadastro.js"></script>
+    </body>
+</html>
+

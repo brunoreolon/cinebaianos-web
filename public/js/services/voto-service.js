@@ -163,6 +163,100 @@ export class VotoService {
 
         return true;
     }
+
+    /**
+     * Registra o voto de um usuário em um filme dentro de um grupo.
+     *
+     * @param {number|string} groupId - ID do grupo
+     * @param {number|string} userId - ID interno do usuário votante
+     * @param {number|string} movieId - ID do filme
+     * @param {number|string} votoId - ID do tipo de voto
+     * @returns {Promise<Object>} - VoteDetailResponse
+     * @throws {ApiError} - Se a requisição falhar
+     */
+    async votarNoGrupo(groupId, userId, movieId, votoId) {
+        const url = new URL(`/api/groups/${groupId}/votes`, window.location.origin);
+        const response = await authService.apiFetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                voter: { id: Number(userId) },
+                movie: { id: Number(movieId) },
+                vote: Number(votoId)
+            })
+        });
+        return await response.json();
+    }
+
+    /**
+     * Altera o voto de um usuário em um filme dentro de um grupo.
+     *
+     * @param {number|string} groupId - ID do grupo
+     * @param {number|string} voterId - ID interno do usuário votante
+     * @param {number|string} movieId - ID do filme
+     * @param {number|string} votoId - ID do novo tipo de voto
+     * @returns {Promise<Object>} - VoteDetailResponse
+     * @throws {ApiError} - Se a requisição falhar
+     */
+    async alterarVotoNoGrupo(groupId, voterId, movieId, votoId) {
+        const url = new URL(`/api/groups/${groupId}/votes/users/${voterId}/movies/${movieId}`, window.location.origin);
+        const response = await authService.apiFetch(url, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: Number(votoId) })
+        });
+        return await response.json();
+    }
+
+    async buscarTiposVotosDoGrupo(groupId) {
+        const url = new URL(`/api/groups/${groupId}/vote-types`, window.location.origin);
+        const response = await authService.apiFetch(url);
+        return await response.json();
+    }
+
+    async buscarTiposVotosGlobaisNoGrupo(groupId) {
+        const url = new URL(`/api/groups/${groupId}/vote-types/global`, window.location.origin);
+        const response = await authService.apiFetch(url);
+        return await response.json();
+    }
+
+    async criarTipoVotoDoGrupo(groupId, voto) {
+        const url = new URL(`/api/groups/${groupId}/vote-types`, window.location.origin);
+        const response = await authService.apiFetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                name: voto.name,
+                description: voto.description,
+                color: voto.color,
+                emoji: voto.emoji
+            })
+        });
+        return await response.json();
+    }
+
+    async atualizarTipoVotoDoGrupo(groupId, voto) {
+        const url = new URL(`/api/groups/${groupId}/vote-types/${voto.id}`, window.location.origin);
+        const response = await authService.apiFetch(url, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                name: voto.name,
+                description: voto.description,
+                color: voto.color,
+                emoji: voto.emoji
+            })
+        });
+        return await response.json();
+    }
+
+    async excluirTipoVotoDoGrupo(groupId, voteTypeId) {
+        const url = new URL(`/api/groups/${groupId}/vote-types/${voteTypeId}`, window.location.origin);
+        await authService.apiFetch(url, {
+            method: 'DELETE'
+        });
+        return true;
+    }
 }
 
 export const votoService = new VotoService();

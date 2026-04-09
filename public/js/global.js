@@ -6,7 +6,30 @@ export function getQueryParam(param) {
 }
 
 export function isUsuarioVotouNoFilme(votes, discordId) {
-    return votes.some(v => v.voter && v.voter.discordId === discordId);
+    return deduplicarVotosPorUsuario(votes).some(v => v.voter && v.voter.discordId === discordId);
+}
+
+export function deduplicarVotosPorUsuario(votos = []) {
+    const porUsuario = new Map();
+
+    votos.forEach(voto => {
+        const discordId = voto?.voter?.discordId;
+        if (!discordId) return;
+
+        const atual = porUsuario.get(discordId);
+        if (!atual) {
+            porUsuario.set(discordId, voto);
+            return;
+        }
+
+        const atualData = new Date(atual?.vote?.votedAt || 0).getTime();
+        const novaData = new Date(voto?.vote?.votedAt || 0).getTime();
+        if (novaData >= atualData) {
+            porUsuario.set(discordId, voto);
+        }
+    });
+
+    return [...porUsuario.values()];
 }
 
 export function criarElemento(tag, classes = [], texto = '') {
@@ -17,22 +40,36 @@ export function criarElemento(tag, classes = [], texto = '') {
     return el;
 }
 
-function foiAdicionadoRecentemente(filme) {
-    if (!filme.dateAdded) return false; // garante que não quebre se faltar a data
+function obterJanelaFilmeNovoDias(filme, options = {}) {
+    const diasBackend = Number(options.movieNewDays ?? filme?.movieNewDays ?? filme?.group?.movieNewDays);
+    if (Number.isFinite(diasBackend) && diasBackend >= 0) {
+        return diasBackend;
+    }
+
+    const diasPadrao = Number(FILME_RECENTE_DIAS);
+    return Number.isFinite(diasPadrao) && diasPadrao >= 0 ? diasPadrao : 0;
+}
+
+function foiAdicionadoRecentemente(filme, options = {}) {
+    if (!filme.dateAdded) return false;
+
+    const diasLimite = obterJanelaFilmeNovoDias(filme, options);
+    if (diasLimite <= 0) return false;
+
     const dataAdicionado = new Date(filme.dateAdded);
     const agora = new Date();
 
     const diffMs = agora - dataAdicionado;
     const diffDias = diffMs / (1000 * 60 * 60 * 24);
 
-    return diffDias <= FILME_RECENTE_DIAS;
+    return diffDias <= diasLimite;
 }
 
 function criarBadgeFilmeRecente(filme) {
     return criarElemento('div', ['badge-novo'], 'Novo');
 }
 
-export function criarFigure(filme, usuario = '') {
+export function criarFigure(filme, usuario = '', options = {}) {
     const figure = criarElemento('figure', ['card']);
     figure.dataset.tmdbId = filme.tmdbId;
 
@@ -62,7 +99,7 @@ export function criarFigure(filme, usuario = '') {
     const footer = criarFooter(filme, usuario);
     figure.appendChild(footer);
 
-    if (foiAdicionadoRecentemente(filme)) {
+    if (foiAdicionadoRecentemente(filme, options)) {
         const badge = criarBadgeFilmeRecente(filme);
         figure.appendChild(badge);
     }
@@ -76,7 +113,7 @@ export function criarFigure(filme, usuario = '') {
 }
 
 export function criarFooter(filme, usuario) {
-    const votos = filme.votes || [];
+    const votos = deduplicarVotosPorUsuario(filme.votes || []);
     const footer = criarElemento('footer', ['card-footer']);
     const divVotos = criarElemento('div', ['gap']);
     const divMeuVoto = criarElemento('div');
@@ -111,7 +148,8 @@ export function criarFooter(filme, usuario) {
 }
 
 function getVotoDoUsuarioFilme(discordId, votos) {
-    return votos.find(v => v.voter.discordId == discordId);
+    const votosDeduplicados = deduplicarVotosPorUsuario(votos || []);
+    return votosDeduplicados.find(v => String(v.voter.discordId) === String(discordId));
 }
 
 function criarBotaoAvaliar(filme) {

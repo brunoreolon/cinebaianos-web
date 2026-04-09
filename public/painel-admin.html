@@ -12,6 +12,7 @@
         <link rel="stylesheet" href="./css/pages/admin/modal-cadastrar-voto.css" type="text/css">
         <link rel="stylesheet" href="./css/pages/admin/modal-redefinir-senha.css" type="text/css">
         <link rel="stylesheet" href="./css/pages/admin/modal-permissoes.css" type="text/css">
+        <link rel="stylesheet" href="./css/pages/admin/modal-banimento.css" type="text/css">
         <link rel="stylesheet" href="./css/pages/admin/painel-admin.css" type="text/css">
         <link rel="stylesheet" href="./css/pages/admin/responsivo.css" type="text/css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
@@ -38,34 +39,68 @@
                         <h1>Painel de Administração</h1>
                     </div>
 
+                    <div class="admin-kpis">
+                        <article class="admin-kpi-card">
+                            <span>Total de grupos</span>
+                            <strong id="kpi-total-grupos">0</strong>
+                        </article>
+                        <article class="admin-kpi-card">
+                            <span>Grupos banidos</span>
+                            <strong id="kpi-grupos-banidos">0</strong>
+                        </article>
+                        <article class="admin-kpi-card">
+                            <span>Total de usuários</span>
+                            <strong id="kpi-total-usuarios">0</strong>
+                        </article>
+                        <article class="admin-kpi-card">
+                            <span>Usuários banidos</span>
+                            <strong id="kpi-usuarios-banidos">0</strong>
+                        </article>
+                        <article class="admin-kpi-card">
+                            <span>Usuários admin</span>
+                            <strong id="kpi-usuarios-admin">0</strong>
+                        </article>
+                        <article class="admin-kpi-card">
+                            <span>Total de bots</span>
+                            <strong id="kpi-total-bots">0</strong>
+                        </article>
+                    </div>
+
                     <div class="sub-menus">
-                        <button class="btn-menu ativo">Tipos de Votos</button>
-                        <button class="btn-menu">Usuários</button>
-                        <button class="btn-menu">Bots</button>
+                        <button class="btn-menu ativo" data-tab="grupos">Grupos</button>
+                        <button class="btn-menu" data-tab="usuarios">Usuários</button>
+                        <button class="btn-menu" data-tab="votos">Tipos de Votos</button>
+                        <button class="btn-menu" data-tab="bots">Bots</button>
                     </div>
                     
                     <div class="tab-content">
-                        <div class="tab-pane ativo" id="votos">
+                        <div class="tab-pane ativo" id="grupos">
                             <div class="secao-topo">
                                 <div class="secao-titulo">
-                                    <h4>Tipos de Votos</h4>
-                                    <p>Gerencie os tipos de avaliações que os usuários podem dar aos filmes</p>
+                                    <h4>Grupos cadastrados</h4>
+                                    <p>Visão global dos grupos no ambiente multi-tenant.</p>
                                 </div>
-                                <button class="btn-novo">
-                                    <i class="fa-solid fa-plus"></i>
-                                    Novo Tipo de Voto
-                                </button>
+                                <div class="grupos-filtro">
+                                    <label for="grupos-busca" class="grupos-filtro-label">Buscar grupo</label>
+                                    <input id="grupos-busca" type="search" placeholder="Buscar por nome ou #tag" autocomplete="off">
+                                </div>
+                                <div id="grupos-resumo" class="secao-resumo">0 grupos</div>
                             </div>
-                            <div class="lista-votos">
-                                
+                            <div class="grupos-filtros-rapidos" role="group" aria-label="Filtros de grupos">
+                                <button type="button" class="chip-filtro-grupo ativo" data-group-filter="ALL">Todos</button>
+                                <button type="button" class="chip-filtro-grupo" data-group-filter="BANNED">Banidos</button>
+                                <button type="button" class="chip-filtro-grupo" data-group-filter="ACTIVE">Ativos</button>
                             </div>
+                            <div id="lista-grupos-admin" class="lista-grupos-admin"></div>
                         </div>
+
                         <div class="tab-pane" id="usuarios">
                             <div class="secao-topo">
                                 <div class="secao-titulo">
                                     <h4>Gerenciamento de Usuários</h4>
-                                    <p>Visualize e gerencie permissões dos usuários do sistema</p>
+                                    <p>Visualize, ajuste permissões e gerencie banimentos globais.</p>
                                 </div>
+                                <div id="usuarios-resumo" class="secao-resumo">0 usuários</div>
                             </div>
                             <div class="tabela-container">
                                 <table>
@@ -75,22 +110,37 @@
                                             <th>Email</th>
                                             <th>Membro Desde</th>
                                             <th>Status</th>
-                                            <th>Estatísticas</th>
                                             <th>Ações</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        
-                                    </tbody>
+                                    <tbody></tbody>
                                 </table>
                             </div>
                         </div>
+
+                        <div class="tab-pane" id="votos">
+                            <div class="secao-topo">
+                                <div class="secao-titulo">
+                                    <h4>Tipos de Votos</h4>
+                                    <p>Gerencie apenas os tipos de avaliações globais do sistema.</p>
+                                </div>
+                                <div id="votos-resumo" class="secao-resumo">0 votos</div>
+                                <button class="btn-novo">
+                                    <i class="fa-solid fa-plus"></i>
+                                    Novo Tipo de Voto
+                                </button>
+                            </div>
+                            <div class="lista-votos">
+                            </div>
+                        </div>
+
                         <div class="tab-pane" id="bots">
                             <div class="secao-topo">
                                 <div class="secao-titulo">
                                     <h4>Gerenciamento de Bots</h4>
-                                    <p>Visualize e gerencie permissões dos bots do sistema</p>
+                                    <p>Visualize e gerencie bots cadastrados no sistema.</p>
                                 </div>
+                                <div id="bots-resumo" class="secao-resumo">0 bots</div>
                             </div>
                             <div class="tabela-container">
                                 <table>
@@ -103,9 +153,7 @@
                                             <th>Ações</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                       
-                                    </tbody>
+                                    <tbody></tbody>
                                 </table>
                             </div>
                         </div>
@@ -230,7 +278,45 @@
                 </footer>
             </div>
         </div>
-        
+        <div id="modal-banimento" class="modal inativo">
+            <div class="modal-content modal-banimento-content">
+                <header>
+                    <h2 class="banimento-titulo">Banir item</h2>
+                    <p class="secundario banimento-subtitulo">Defina os detalhes do banimento global.</p>
+                    <span class="close">&times;</span>
+                </header>
+                <section class="dados">
+                    <div class="banimento-destino">
+                        <span class="badge banimento-contexto">Grupo</span>
+                        <h3 class="banimento-nome">-</h3>
+                        <p class="secundario banimento-identificador"></p>
+                    </div>
+
+                    <div class="banimento-formulario">
+                        <div class="campo">
+                            <label for="banimento-motivo">Motivo * <span id="banimento-motivo-contador" class="banimento-contador">0/200</span></label>
+                            <input id="banimento-motivo" type="text" maxlength="200" placeholder="Ex: violou as regras da comunidade">
+                            <p id="banimento-motivo-erro" class="banimento-erro inativo"></p>
+                        </div>
+                        <div class="campo">
+                            <label for="banimento-expira">Expiração (opcional)</label>
+                            <input id="banimento-expira" type="datetime-local">
+                            <p id="banimento-expira-erro" class="banimento-erro inativo"></p>
+                        </div>
+                        <p class="banimento-ajuda">Se não definir expiração, o banimento ficará ativo até desbanimento manual.</p>
+                    </div>
+
+                    <div class="banimento-confirmacao inativo">
+                        <p class="banimento-confirmacao-texto">Tem certeza que deseja remover o banimento global deste item?</p>
+                    </div>
+                </section>
+                <footer class="banimento-acoes">
+                    <button class="btn-cancelar" type="button">Cancelar</button>
+                    <button class="btn-confirmar-banimento" type="button">Confirmar</button>
+                </footer>
+            </div>
+        </div>
+
         <script type="module" src="./js/include.js"></script>
         <script type="module" src="./js/pages/admin/painel-admin.js"></script>
     </body>

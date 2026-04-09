@@ -1,0 +1,203 @@
+.movie-filters {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding: 14px;
+    border: 1px solid oklch(var(--cor-preto-1-params) / 0.14);
+    border-radius: 14px;
+    background: linear-gradient(180deg, var(--cor-preto-3), var(--cor-preto-7));
+}
+
+.movie-filters-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.movie-filters-results {
+    color: var(--cor-branco-2);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.movie-filters-clear {
+    min-height: 34px;
+    padding: 0 12px;
+    border-radius: 10px;
+    border: 1px solid var(--cor-cinza-3);
+    background: transparent;
+    color: var(--cor-branco-1);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.movie-filters-clear:hover {
+    border-color: var(--cor-roxo-1);
+    background: oklch(var(--cor-preto-1-params) / 0.14);
+}
+
+.movie-filters .filtros-superiores {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+}
+
+.movie-filters .filtro-ordenar,
+.movie-filters .filtro-usuario,
+.movie-filters .filtro-voto,
+.movie-filters .filtro-genero,
+.movie-filters .filtro-size {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.movie-filters span {
+    color: var(--cor-branco-2);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+}
+
+.movie-filters select,
+.movie-filters input {
+    min-height: 38px;
+    border-radius: 10px;
+    border: 1px solid var(--cor-cinza-3);
+    background: var(--cor-preto-7);
+    color: var(--cor-branco-1);
+    font-size: 14px;
+    padding: 0 12px;
+    box-sizing: border-box;
+}
+
+.movie-filters select {
+    min-width: 130px;
+}
+
+.movie-filters input {
+    width: 100%;
+}
+
+.movie-filters select:focus,
+.movie-filters input:focus,
+.movie-filters .ordenacao-direcao:focus-within {
+    outline: none;
+    border-color: var(--cor-roxo-1);
+    box-shadow: 0 0 0 3px oklch(var(--cor-roxo-2-params) / 0.15);
+}
+
+.movie-filters .divisao {
+    width: 1px;
+    align-self: stretch;
+    background: oklch(var(--cor-preto-1-params) / 0.2);
+}
+
+.movie-filters .filtro-busca {
+    width: 100%;
+}
+
+.movie-filters .ordenacao-direcao {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 38px;
+    border-radius: 10px;
+    border: 1px solid var(--cor-cinza-3);
+    background: var(--cor-preto-7);
+    padding: 0 8px 0 2px;
+}
+
+.movie-filters #ordenar-direcao,
+.movie-filters #grupo-ordenar-direcao {
+    width: 32px;
+    height: 32px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--cor-branco-1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.movie-filters .texto-direcao {
+    color: var(--cor-branco-2);
+    font-size: 12px;
+    font-weight: 700;
+    user-select: none;
+}
+
+.movie-filters .ordenacao-direcao.ativo {
+    border-color: var(--cor-roxo-1);
+}
+
+.paginacao {
+    margin-top: 28px;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.paginacao .btn-pagina {
+    min-width: 40px;
+    min-height: 40px;
+    padding: 0 12px;
+    border-radius: 10px;
+    border: 1px solid var(--cor-cinza-3);
+    background: var(--cor-preto-7);
+    color: var(--cor-branco-1);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.paginacao .btn-pagina:hover:not(:disabled) {
+    border-color: var(--cor-roxo-1);
+    background: var(--cor-roxo-4);
+}
+
+.paginacao .btn-pagina:disabled {
+    background: var(--cor-roxo-3);
+    border-color: var(--cor-roxo-3);
+    cursor: default;
+}
+
+@media (max-width: 900px) {
+    .movie-filters .divisao {
+        display: none;
+    }
+}
+
+@media (max-width: 700px) {
+    .movie-filters-toolbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .movie-filters .filtros-superiores {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+
+    .movie-filters .filtro-ordenar,
+    .movie-filters .filtro-usuario,
+    .movie-filters .filtro-voto,
+    .movie-filters .filtro-genero,
+    .movie-filters .filtro-size {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+
+    .movie-filters select {
+        width: 100%;
+    }
+}
+
