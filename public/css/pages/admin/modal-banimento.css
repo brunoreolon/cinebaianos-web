@@ -1,0 +1,130 @@
+.modal-banimento-content {
+    max-width: 560px;
+}
+
+.banimento-destino {
+    border: 1px solid var(--cor-cinza-3);
+    border-radius: 10px;
+    padding: 12px;
+    background: oklch(var(--cor-preto-1-params) / 0.22);
+}
+
+.banimento-destino h3,
+.banimento-destino p {
+    margin: 6px 0 0;
+}
+
+.banimento-contexto {
+    border: 1px solid var(--cor-roxo-1);
+    color: var(--cor-roxo-1);
+    background: transparent;
+}
+
+.banimento-formulario,
+.banimento-confirmacao {
+    margin-top: 10px;
+}
+
+.banimento-contador {
+    float: right;
+    color: var(--cor-branco-2);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.banimento-erro {
+    margin: 6px 0 0;
+    color: var(--cor-vermelho-2);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.banimento-erro.inativo {
+    display: none;
+}
+
+.modal-banimento-content .campo input.input-invalido {
+    border-color: var(--cor-vermelho-1);
+    box-shadow: 0 0 0 2px oklch(var(--cor-preto-1-params) / 0.12);
+}
+
+.banimento-confirmacao.inativo {
+    display: none;
+}
+
+.banimento-confirmacao {
+    border: 1px dashed var(--cor-cinza-3);
+    border-radius: 10px;
+    padding: 16px;
+    color: var(--cor-branco-2);
+}
+
+.banimento-confirmacao-texto {
+    margin: 0;
+}
+
+.banimento-ajuda {
+    margin-top: 10px;
+    color: var(--cor-branco-2);
+    font-size: 12px;
+}
+
+.banimento-acoes {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-confirmar-banimento {
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-weight: 700;
+    cursor: pointer;
+    color: var(--cor-branco-1);
+    background: var(--cor-vermelho-1);
+}
+
+.btn-confirmar-banimento:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px oklch(var(--cor-preto-1-params) / 0.2);
+}
+
+.btn-confirmar-banimento:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.banimento-acoes .btn-cancelar {
+    border: 1px solid var(--cor-cinza-3);
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-weight: 700;
+    cursor: pointer;
+    color: var(--cor-branco-1);
+    background: oklch(var(--cor-preto-1-params) / 0.28);
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s, background 0.2s;
+}
+
+.banimento-acoes .btn-cancelar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px oklch(var(--cor-preto-1-params) / 0.2);
+    border-color: var(--cor-branco-2);
+    background: oklch(var(--cor-preto-1-params) / 0.36);
+}
+
+.banimento-acoes .btn-cancelar:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 6px oklch(var(--cor-preto-1-params) / 0.15);
+}
+
+.modal-banimento-content.modo-desbanir .banimento-formulario {
+    display: none;
+}
+
+.modal-banimento-content.modo-desbanir .btn-confirmar-banimento {
+    background: var(--cor-roxo-3);
+}

@@ -13,6 +13,80 @@
         gap: 12px;
     }
 
+    .secao-resumo {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .grupos-filtro {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .grupos-filtros-rapidos {
+        flex-wrap: wrap;
+    }
+
+    .chip-filtro-grupo {
+        flex: 1 1 calc(33.333% - 6px);
+        text-align: center;
+    }
+
+    .grupo-admin-card {
+        padding: 14px;
+    }
+
+    .grupo-admin-head-right {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .grupo-admin-head-right .btn-acoes {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .grupo-admin-brand {
+        align-items: flex-start;
+    }
+
+    .grupo-admin-resumo {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .grupo-admin-meta-linha {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: nowrap;
+        width: 100%;
+        min-width: 0;
+    }
+
+    .grupo-admin-owner {
+        min-width: 0;
+        flex: 1 1 auto;
+    }
+
+    .grupo-admin-owner span {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .grupo-admin-meta-linha .grupo-admin-pill {
+        flex: 0 0 auto;
+        white-space: nowrap;
+    }
+
+    .btn-toggle-detalhes {
+        margin-left: 0;
+        width: 100%;
+        justify-content: center;
+    }
+
 
     /* tab votos */
     .btn-novo {
@@ -82,9 +156,14 @@
     }
 
     .acoes-usuario,
-    .acoes-usuario {
+    .acoes-bot {
         flex-direction: column;
         align-items: center;
+    }
+
+    .usuarios-info,
+    .bots-info {
+        min-width: 0;
     }
 
     .btn-acoes {
@@ -159,9 +238,15 @@
     modal-gerenciar-permissoes
     */
     .redefinicao-acoes,
-    .gerenciamento-acoes {
+    .gerenciamento-acoes,
+    .banimento-acoes {
         flex-direction: column;
         gap: 10px; 
+        width: 100%;
+    }
+
+    .banimento-acoes .btn-cancelar,
+    .banimento-acoes .btn-confirmar-banimento {
         width: 100%;
     }
 

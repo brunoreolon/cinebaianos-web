@@ -8,7 +8,7 @@ export function abrirModalRedefinirSenha(dados) {
     modal.classList.remove("inativo");
     modal.classList.add("ativo");
 
-    modal.dataset.discordId = dados.discordId;
+    modal.dataset.userId = dados.userId;
 
      // Seleciona os elementos do modal para exibir nome e email
     const nomeEl = modal.querySelector(".nome-usuario");  // crie essa classe no span do modal
@@ -26,7 +26,7 @@ export function abrirModalRedefinirSenha(dados) {
             return;
         }
         try {
-            const novaSenha = await adminService.redefinirSenha(modal.dataset.discordId, senha.value);
+            await adminService.redefinirSenha(modal.dataset.userId, senha.value);
             fecharModal(modal);
             criarMensagem(`Senha redefinida com sucesso para o usuário ${dados.nome}. Um email será enviado para o usuário contendo a nova senha`, MensagemTipo.SUCCESS);
         } catch(err) {
