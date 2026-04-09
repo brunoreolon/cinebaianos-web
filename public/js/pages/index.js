@@ -13,6 +13,42 @@ let grupoAtualContexto = null;
 let grupoMovieNewDays = null;
 let usuarioLogado = null;
 
+function criarEstadoVazioCatalogo(titulo, descricao) {
+    const empty = document.createElement('div');
+    empty.className = 'catalog-empty-state';
+    empty.innerHTML = `
+        <i class="fa-regular fa-folder-open"></i>
+        <strong>${titulo}</strong>
+        <span>${descricao}</span>
+    `;
+    return empty;
+}
+
+function renderizarSkeletonCards(container, count = 8) {
+    if (!container) return;
+    container.innerHTML = '';
+    for (let i = 0; i < count; i++) {
+        const skeleton = document.createElement('article');
+        skeleton.className = 'card-skeleton';
+        container.appendChild(skeleton);
+    }
+}
+
+function atualizarGridComTransicao(container, renderFn) {
+    if (!container) {
+        renderFn();
+        return;
+    }
+
+    container.classList.add('catalog-grid-updating');
+    requestAnimationFrame(() => {
+        renderFn();
+        requestAnimationFrame(() => {
+            container.classList.remove('catalog-grid-updating');
+        });
+    });
+}
+
 function criarCardFilmeComContextoGrupo(filme, usuario) {
     return criarFigure(filme, usuario, { movieNewDays: grupoMovieNewDays });
 }
@@ -37,9 +73,12 @@ function criarCardsAguardandoAvaliacao(usuario, filmes) {
     divPai.innerHTML = '';
 
     if (!filmes || filmes.length === 0) {
-        const p = criarElemento('p', ['fonte-secundaria', 'sem-filmes-ag-avaliacao'], 'Nenhum filme aguardando avaliação.');
-        p.style.color = 'teal';
-        divPai.appendChild(p);
+        const estadoVazio = criarEstadoVazioCatalogo(
+            'Nenhum filme aguardando avaliação',
+            'Quando você tiver filmes sem voto no grupo atual, eles aparecerão aqui.'
+        );
+        estadoVazio.classList.add('sem-filmes-ag-avaliacao');
+        divPai.appendChild(estadoVazio);
         return;
     }
 
@@ -56,9 +95,10 @@ function criarCardsTodos(filmes) {
     divPai.innerHTML = '';
 
     if (!filmes || filmes.length === 0) {
-        const p = criarElemento('p', ['fonte-secundaria'], 'Nenhum filme encontrado.');
-        p.style.color = 'teal';
-        divPai.appendChild(p);
+        divPai.appendChild(criarEstadoVazioCatalogo(
+            'Nenhum filme encontrado',
+            'Tente ajustar os filtros para visualizar outros filmes do grupo.'
+        ));
         return;
     }
 
@@ -136,7 +176,7 @@ async function atualizarFilmes(page = 0) {
     const inicio = currentPage * size;
     const filmesNaPagina = filmesFiltrados.slice(inicio, inicio + size);
 
-    criarCardsTodos(filmesNaPagina);
+    atualizarGridComTransicao(form.todos(), () => criarCardsTodos(filmesNaPagina));
     criarPaginacao(totalPages, currentPage);
     atualizarResumoFiltros(filmesFiltrados.length);
 }
@@ -323,6 +363,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     try {
         await authService.requireLogin();
+
+        renderizarSkeletonCards(form.aguardandoAvaliacao(), 4);
+        renderizarSkeletonCards(form.todos(), 10);
 
         usuarioLogado = await authService.getUsuarioLogado();
         if (!usuarioLogado) window.location.href = "./login.html";

@@ -37,9 +37,9 @@ async function incluirHeader() {
 
     if (usuario?.superAdmin === true) {
         const links = document.querySelector('#header .links');
-        const rankingWrapper = btnRanking?.parentElement;
+        const profileMenu = document.querySelector('#header .profile-menu');
 
-        if (links && rankingWrapper) {
+        if (links && profileMenu) {
             const adminWrapper = document.createElement('div');
             adminWrapper.innerHTML = `
                 <button type="button" class="btn-admin-header btn-admin-header-classic">
@@ -54,7 +54,7 @@ async function incluirHeader() {
                 });
             });
 
-            links.insertBefore(adminWrapper, rankingWrapper.nextSibling);
+            links.insertBefore(adminWrapper, profileMenu);
         }
     }
 

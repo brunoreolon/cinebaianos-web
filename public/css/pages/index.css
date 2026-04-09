@@ -4,6 +4,44 @@
     margin-bottom: 20px; 
 }
 
+.aguardando-avaliacao,
+.todos {
+    margin-top: 28px;
+}
+
+.aguardando-avaliacao {
+    margin-top: 8px;
+}
+
+.aguardando-avaliacao > header,
+.todos > header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 0 0 14px;
+}
+
+.aguardando-avaliacao > header::after,
+.todos > header::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, oklch(var(--cor-roxo-2-params) / 0.42), transparent 88%);
+}
+
+.aguardando-avaliacao > header h2,
+.todos > header h2 {
+    margin: 0;
+    font-size: 27px;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+}
+
+.aguardando-avaliacao .inline,
+.todos .inline {
+    margin-top: 12px;
+}
+
 #adicionar-filme .index-add-action {
     position: relative;
     overflow: hidden;
@@ -108,8 +146,8 @@
 }
 
 .modal-content h3 {
-    margin: 0px 0px 4px 0px;
-} 
+    margin: 0 0 4px;
+}
 
 .modal-group-context {
     margin: 0 36px 0 0;
@@ -199,10 +237,8 @@
 }
 
 .filmes-encontrados {
-    max-height: 28rem; 
-    overflow-y: auto;
-    margin-top: 20px;        
-    max-height: 300px;       
+    margin-top: 20px;
+    max-height: 300px;
     overflow-y: auto;
 }
 
@@ -214,9 +250,6 @@
     border-radius: 10px;
     align-items: center;
     justify-content: center;
-}
-
-.filmes-encontrados ul li {
     transition: background 0.2s;
 }
 
@@ -271,7 +304,7 @@
 /* Filtros de filmes migrados para css/components/movie-filters.css */
 
 .paginacao {
-    margin-top: 80px;
+    margin-top: 56px;
     display: flex;
     justify-content: center;
     gap: 5px;
@@ -305,7 +338,7 @@
     }
 
     .btn-pesquisar {
-        padding: 10px 0px;
+        padding: 10px 0;
     }
 
     .lista {

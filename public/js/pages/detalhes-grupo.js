@@ -246,6 +246,40 @@ function createMetaItem(label, value) {
     return item;
 }
 
+function createCatalogEmptyState(title, subtitle = '') {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'catalog-empty-state';
+    wrapper.innerHTML = `
+        <i class="fa-regular fa-folder-open"></i>
+        <strong>${title}</strong>
+        <span>${subtitle}</span>
+    `;
+    return wrapper;
+}
+
+function renderMovieSkeletons(container, count = 8) {
+    if (!container) return;
+    container.innerHTML = '';
+    for (let i = 0; i < count; i++) {
+        const skeleton = document.createElement('article');
+        skeleton.className = 'card-skeleton';
+        container.appendChild(skeleton);
+    }
+}
+
+function updateGridWithTransition(container, renderFn) {
+    if (!container) {
+        renderFn();
+        return;
+    }
+
+    container.classList.add('catalog-grid-updating');
+    requestAnimationFrame(() => {
+        renderFn();
+        requestAnimationFrame(() => container.classList.remove('catalog-grid-updating'));
+    });
+}
+
 function normalizarDateTimeLocal(valor) {
     if (!valor) return null;
     return valor.length === 16 ? `${valor}:00` : valor;
@@ -1006,13 +1040,14 @@ function atualizarFilmesGrupo(page = 0) {
     const size = Number(document.getElementById('grupo-filmes-size')?.value) || 20;
     const filteredMovies = filtrarEOrdenarFilmesGrupo();
 
-    container.innerHTML = '';
-
     if (!filteredMovies.length) {
-        container.appendChild(createEmptyState(
-            'Nenhum filme encontrado para os filtros atuais.',
-            'Ajuste os filtros para visualizar mais resultados.'
-        ));
+        updateGridWithTransition(container, () => {
+            container.innerHTML = '';
+            container.appendChild(createCatalogEmptyState(
+                'Nenhum filme encontrado para os filtros atuais',
+                'Ajuste os filtros para visualizar mais resultados.'
+            ));
+        });
         if (paginacao) paginacao.innerHTML = '';
         atualizarResumoFiltrosFilmesGrupo(0);
         return;
@@ -1023,7 +1058,10 @@ function atualizarFilmesGrupo(page = 0) {
     const start = currentPage * size;
     const moviesOnPage = filteredMovies.slice(start, start + size);
 
-    moviesOnPage.forEach(movie => container.appendChild(createMovieCard(movie)));
+    updateGridWithTransition(container, () => {
+        container.innerHTML = '';
+        moviesOnPage.forEach(movie => container.appendChild(createMovieCard(movie)));
+    });
     criarPaginacaoFilmesGrupo(totalPages, currentPage);
     atualizarResumoFiltrosFilmesGrupo(filteredMovies.length);
 }
@@ -1039,8 +1077,8 @@ function renderMovies() {
 
     if (!state.movies.length) {
         container.innerHTML = '';
-        container.appendChild(createEmptyState(
-            'Este grupo ainda não possui filmes.',
+        container.appendChild(createCatalogEmptyState(
+            'Este grupo ainda não possui filmes',
             'Quando novos filmes forem adicionados, eles aparecerão aqui.'
         ));
         if (paginacao) paginacao.innerHTML = '';
@@ -2069,6 +2107,9 @@ async function carregarDados() {
 }
 
 async function carregarPagina() {
+    const moviesContainer = document.getElementById('filmes-lista');
+    renderMovieSkeletons(moviesContainer, 8);
+
     await carregarDados();
     renderHero();
     renderMembers();
