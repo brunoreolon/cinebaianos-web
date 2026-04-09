@@ -1,176 +1,274 @@
 .perfil-edicao {
-    max-width: 980px;
+    max-width: 1040px;
     width: 100%;
-    margin: 0 auto; 
+    margin: 6px auto 0;
+    padding: 28px;
+    box-sizing: border-box;
+    overflow-x: hidden;
     border: 1px solid var(--cor-cinza-3);
-    border-radius: 10px;
-    padding: 24px;
-    background: var(--cor-preto-3);
+    border-radius: 20px;
+    background: linear-gradient(180deg, var(--cor-preto-3), var(--cor-preto-7));
+    box-shadow: 0 18px 38px oklch(var(--cor-preto-1-params) / 0.28);
+}
+
+.secao-header {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 26px;
+    padding: 0 0 18px;
+    border-bottom: 1px solid oklch(var(--cor-preto-1-params) / 0.16);
 }
 
 .secao-header h4,
 .secao-header p {
-    margin: 0px;
-    font-weight: 100;
+    margin: 0;
+}
+
+.secao-header h4 {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    color: var(--cor-branco-1);
 }
 
 .secao-header p {
     color: var(--cor-branco-2);
+    font-size: 15px;
+    line-height: 1.5;
 }
 
 .perfil-foto-linha {
     display: flex;
-    flex-direction: row;
     align-items: center;
-    gap: 28px;
-    margin-top: 28px;
+    gap: 24px;
+    margin-top: 0;
+    padding: 18px;
+    border: 1px solid oklch(var(--cor-preto-1-params) / 0.14);
+    border-radius: 18px;
+    background: linear-gradient(180deg, oklch(var(--cor-preto-1-params) / 0.08), oklch(var(--cor-preto-1-params) / 0.12));
 }
 
 .perfil-foto-linha .campo {
-    flex: 1; /* ocupa todo o espaço disponível */
+    flex: 1;
+    margin-top: 0;
+}
+
+.foto-atual {
+    width: 120px;
+    min-width: 120px;
+    height: 120px;
+    padding: 6px;
+    border-radius: 50%;
+    border: 1px solid oklch(var(--cor-roxo-2-params) / 0.34);
+    background: linear-gradient(180deg, oklch(var(--cor-roxo-2-params) / 0.16), oklch(var(--cor-preto-1-params) / 0.06));
+    box-shadow: 0 12px 24px oklch(var(--cor-preto-1-params) / 0.18);
+    box-sizing: border-box;
 }
 
 .foto-atual img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
     border-radius: 50%;
-    width: 90px;
 }
 
 .campo {
     display: flex;
     flex-direction: column;
-    text-decoration: none;
-    gap: 4px;
-    margin-top: 28px;
+    gap: 8px;
+    margin-top: 22px;
     min-width: 0;
 }
 
+.campo label {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--cor-branco-2);
+    letter-spacing: 0.01em;
+}
+
+.campo input,
 .campo textarea {
     width: 100%;
     box-sizing: border-box;
-    overflow-wrap: break-word;
-    word-break: break-word;
-    white-space: pre-wrap;
-}
-
-.perfil-edicao {
-    overflow-x: hidden;
-}
-
-.perfil-foto-linha .campo {
-    margin-top: 0; 
-}
-
-.campo label {
-    font-weight: 100;
-    font-size: 14px;
+    outline: none;
+    border: 1px solid var(--cor-cinza-3);
+    border-radius: 14px;
+    background: var(--cor-preto-7);
+    color: var(--cor-branco-1);
+    transition: border-color 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
 }
 
 .campo input {
-    height: 25px;
-    padding: 4px 12px;
-}
-
-.criado-em label,
-.criado-em p {
-    margin: 0px;
-    font-weight: 100;
-}
-
-.criado-em p {
-    color: var(--cor-branco-2);
+    min-height: 48px;
+    padding: 0 14px;
+    font-size: 15px;
 }
 
 .campo textarea {
     resize: vertical;
-    padding: 8px 12px;
+    min-height: 120px;
+    padding: 12px 14px;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    white-space: pre-wrap;
+    font-size: 15px;
+    line-height: 1.5;
 }
 
-.campo textarea::placeholder {
-    font-size: 16px;
-}
-
-.campo input, 
-.campo textarea {
-    outline: none;
-    border: 1px solid var(--cor-cinza-3); 
-    border-radius: 6px;
-    background: var(--cor-preto-7);
-    color: var(--cor-branco-1); /* opcional, mas melhora muito a leitura */
-}
-
-@keyframes foco-brilhando {
-    0%   { box-shadow: 0 0 6px 2px oklch(var(--cor-roxo-2-params) / 0.5); }
-    50%  { box-shadow: 0 0 10px 3px oklch(var(--cor-roxo-2-params) / 0.8); }
-    100% { box-shadow: 0 0 6px 2px oklch(var(--cor-roxo-2-params) / 0.5); }
+.campo textarea::placeholder,
+.campo input::placeholder {
+    color: oklch(var(--cor-branco-2) / 0.8);
 }
 
 .campo input:focus,
 .campo textarea:focus {
-    border-color: var(--cor-roxo-2);
-    animation: foco-brilhando 1.4s ease-in-out infinite;
+    border-color: var(--cor-roxo-1);
+    box-shadow: 0 0 0 3px oklch(var(--cor-roxo-2-params) / 0.16);
+    background: oklch(var(--cor-preto-1-params) / 0.12);
+}
+
+.campos-senha {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.campos-senha .campo {
+    margin-top: 22px;
+}
+
+.criado-em {
+    margin-top: 24px;
+    padding: 16px 18px;
+    border: 1px solid oklch(var(--cor-preto-1-params) / 0.14);
+    border-radius: 16px;
+    background: linear-gradient(180deg, oklch(var(--cor-preto-1-params) / 0.08), transparent);
+}
+
+.criado-em label,
+.criado-em p {
+    margin: 0;
+}
+
+.criado-em label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--cor-branco-2);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.criado-em p {
+    font-size: 16px;
+    color: var(--cor-branco-1);
+    font-weight: 600;
 }
 
 .perfil-botoes {
-    margin-top: 38px;
+    margin-top: 34px;
     display: flex;
-    flex-direction: row;
-    justify-content: center;
-    gap: 32px;
+    justify-content: flex-end;
+    gap: 14px;
     width: 100%;
 }
 
 .perfil-botoes button {
-    flex: 1;           
-    max-width: 100%;   
-    padding: 10px 20px;
-    border: none;
-    border-radius: 10px;
-    font-weight: 600;
-    font-size: 14px;
-    box-shadow: 0 4px 6px oklch(var(--cor-preto-1-params) / 0.15);
-    transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+    min-height: 48px;
+    padding: 0 20px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 15px;
+    border: 1px solid transparent;
+    box-shadow: 0 8px 18px oklch(var(--cor-preto-1-params) / 0.18);
+    transition: background 0.22s ease, transform 0.2s ease, box-shadow 0.2s ease, border-color 0.22s ease;
     cursor: pointer;
 }
 
 .perfil-botoes button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 8px oklch(var(--cor-preto-1-params) / 0.2);
+    transform: translateY(-1px);
+    box-shadow: 0 12px 24px oklch(var(--cor-preto-1-params) / 0.22);
 }
 
 .perfil-botoes button:active {
     transform: translateY(0);
-    box-shadow: 0 4px 6px oklch(var(--cor-preto-1-params) / 0.15);
+}
+
+.btn-cancelar {
+    background: transparent;
+    color: var(--cor-branco-1);
+    border-color: var(--cor-cinza-3) !important;
+}
+
+.btn-cancelar:hover {
+    border-color: var(--cor-roxo-1) !important;
+    background: oklch(var(--cor-preto-1-params) / 0.14);
 }
 
 .btn-salvar {
-    background: var(--cor-roxo-3);
+    background: linear-gradient(135deg, var(--cor-roxo-3), var(--cor-roxo-4));
     color: var(--cor-branco-1);
-    border: none;
-    transition: background 0.3s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 .btn-salvar:hover {
-    background: var(--cor-roxo-4);
+    filter: saturate(1.08);
+}
+
+@media (max-width: 900px) {
+    .perfil-edicao {
+        padding: 22px;
+        border-radius: 18px;
+    }
+
+    .campos-senha {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (max-width: 600px) {
+    .perfil-edicao {
+        padding: 16px;
+        border-radius: 16px;
+    }
+
+    .secao-header {
+        margin-bottom: 20px;
+        padding-bottom: 14px;
+    }
+
+    .secao-header h4 {
+        font-size: 24px;
+    }
+
     .perfil-foto-linha {
-        flex-direction: column; /* empilha verticalmente */
-        align-items: flex-start; /* ou center se preferir */
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+        padding: 16px;
     }
 
     .perfil-foto-linha .campo {
-        width: 100%; /* ocupa toda a largura disponível */
-        margin-top: 28px; /* espaço entre imagem e input */
+        width: 100%;
     }
 
-    .foto-atual img {
-        width: 80px; /* opcional: reduzir um pouco a imagem */
-        height: 80px;
+    .foto-atual {
+        width: 92px;
+        min-width: 92px;
+        height: 92px;
     }
 
     .perfil-botoes {
-        flex-direction: column;
-        gap: 16px;
+        flex-direction: column-reverse;
+        gap: 12px;
+    }
+
+    .perfil-botoes button {
+        width: 100%;
     }
 }
