@@ -42,15 +42,16 @@ async function incluirHeader() {
         if (links && rankingWrapper) {
             const adminWrapper = document.createElement('div');
             adminWrapper.innerHTML = `
-                <button type="button" class="btn-admin-header">
-                    <i class="fa-solid fa-shield-halved"></i>
+                <button type="button" class="btn-admin-header btn-admin-header-classic">
+                    <i class="fa-solid fa-crown"></i>
                     <span class="btn-text">Admin</span>
                 </button>
             `;
 
-            const adminButton = adminWrapper.querySelector('.btn-admin-header');
-            adminButton?.addEventListener('click', () => {
-                window.location.href = './painel-admin.html';
+            adminWrapper.querySelectorAll('.btn-admin-header').forEach((adminButton) => {
+                adminButton.addEventListener('click', () => {
+                    window.location.href = './painel-admin.html';
+                });
             });
 
             links.insertBefore(adminWrapper, rankingWrapper.nextSibling);
