@@ -1,0 +1,67 @@
+<!-- Modal de Doação -->
+<div id="donation-modal" class="donation-modal">
+    <div class="donation-modal-overlay"></div>
+    <div class="donation-modal-content">
+        <div class="donation-header">
+            <h2>
+                <i class="fa-solid fa-heart"></i>
+                Apoie o CineBaianos
+            </h2>
+            <p>Ajude a manter o site funcionando</p>
+        </div>
+
+        <div class="donation-body">
+            <div class="donation-info">
+                <strong>Por que doar?</strong>
+                Suas contribuições nos ajudam a cobrir custos de servidor, manutenção e desenvolvimento de novas funcionalidades para toda a comunidade.
+            </div>
+
+            <div class="donation-qrcode-section">
+                <h3>Chave PIX</h3>
+                <div class="donation-copy-pix">
+                    <div class="donation-copy-pix-text" id="pix-key-display">00020126580014br.gov.bcb.pix0136</div>
+                    <button type="button" class="donation-copy-btn" id="btn-copy-pix">
+                        <i class="fa-solid fa-copy"></i> Copiar
+                    </button>
+                </div>
+            </div>
+
+            <div class="donation-values">
+                <label class="donation-values-label">Escolha um valor ou digite o seu:</label>
+                <div class="donation-values-grid" id="donation-values-buttons"></div>
+
+                <div class="donation-custom-section">
+                    <div class="currency">R$</div>
+                    <input
+                        type="number"
+                        id="donation-custom-input"
+                        placeholder="Valor personalizado"
+                        min="1"
+                        step="0.01"
+                    />
+                </div>
+            </div>
+
+            <div class="donation-benefits">
+                <h4>Seu apoio mantém:</h4>
+                <ul>
+                    <li>Servidor funcionando 24/7</li>
+                    <li>Novas funcionalidades e melhorias</li>
+                    <li>Suporte da comunidade</li>
+                    <li>Banco de dados de filmes atualizado</li>
+                </ul>
+            </div>
+
+            <div class="donation-actions">
+                <button type="button" class="donation-actions button donation-btn-secondary" id="close-donation-modal">
+                    Fechar
+                </button>
+                <button type="button" class="donation-actions button donation-btn-primary">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    Abrir PIX no Banco
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
