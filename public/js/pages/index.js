@@ -225,6 +225,7 @@ function popularFiltroUsuarios(filmes) {
 async function abrirModalNovoFilme() {
     const modal = form.modalNovoFilme();
     modal.classList.remove("inativo");
+    modal.classList.remove("fechando");
     modal.classList.add("ativo");
 
     const titulo = modal.querySelector("#titulo");
@@ -344,8 +345,15 @@ async function abrirModalNovoFilme() {
 }
 
 function fecharModal(modal) {
+    if (!modal || modal.classList.contains('fechando') || modal.classList.contains('inativo')) return;
+
     modal.classList.remove('ativo');
-    setTimeout(() => modal.classList.add('inativo'), 300);
+    modal.classList.add('fechando');
+
+    setTimeout(() => {
+        modal.classList.remove('fechando');
+        modal.classList.add('inativo');
+    }, 280);
 }
 
 // ====================== INICIALIZAÇÃO ======================
