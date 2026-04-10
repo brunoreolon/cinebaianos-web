@@ -708,7 +708,7 @@ function atualizarHeroAcoes() {
     if (isCurrentGroupSelected()) {
         actionPrimary.innerHTML = '<i class="fa-solid fa-house"></i> Acessar grupo';
         actionPrimary.addEventListener('click', () => {
-            window.location.href = './index.html';
+            window.location.href = './catalogo.html';
         });
     } else {
         actionPrimary.innerHTML = '<i class="fa-solid fa-star"></i> Selecionar e acessar';
@@ -717,7 +717,7 @@ function atualizarHeroAcoes() {
                 await groupService.definirGrupoPadrao(state.group.id);
                 state.currentGroup = await loadCurrentGroup();
                 setFlashMessage(`Grupo "${state.group.name}" definido como grupo atual.`, 'SUCCESS');
-                window.location.href = './index.html';
+                window.location.href = './catalogo.html';
             } catch (err) {
                 handleUiError(err, 'Não foi possível selecionar este grupo.');
             }

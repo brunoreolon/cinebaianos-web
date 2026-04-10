@@ -57,7 +57,7 @@ function renderizarEstadoVazioFilme({ groupId, groupName }) {
     );
     const actions = criarElemento('div', ['detalhes-filme-empty-actions']);
 
-    actions.appendChild(criarAcaoEstadoVazio('./index.html', 'fa-solid fa-house', 'Ver filmes do grupo'));
+    actions.appendChild(criarAcaoEstadoVazio('./catalogo.html', 'fa-solid fa-house', 'Ver filmes do grupo'));
 
     if (groupId) {
         actions.appendChild(criarAcaoEstadoVazio(`./detalhes-grupo.html?id=${groupId}`, 'fa-solid fa-people-group', 'Abrir detalhes do grupo'));
@@ -88,7 +88,7 @@ function preencherDetalhes(filme, usuario) {
                 texto: "Filme removido com sucesso.",
                 tipo: "SUCCESS"
             }));
-            window.location.href = "./index.html";
+            window.location.href = "./catalogo.html";
         } catch (err) {
             if (err instanceof ApiError) {
                 criarMensagem(err.detail || "Erro ao excluir filme.", MensagemTipo.ERROR);
@@ -280,7 +280,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (!filmeId) {
             setFlashMessage('Filme inválido para exibir detalhes.', 'ALERT');
-            window.location.href = './index.html';
+            window.location.href = './catalogo.html';
             return;
         }
 
