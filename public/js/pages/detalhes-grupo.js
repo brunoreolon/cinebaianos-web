@@ -1556,13 +1556,20 @@ function renderBanimentosAtivos() {
 
         const memberName = ban.member?.name || `Usuário #${ban.member?.id}`;
         const bannedByName = ban.bannedBy?.name || '—';
+        const isTemporaryBan = Boolean(ban.expiresAt);
         const expires = formatarDataHora(ban.expiresAt);
 
         card.innerHTML = `
             <div class="gestao-item-info">
-                <strong>${memberName}</strong>
+                <div class="ban-item-header">
+                    <strong>${memberName}</strong>
+                    <span class="ban-type-badge ${isTemporaryBan ? 'is-temporary' : 'is-permanent'}">
+                        <i class="fa-solid ${isTemporaryBan ? 'fa-hourglass-half' : 'fa-infinity'}"></i>
+                        ${isTemporaryBan ? 'Temporário' : 'Permanente'}
+                    </span>
+                </div>
                 <span>Motivo: ${ban.reason}</span>
-                <span>Banido por: ${bannedByName} • Expira: ${expires}</span>
+                <span>Banido por: ${bannedByName} • ${isTemporaryBan ? `Expira em: ${expires}` : 'Sem expiração'}</span>
             </div>
             <div class="gestao-item-acoes">
                 <button type="button" class="btn-membro-action danger-light" data-action="desbanir">Desbanir</button>
