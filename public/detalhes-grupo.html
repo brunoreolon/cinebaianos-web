@@ -355,6 +355,34 @@
                 </div>
             </div>
 
+            <!-- Modal: Transferir owner -->
+            <div id="modal-transferir-owner" class="modal inativo">
+                <div class="modal-content grupo-modal-content modal-content-sm">
+                    <h3>Transferir ownership</h3>
+                    <p class="modal-subtitle">Escolha o membro que passará a ser o novo dono deste grupo.</p>
+                    <span class="close" id="fechar-modal-transferir-owner">&times;</span>
+                    <form id="form-transferir-owner">
+                        <div class="campo">
+                            <label for="transfer-owner-select">Novo owner</label>
+                            <select id="transfer-owner-select" required></select>
+                        </div>
+
+                        <div class="transfer-owner-info" id="transfer-owner-info">
+                            <strong>Importante</strong>
+                            <span>Ao concluir a transferência, você deixará de ser owner e passará a ser membro do grupo.</span>
+                        </div>
+
+                        <div class="modal-acoes">
+                            <button type="button" id="btn-cancelar-transferir-owner" class="btn-modal-cancelar">Cancelar</button>
+                            <button type="submit" class="btn-modal-salvar">
+                                <i class="fa-solid fa-crown"></i>
+                                Confirmar transferência
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
             <!-- Modal: Banir Membro -->
             <div id="modal-banir-membro" class="modal inativo">
                 <div class="modal-content grupo-modal-content">
