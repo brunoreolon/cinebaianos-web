@@ -848,18 +848,10 @@ function renderHero() {
 
 function createMovieCard(movie) {
     const movieNewDays = Number(state.group?.movieNewDays ?? state.currentGroup?.movieNewDays);
-    const card = criarFigure(movie, state.usuario || {}, {
-        movieNewDays: Number.isFinite(movieNewDays) ? movieNewDays : null
+    return criarFigure(movie, state.usuario || {}, {
+        movieNewDays: Number.isFinite(movieNewDays) ? movieNewDays : null,
+        groupId: state.groupId
     });
-    const href = card.getAttribute('href');
-
-    if (href) {
-        const url = new URL(href, window.location.origin);
-        url.searchParams.set('groupId', String(state.groupId));
-        card.setAttribute('href', `${url.pathname}${url.search}`);
-    }
-
-    return card;
 }
 
 function popularFiltroUsuariosFilmesGrupo() {

@@ -5,10 +5,30 @@ import { getQueryParam, formatarData, isUsuarioVotouNoFilme, criarElemento, orde
 import { ApiError } from '../exception/api-error.js';
 import { criarMensagem } from '../components/mensagens.js';
 import { MensagemTipo } from '../components/mensagem-tipo.js';
-import { getCurrentGroup, setFlashMessage } from '../services/group-context.js';
+import { getCurrentGroup, loadCurrentGroup, setFlashMessage } from '../services/group-context.js';
 
 // ID do grupo atual — preenchido na inicialização
 let currentGroupId = null;
+
+function parseNullableNumber(value) {
+    if (value === null || value === undefined || value === '') return null;
+    const parsed = Number(value);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+}
+
+function normalizeDetalhesFilmeUrl(filmeId, groupId, shouldKeepAvaliar) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('id', String(filmeId));
+    url.searchParams.set('groupId', String(groupId));
+
+    if (shouldKeepAvaliar) {
+        url.searchParams.set('avaliar', '1');
+    } else {
+        url.searchParams.delete('avaliar');
+    }
+
+    window.history.replaceState({}, '', `${url.pathname}${url.search}`);
+}
 
 function getVotoDoUsuarioNoFilme(filme, usuarioId) {
     const votos = deduplicarVotosPorUsuario(filme.votes || []);
@@ -210,8 +230,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const filmeId = getQueryParam('id');
-        const groupIdFromQuery = Number(getQueryParam('groupId'));
-        const grupo = getCurrentGroup();
+        const groupIdFromQuery = parseNullableNumber(getQueryParam('groupId'));
+        const avaliarFromQuery = getQueryParam('avaliar') === '1';
+
+        let grupo = getCurrentGroup();
+        if (!grupo) {
+            grupo = await loadCurrentGroup();
+        }
+
         currentGroupId = groupIdFromQuery || grupo?.id || null;
 
         if (!filmeId) {
@@ -226,6 +252,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
+        if (!groupIdFromQuery) {
+            normalizeDetalhesFilmeUrl(filmeId, currentGroupId, avaliarFromQuery);
+        }
+
         const filme = await filmeService.buscarFilmeDoGrupo(currentGroupId, filmeId);
         if (!filme) {
             setFlashMessage('Filme não encontrado no grupo informado.', 'ALERT');
@@ -233,12 +263,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        const deveAvaliar = getQueryParam('avaliar');
-        if (deveAvaliar === '1') {
+        if (avaliarFromQuery) {
             abrirModalAvaliacao(filme, usuario, true, false, currentGroupId);
-
-            const novaURL = window.location.pathname + window.location.search.replace(/(&)?avaliar=1/, '');
-            window.history.replaceState({}, '', novaURL);
+            normalizeDetalhesFilmeUrl(filmeId, currentGroupId, false);
         }
 
         preencherDetalhes(filme, usuario,);
