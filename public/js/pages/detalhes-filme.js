@@ -30,6 +30,43 @@ function normalizeDetalhesFilmeUrl(filmeId, groupId, shouldKeepAvaliar) {
     window.history.replaceState({}, '', `${url.pathname}${url.search}`);
 }
 
+function criarAcaoEstadoVazio(href, iconClass, texto) {
+    const link = criarElemento('a', ['detalhes-filme-empty-action']);
+    link.href = href;
+    link.innerHTML = `<i class="${iconClass}"></i><span>${texto}</span>`;
+    return link;
+}
+
+function renderizarEstadoVazioFilme({ groupId, groupName }) {
+    const detalhesFilme = document.getElementById('detalhes-filme');
+    if (!detalhesFilme) return;
+
+    detalhesFilme.classList.add('detalhes-filme-empty');
+    detalhesFilme.innerHTML = '';
+
+    const emptyState = criarElemento('div', ['catalog-empty-state', 'detalhes-filme-empty-state']);
+
+    const icon = criarElemento('i', ['fa-solid', 'fa-film']);
+    const titulo = criarElemento('strong', [], 'Este filme não está disponível no grupo atual');
+    const descricao = criarElemento(
+        'span',
+        [],
+        groupName
+            ? `O filme que você tentou abrir não foi encontrado em "${groupName}". Você pode voltar para a lista de filmes do grupo atual ou abrir os detalhes do grupo para explorar outras opções.`
+            : 'O filme que você tentou abrir não foi encontrado no grupo selecionado. Volte para a lista de filmes e escolha outro título.'
+    );
+    const actions = criarElemento('div', ['detalhes-filme-empty-actions']);
+
+    actions.appendChild(criarAcaoEstadoVazio('./index.html', 'fa-solid fa-house', 'Ver filmes do grupo'));
+
+    if (groupId) {
+        actions.appendChild(criarAcaoEstadoVazio(`./detalhes-grupo.html?id=${groupId}`, 'fa-solid fa-people-group', 'Abrir detalhes do grupo'));
+    }
+
+    emptyState.append(icon, titulo, descricao, actions);
+    detalhesFilme.appendChild(emptyState);
+}
+
 function getVotoDoUsuarioNoFilme(filme, usuarioId) {
     const votos = deduplicarVotosPorUsuario(filme.votes || []);
     return votos.find(v => v.voter.discordId === usuarioId);
@@ -238,7 +275,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             grupo = await loadCurrentGroup();
         }
 
-        currentGroupId = groupIdFromQuery || grupo?.id || null;
+        const currentSelectedGroupId = parseNullableNumber(grupo?.id);
+        currentGroupId = currentSelectedGroupId || groupIdFromQuery || null;
 
         if (!filmeId) {
             setFlashMessage('Filme inválido para exibir detalhes.', 'ALERT');
@@ -252,14 +290,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        if (!groupIdFromQuery) {
+        if (groupIdFromQuery !== currentGroupId) {
             normalizeDetalhesFilmeUrl(filmeId, currentGroupId, avaliarFromQuery);
         }
 
         const filme = await filmeService.buscarFilmeDoGrupo(currentGroupId, filmeId);
         if (!filme) {
-            setFlashMessage('Filme não encontrado no grupo informado.', 'ALERT');
-            window.location.href = './index.html';
+            renderizarEstadoVazioFilme({
+                groupId: currentGroupId,
+                groupName: grupo?.name || null
+            });
             return;
         }
 
@@ -294,6 +334,8 @@ window.addEventListener('filmeAtualizado', async (e) => {
         
         const botao = document.querySelector('#botao-avaliar button');
         const minhaAvaliacao = document.querySelector('#minha-avaliacao');
+
+        if (!botao || !minhaAvaliacao) return;
 
         atualizarBotaoEMinhaAvaliacao(filmeAtualizado, usuario, botao, minhaAvaliacao);
     } catch (err) {
