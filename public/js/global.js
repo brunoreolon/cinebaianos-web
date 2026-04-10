@@ -65,8 +65,23 @@ function foiAdicionadoRecentemente(filme, options = {}) {
     return diffDias <= diasLimite;
 }
 
-function criarBadgeFilmeRecente(filme) {
+function criarBadgeFilmeRecente() {
     return criarElemento('div', ['badge-novo'], 'Novo');
+}
+
+export function buildDetalhesFilmeUrl(filmeId, options = {}) {
+    const url = new URL('./detalhes-filme.html', window.location.origin);
+    url.searchParams.set('id', String(filmeId));
+
+    if (options.groupId !== null && options.groupId !== undefined && options.groupId !== '') {
+        url.searchParams.set('groupId', String(options.groupId));
+    }
+
+    if (options.avaliar) {
+        url.searchParams.set('avaliar', '1');
+    }
+
+    return `${url.pathname}${url.search}`;
 }
 
 export function criarFigure(filme, usuario = '', options = {}) {
@@ -114,23 +129,23 @@ export function criarFigure(filme, usuario = '', options = {}) {
     divFilho.append(titulo, anoLancamento, metaList);
     figure.appendChild(divFilho);
 
-    const footer = criarFooter(filme, usuario);
+    const footer = criarFooter(filme, usuario, options);
     figure.appendChild(footer);
 
     if (foiAdicionadoRecentemente(filme, options)) {
-        const badge = criarBadgeFilmeRecente(filme);
+        const badge = criarBadgeFilmeRecente();
         figure.appendChild(badge);
     }
 
     const linkCard = criarElemento('a', ['card-link']);
-    linkCard.href = `./detalhes-filme.html?id=${filme.id}`;
+    linkCard.href = buildDetalhesFilmeUrl(filme.id, { groupId: options.groupId });
     linkCard.title = filme.title;
     linkCard.appendChild(figure);
 
     return linkCard;
 }
 
-export function criarFooter(filme, usuario) {
+export function criarFooter(filme, usuario, options = {}) {
     const votos = deduplicarVotosPorUsuario(filme.votes || []);
     const footer = criarElemento('footer', ['card-footer']);
     const divVotos = criarElemento('div', ['gap', 'card-votes-summary']);
@@ -155,7 +170,7 @@ export function criarFooter(filme, usuario) {
     });
 
     if (!isUsuarioVotouNoFilme(votos, usuario.discordId)) {
-        const botao = criarBotaoAvaliar(filme);
+        const botao = criarBotaoAvaliar(filme, options);
         divMeuVoto.appendChild(botao);
     } else {
         divMeuVoto.classList.add('has-vote');
@@ -175,7 +190,7 @@ function getVotoDoUsuarioFilme(discordId, votos) {
     return votosDeduplicados.find(v => String(v.voter.discordId) === String(discordId));
 }
 
-function criarBotaoAvaliar(filme) {
+function criarBotaoAvaliar(filme, options = {}) {
     const btnAvaliar = criarElemento('button', ['btn-avaliar'], 'Avaliar');
     btnAvaliar.type = 'button';
     btnAvaliar.innerHTML = '<i class="fa-regular fa-star"></i><span>Avaliar</span>';
@@ -185,7 +200,10 @@ function criarBotaoAvaliar(filme) {
         e.preventDefault();
         e.stopPropagation();
 
-        window.location.href = `./detalhes-filme.html?id=${filme.id}&avaliar=1`;
+        window.location.href = buildDetalhesFilmeUrl(filme.id, {
+            groupId: options.groupId,
+            avaliar: true
+        });
     });
 
     return btnAvaliar

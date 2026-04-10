@@ -50,7 +50,10 @@ function atualizarGridComTransicao(container, renderFn) {
 }
 
 function criarCardFilmeComContextoGrupo(filme, usuario) {
-    return criarFigure(filme, usuario, { movieNewDays: grupoMovieNewDays });
+    return criarFigure(filme, usuario, {
+        movieNewDays: grupoMovieNewDays,
+        groupId: grupoAtualId
+    });
 }
 
 function parseMovieNewDays(value) {

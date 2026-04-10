@@ -4,7 +4,7 @@ import { ApiError } from '../../exception/api-error.js';
 import { criarMensagem } from '../../components/mensagens.js';
 import { MensagemTipo } from '../../components/mensagem-tipo.js';
 
-export function abrirModalPermissoes(dados, usuarioLogado) {
+export function abrirModalPermissoes(dados, usuarioLogado, onSaveSuccess) {
     const modal = document.getElementById('modal-gerenciar-permissoes');
     modal.classList.remove("inativo");
     modal.classList.add("ativo");
@@ -57,7 +57,7 @@ export function abrirModalPermissoes(dados, usuarioLogado) {
     const btnConcluir = modal.querySelector(".btn-concluir");
     btnConcluir.onclick = async () => {
         try {
-            if (dados.discordId === MY_DISCORD_ID && dados.discordId !== usuarioLogado.discordId) {
+            if (dados.discordId === MY_DISCORD_ID && dados.discordId !== usuarioLogado?.discordId) {
                 criarMensagem("Você tentou… e falhou miseravelmente 😎", MensagemTipo.ERROR);
                 return;
             }
@@ -81,34 +81,14 @@ export function abrirModalPermissoes(dados, usuarioLogado) {
 
             criarMensagem("Permissões atualizadas com sucesso.", MensagemTipo.SUCCESS);
 
-            const tr = document.querySelector(`tr[data-discord-id="${dados.discordId}"]`);
-            if (tr) {
-                // Atualiza badge de status
-                const spanStatus = tr.querySelector('[data-label="Status"] .badge');
-                spanStatus.className = `badge ${dados.isAtivo ? "badge-ativo" : "badge-inativo"}`;
-                spanStatus.innerHTML = dados.isAtivo
-                    ? "<i class='fa-regular fa-circle-check'></i> Ativo"
-                    : "<i class='fa-solid fa-ban'></i> Inativo";
-
-                // Atualiza badge de admin
-                const nomeBadge = tr.querySelector('[data-label="Usuário"] .nome-badge');
-                const adminShouldBeVisible = !!dados.isAdmin || !!dados.superAdmin;
-                const badgeAdmin = nomeBadge?.querySelector('.badge-admin');
-
-                if (nomeBadge) {
-                    if (adminShouldBeVisible && !badgeAdmin) {
-                        const spanAdmin = document.createElement('span');
-                        spanAdmin.className = 'badge badge-admin';
-                        spanAdmin.innerHTML = '<i class="fa-solid fa-shield"></i> Admin';
-                        nomeBadge.appendChild(spanAdmin);
-                    }
-
-                    if (!adminShouldBeVisible && badgeAdmin) {
-                        badgeAdmin.remove();
-                    }
-                }
-
-                tr.dataset.isAdmin = String(adminShouldBeVisible);
+            if (typeof onSaveSuccess === 'function') {
+                await onSaveSuccess({
+                    userId: dados.userId,
+                    discordId: dados.discordId,
+                    isAdmin: !!dados.isAdmin,
+                    superAdmin: !!dados.superAdmin,
+                    isAtivo: !!dados.isAtivo
+                });
             }
 
             fecharModal(modal);

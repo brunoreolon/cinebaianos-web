@@ -150,6 +150,13 @@ function canChangeRole(member) {
     return member.role !== 'OWNER';
 }
 
+function getTransferOwnershipCandidates() {
+    return sortMembers(state.members)
+        .filter(member => member?.active)
+        .filter(member => !isCurrentUser(member))
+        .filter(member => member.role !== 'OWNER');
+}
+
 function sortMembers(members) {
     const weight = {
         OWNER: 0,
@@ -771,6 +778,16 @@ function atualizarHeroAcoes() {
         container.appendChild(editButton);
 
         if (state.permissions?.canTransferOwnership) {
+            const transferButton = document.createElement('button');
+            transferButton.type = 'button';
+            transferButton.className = 'grupo-btn-secondary';
+            transferButton.innerHTML = '<i class="fa-solid fa-crown"></i> Transferir ownership';
+            transferButton.addEventListener('click', () => {
+                preencherFormularioTransferenciaOwner();
+                abrirModal(document.getElementById('modal-transferir-owner'));
+            });
+            container.appendChild(transferButton);
+
             const deleteButton = document.createElement('button');
             deleteButton.type = 'button';
             deleteButton.className = 'grupo-btn-secondary grupo-btn-danger';
@@ -848,18 +865,10 @@ function renderHero() {
 
 function createMovieCard(movie) {
     const movieNewDays = Number(state.group?.movieNewDays ?? state.currentGroup?.movieNewDays);
-    const card = criarFigure(movie, state.usuario || {}, {
-        movieNewDays: Number.isFinite(movieNewDays) ? movieNewDays : null
+    return criarFigure(movie, state.usuario || {}, {
+        movieNewDays: Number.isFinite(movieNewDays) ? movieNewDays : null,
+        groupId: state.groupId
     });
-    const href = card.getAttribute('href');
-
-    if (href) {
-        const url = new URL(href, window.location.origin);
-        url.searchParams.set('groupId', String(state.groupId));
-        card.setAttribute('href', `${url.pathname}${url.search}`);
-    }
-
-    return card;
 }
 
 function popularFiltroUsuariosFilmesGrupo() {
@@ -1547,13 +1556,20 @@ function renderBanimentosAtivos() {
 
         const memberName = ban.member?.name || `Usuário #${ban.member?.id}`;
         const bannedByName = ban.bannedBy?.name || '—';
+        const isTemporaryBan = Boolean(ban.expiresAt);
         const expires = formatarDataHora(ban.expiresAt);
 
         card.innerHTML = `
             <div class="gestao-item-info">
-                <strong>${memberName}</strong>
+                <div class="ban-item-header">
+                    <strong>${memberName}</strong>
+                    <span class="ban-type-badge ${isTemporaryBan ? 'is-temporary' : 'is-permanent'}">
+                        <i class="fa-solid ${isTemporaryBan ? 'fa-hourglass-half' : 'fa-infinity'}"></i>
+                        ${isTemporaryBan ? 'Temporário' : 'Permanente'}
+                    </span>
+                </div>
                 <span>Motivo: ${ban.reason}</span>
-                <span>Banido por: ${bannedByName} • Expira: ${expires}</span>
+                <span>Banido por: ${bannedByName} • ${isTemporaryBan ? `Expira em: ${expires}` : 'Sem expiração'}</span>
             </div>
             <div class="gestao-item-acoes">
                 <button type="button" class="btn-membro-action danger-light" data-action="desbanir">Desbanir</button>
@@ -1640,6 +1656,38 @@ function preencherFormularioEdicao() {
     atualizarContadoresEdicaoGrupo();
     atualizarPreviewEdicaoGrupo();
     validarFormularioEdicaoGrupo();
+}
+
+function preencherFormularioTransferenciaOwner() {
+    const select = document.getElementById('transfer-owner-select');
+    if (!select) return;
+
+    const candidates = getTransferOwnershipCandidates();
+    select.innerHTML = '';
+
+    if (!candidates.length) {
+        const option = document.createElement('option');
+        option.value = '';
+        option.textContent = 'Nenhum membro elegível no momento';
+        select.appendChild(option);
+        select.disabled = true;
+        return;
+    }
+
+    const placeholder = document.createElement('option');
+    placeholder.value = '';
+    placeholder.textContent = 'Selecione um membro';
+    select.appendChild(placeholder);
+
+    candidates.forEach(member => {
+        const option = document.createElement('option');
+        option.value = String(member.member?.id);
+        option.textContent = `${member.member?.name || 'Membro'} • ${getRoleMeta(member.role).label}`;
+        select.appendChild(option);
+    });
+
+    select.disabled = false;
+    select.value = '';
 }
 
 function abrirModalVotoGrupo(voteType = null) {
@@ -1783,6 +1831,7 @@ function configurarTabs() {
 
 function configurarModais() {
     const modalEditar = document.getElementById('modal-editar-grupo');
+    const modalTransferirOwner = document.getElementById('modal-transferir-owner');
     const modalBanir = document.getElementById('modal-banir-membro');
     const modalExpulsar = document.getElementById('modal-expulsar-membro');
     const modalVotoGrupo = document.getElementById('modal-voto-grupo');
@@ -1794,6 +1843,8 @@ function configurarModais() {
 
     document.getElementById('fechar-modal-editar')?.addEventListener('click', () => fecharModal(modalEditar));
     document.getElementById('btn-cancelar-editar')?.addEventListener('click', () => fecharModal(modalEditar));
+    document.getElementById('fechar-modal-transferir-owner')?.addEventListener('click', () => fecharModal(modalTransferirOwner));
+    document.getElementById('btn-cancelar-transferir-owner')?.addEventListener('click', () => fecharModal(modalTransferirOwner));
     document.getElementById('fechar-modal-ban')?.addEventListener('click', () => fecharModal(modalBanir));
     document.getElementById('btn-cancelar-ban')?.addEventListener('click', () => fecharModal(modalBanir));
     document.getElementById('fechar-modal-expulsar')?.addEventListener('click', () => fecharModal(modalExpulsar));
@@ -1802,7 +1853,7 @@ function configurarModais() {
     document.getElementById('btn-cancelar-voto-grupo')?.addEventListener('click', () => fecharModal(modalVotoGrupo));
     document.getElementById('btn-novo-voto-grupo')?.addEventListener('click', () => abrirModalVotoGrupo());
 
-    [modalEditar, modalBanir, modalExpulsar, modalVotoGrupo].forEach(modal => {
+    [modalEditar, modalTransferirOwner, modalBanir, modalExpulsar, modalVotoGrupo].forEach(modal => {
         modal?.addEventListener('click', (event) => {
             if (event.target === modal) {
                 fecharModal(modal);
@@ -1888,6 +1939,29 @@ function configurarModais() {
             await carregarPagina();
         } catch (err) {
             handleUiError(err, 'Não foi possível atualizar o grupo.');
+        }
+    });
+
+    document.getElementById('form-transferir-owner')?.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const select = document.getElementById('transfer-owner-select');
+        const newOwnerId = Number(select?.value || 0);
+        if (!newOwnerId) {
+            criarMensagem('Selecione um membro para transferir a ownership.', MensagemTipo.ALERT);
+            return;
+        }
+
+        const member = state.members.find(item => Number(item.member?.id) === newOwnerId);
+        const memberName = member?.member?.name || 'o membro selecionado';
+
+        try {
+            await groupService.transferirOwnership(state.groupId, newOwnerId);
+            fecharModal(modalTransferirOwner);
+            criarMensagem(`Ownership do grupo transferida para "${memberName}".`, MensagemTipo.SUCCESS);
+            await carregarPagina();
+        } catch (err) {
+            handleUiError(err, 'Não foi possível transferir a ownership deste grupo.');
         }
     });
 

@@ -220,6 +220,16 @@ export class VotoService {
         return await response.json();
     }
 
+    async buscarTiposVotosDisponiveis(groupId = null) {
+        if (groupId !== null && groupId !== undefined && groupId !== '') {
+            const url = new URL(`/api/groups/${groupId}/vote-types/available`, window.location.origin);
+            const response = await authService.apiFetch(url);
+            return await response.json();
+        }
+
+        return this.buscarTiposVotos();
+    }
+
     async criarTipoVotoDoGrupo(groupId, voto) {
         const url = new URL(`/api/groups/${groupId}/vote-types`, window.location.origin);
         const response = await authService.apiFetch(url, {

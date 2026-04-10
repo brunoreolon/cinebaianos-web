@@ -200,6 +200,13 @@ export class GroupService {
         return await response.json();
     }
 
+    async transferirOwnership(groupId, newOwnerId) {
+        const response = await authService.apiFetch(`/api/groups/${groupId}/transfer-ownership/${newOwnerId}`, {
+            method: 'PUT'
+        });
+        return await response.json();
+    }
+
     async excluirGrupo(groupId) {
         await authService.apiFetch(`/api/groups/${groupId}`, {
             method: 'DELETE'

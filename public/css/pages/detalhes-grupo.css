@@ -261,8 +261,11 @@
 }
 
 .filmes-grupo-grid {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     margin-top: 10px;
+    overflow: visible;
+    padding-inline: 6px;
+    margin-inline: -6px;
 }
 
 .membro-card {
@@ -540,6 +543,37 @@
     display: none;
 }
 
+.ban-item-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+.ban-type-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    border: 1px solid transparent;
+}
+
+.ban-type-badge.is-permanent {
+    color: var(--cor-vermelho-1);
+    background: oklch(0.22 0.04 264.1);
+    border-color: oklch(0.63 0.20 29.223 / 0.35);
+}
+
+.ban-type-badge.is-temporary {
+    color: var(--cor-ouro-1);
+    background: oklch(0.24 0.04 264.1);
+    border-color: oklch(0.85 0.12 91.936 / 0.28);
+}
+
 .grupo-empty-state {
     padding: 28px;
     border: 1px dashed var(--cor-cinza-3);
@@ -557,8 +591,7 @@
 .filmes-grupo-grid .card-link {
     display: flex;
     height: 100%;
-    max-width: 260px;
-    justify-self: start;
+    width: 100%;
 }
 
 .filmes-grupo-grid.catalog-grid-updating {
@@ -569,6 +602,12 @@
 .filmes-grupo-grid .card {
     height: 100%;
     background: linear-gradient(180deg, var(--cor-preto-3), var(--cor-preto-7));
+}
+
+@media (max-width: 1200px) {
+    .filmes-grupo-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
 }
 
 .modal {
@@ -716,6 +755,26 @@
     background: var(--cor-preto-7);
     color: var(--cor-branco-1);
     box-sizing: border-box;
+}
+
+.transfer-owner-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 6px 0 18px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    border: 1px solid oklch(0.85 0.12 91.936 / 0.28);
+    background: oklch(0.24 0.04 264.1);
+}
+
+.transfer-owner-info strong {
+    color: var(--cor-ouro-1);
+}
+
+.transfer-owner-info span {
+    color: var(--cor-branco-2);
+    line-height: 1.5;
 }
 
 .campo-cor-inputs {
@@ -904,6 +963,10 @@
     .gestao-grid {
         grid-template-columns: 1fr;
     }
+
+    .filmes-grupo-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
 }
 
 @media (max-width: 700px) {
@@ -946,6 +1009,10 @@
     .gestao-item-acoes {
         justify-content: flex-end;
     }
+
+    .filmes-grupo-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 }
 
 @media (max-width: 520px) {
@@ -959,6 +1026,10 @@
 
     .membro-card-actions {
         flex-direction: column;
+    }
+
+    .filmes-grupo-grid {
+        grid-template-columns: 1fr;
     }
 }
 
