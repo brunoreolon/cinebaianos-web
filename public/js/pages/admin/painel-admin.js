@@ -22,6 +22,48 @@ const state = {
     expandedGroupIds: new Set()
 };
 
+function isUserAdmin(usuario) {
+    return usuario?.admin === true || usuario?.isAdmin === true || usuario?.superAdmin === true;
+}
+
+function refreshUsersUi() {
+    atualizarKpis();
+    atualizarResumoAbas();
+    renderUsuarios();
+    renderBots();
+}
+
+async function reloadUsersState() {
+    state.currentUser = await authService.getUsuarioLogado();
+
+    const usuarios = await usuarioService.buscarUsuarios(true);
+    const ordenados = ordenarUsuariosPorNome(usuarios || []);
+    state.users = ordenados.filter(user => !user.bot);
+    state.bots = ordenados.filter(user => user.bot);
+}
+
+async function refreshUsersData() {
+    const usuarios = document.querySelector('#usuarios tbody');
+    const bots = document.querySelector('#bots tbody');
+
+    if (usuarios) {
+        usuarios.innerHTML = '<tr><td colspan="5">Atualizando usuários...</td></tr>';
+    }
+
+    if (bots) {
+        bots.innerHTML = '<tr><td colspan="5">Atualizando bots...</td></tr>';
+    }
+
+    await reloadUsersState();
+    refreshUsersUi();
+}
+
+async function refreshAllData() {
+    renderLoadingStates();
+    await carregarDados();
+    renderTudo();
+}
+
 function normalizarTextoBusca(value) {
     return (value || '')
         .normalize('NFD')
@@ -223,7 +265,7 @@ function atualizarKpis() {
     const gruposBanidos = state.groups.filter(g => g.banned === true).length;
     const totalUsuarios = state.users.filter(u => !u.bot).length;
     const usuariosBanidos = state.users.filter(u => u.banned === true).length;
-    const usuariosAdmin = state.users.filter(u => u.admin === true || u.isAdmin === true || u.superAdmin === true).length;
+    const usuariosAdmin = state.users.filter(isUserAdmin).length;
     const totalBots = state.bots.length;
 
     const gruposEl = document.getElementById('kpi-total-grupos');
@@ -374,9 +416,7 @@ async function handleUserBanToggle(user) {
             criarMensagem(`Usuário "${user.name}" banido com sucesso.`, MensagemTipo.SUCCESS);
         }
 
-        renderLoadingStates();
-        await carregarDados();
-        renderTudo();
+        await refreshAllData();
     } catch (err) {
         handleUiError(err, 'Não foi possível atualizar o status do usuário.');
     }
@@ -384,7 +424,7 @@ async function handleUserBanToggle(user) {
 
 function buildUserRow(usuario, isBot = false) {
     const isGlobalSuperAdmin = usuario.superAdmin === true;
-    const isSystemAdmin = usuario.admin === true || usuario.isAdmin === true || isGlobalSuperAdmin;
+    const isSystemAdmin = isUserAdmin(usuario);
     const tr = document.createElement('tr');
     tr.className = 'admin-entity-row';
     tr.dataset.discordId = usuario.discordId;
@@ -465,7 +505,9 @@ function buildUserRow(usuario, isBot = false) {
             superAdmin: isGlobalSuperAdmin,
             isAtivo: usuario.active,
             isLogado: usuario.discordId === state.currentUser?.discordId
-        }, state.currentUser);
+        }, state.currentUser, async () => {
+            await refreshUsersData();
+        });
     });
 
     tr.querySelector('.btn-ban-toggle')?.addEventListener('click', () => handleUserBanToggle(usuario));
