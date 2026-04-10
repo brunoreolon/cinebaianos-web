@@ -675,7 +675,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 texto: err.detail,
                 tipo: 'ERROR'
             }));
-            window.location.href = './index.html';
+            window.location.href = './catalogo.html';
             return;
         }
 

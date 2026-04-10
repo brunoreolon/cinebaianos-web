@@ -291,7 +291,7 @@ function renderMeuGrupoCard(group, grupoAtual) {
     } else if (isSelected) {
         mainAction.textContent = 'Acessar grupo';
         mainAction.addEventListener('click', () => {
-            window.location.href = './index.html';
+            window.location.href = './catalogo.html';
         });
     } else {
         mainAction.textContent = 'Selecionar e acessar';
@@ -299,7 +299,7 @@ function renderMeuGrupoCard(group, grupoAtual) {
             try {
                 await groupService.definirGrupoPadrao(group.id);
                 setFlashMessage(`Grupo "${group.name}" definido como grupo atual.`, 'SUCCESS');
-                window.location.href = './index.html';
+                window.location.href = './catalogo.html';
             } catch (err) {
                 if (err instanceof ApiError) {
                     criarMensagem(err.detail || 'Não foi possível selecionar o grupo.', MensagemTipo.ERROR);

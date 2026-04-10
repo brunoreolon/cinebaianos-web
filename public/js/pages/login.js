@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             try {
                 await authService.login(loginEmail.value, loginSenha.value, remember.checked);
-                window.location.href = "./index.html";
+                window.location.href = "./catalogo.html";
             } catch (err) {
                 if (err instanceof ApiError) {
                     switch (err.errorCode) {
