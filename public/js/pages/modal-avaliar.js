@@ -7,6 +7,7 @@ import { MensagemTipo } from '../components/mensagem-tipo.js';
 
 export async function abrirModalAvaliacao(filme, usuario, atualizarTelaDetalhes = false, index, groupId = null) {
     const modal = document.querySelector('#modal-avaliar');
+    const normalizedGroupId = groupId !== null && groupId !== undefined && groupId !== '' ? Number(groupId) : null;
     modal.classList.remove('inativo');
     modal.classList.remove('fechando');
     modal.classList.add('ativo');
@@ -15,7 +16,7 @@ export async function abrirModalAvaliacao(filme, usuario, atualizarTelaDetalhes 
     opcoesContainer.innerHTML = '';
 
     try {
-        const votos = ordenarVotosPorDescricao(await votoService.buscarTiposVotos());
+        const votos = ordenarVotosPorDescricao(await votoService.buscarTiposVotosDisponiveis(normalizedGroupId));
 
         votos.forEach(v => {
             const li = document.createElement('li');
@@ -34,12 +35,17 @@ export async function abrirModalAvaliacao(filme, usuario, atualizarTelaDetalhes 
                     const votoId = li.dataset.votoId;
                     let resultado;
 
-                    const usuarioVotou = filme.votes.some(v => v.voter.discordId === usuario.discordId);
+                    const votosDoFilme = Array.isArray(filme.votes) ? filme.votes : [];
+                    const usuarioVotou = votosDoFilme.some(v => v.voter.discordId === usuario.discordId);
                     if (usuarioVotou) {
-                        resultado = await votoService.alterarVotoNoGrupo(groupId, usuario.id, filme.id, votoId);
+                        resultado = normalizedGroupId
+                            ? await votoService.alterarVotoNoGrupo(normalizedGroupId, usuario.id, filme.id, votoId)
+                            : await votoService.alterarVoto(filme.id, usuario.discordId, votoId);
                         criarMensagem(`Voto alterado para ${resultado.vote.description} no filme "${filme.title}"!`, MensagemTipo.SUCCESS);
                     } else {
-                        resultado = await votoService.votarNoGrupo(groupId, usuario.id, filme.id, votoId);
+                        resultado = normalizedGroupId
+                            ? await votoService.votarNoGrupo(normalizedGroupId, usuario.id, filme.id, votoId)
+                            : await votoService.votar(filme.id, usuario.discordId, votoId);
                         criarMensagem(`Voto ${resultado.vote.description} registrado para "${filme.title}"!`, MensagemTipo.SUCCESS);
                     }
 
@@ -47,8 +53,8 @@ export async function abrirModalAvaliacao(filme, usuario, atualizarTelaDetalhes 
 
                     // Atualiza dados do filme a partir do grupo
                     let filmeAtualizado = filme;
-                    if (groupId) {
-                        const atualizado = await filmeService.buscarFilmeDoGrupo(groupId, filme.id);
+                    if (normalizedGroupId) {
+                        const atualizado = await filmeService.buscarFilmeDoGrupo(normalizedGroupId, filme.id);
                         if (atualizado) {
                             filmeAtualizado = atualizado;
                             filme.votes = atualizado.votes;
