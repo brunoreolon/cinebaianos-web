@@ -48,7 +48,9 @@ main,
 .aguardando-avaliacao .inline,
 .todos .inline {
     margin-top: 12px;
-    overflow-x: clip;
+    overflow: visible;
+    padding-inline: 6px;
+    margin-inline: -6px;
 }
 
 #adicionar-filme .index-add-action {
