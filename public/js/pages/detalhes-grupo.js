@@ -2,7 +2,6 @@ import { authService } from '../services/auth-service.js';
 import { groupService } from '../services/group-service.js';
 import { filmeService } from '../services/filme-service.js';
 import { votoService } from '../services/voto-service.js';
-import { usuarioService } from '../services/usuario-service.js';
 import { emojis } from '../emojis.js';
 import { getCurrentGroup, loadCurrentGroup, setFlashMessage } from '../services/group-context.js';
 import { criarFigure, formatarData, formatarDataExtenso, getQueryParam } from '../global.js';
@@ -75,11 +74,10 @@ const state = {
     pendingRequests: [],
     pendingInvites: [],
     bans: [],
-    users: [],
-    usersById: new Map(),
     memberTarget: null,
     voteTypeTarget: null,
-    currentGroup: null
+    currentGroup: null,
+    gestaoSubtab: 'convites'
 };
 
 const editGroupState = {
@@ -92,6 +90,7 @@ const editGroupState = {
 };
 
 const modalCloseTimers = new Map();
+const searchInviteCandidatesDebounced = debounce(executarBuscaCandidatosConvite, 320);
 
 function debounce(fn, delay = 300) {
     let timer;
@@ -191,18 +190,174 @@ function getRoleSectionLabel(role) {
     return labels[role] || role;
 }
 
-function getUserById(userId) {
-    return state.usersById.get(Number(userId)) || null;
-}
-
-function getUserNameById(userId) {
-    return getUserById(userId)?.name || `Usuário #${userId}`;
-}
-
 function formatarDataHora(dataStr) {
     if (!dataStr) return 'Sem expiração';
     const data = new Date(dataStr);
     return data.toLocaleString('pt-BR');
+}
+
+function obterNomeSolicitante(request) {
+    return request?.userName || `Usuário #${request?.userId}`;
+}
+
+function obterNomeConvidado(invite) {
+    return invite?.invitedUserName || (invite?.invitedUserId ? `Usuário #${invite.invitedUserId}` : 'Qualquer usuário');
+}
+
+function resetInviteCandidateSelection({ clearInput = false } = {}) {
+    const hiddenInput = document.getElementById('convite-user-id');
+    const searchInput = document.getElementById('convite-user-search');
+    const helper = document.getElementById('convite-user-helper');
+    const results = document.getElementById('convite-user-results');
+
+    if (hiddenInput) hiddenInput.value = '';
+    if (clearInput && searchInput) searchInput.value = '';
+    if (helper) helper.textContent = 'Digite pelo menos 2 caracteres para buscar usuários elegíveis.';
+    if (results) {
+        results.innerHTML = '';
+        results.classList.add('inativo');
+    }
+}
+
+function renderInviteCandidateResults(response = null) {
+    const results = document.getElementById('convite-user-results');
+    const helper = document.getElementById('convite-user-helper');
+    if (!results || !helper) return;
+
+    results.innerHTML = '';
+
+    const candidates = response?.candidates || [];
+    if (!candidates.length) {
+        results.classList.remove('inativo');
+        results.innerHTML = '<div class="invite-user-empty">Nenhum usuário elegível encontrado.</div>';
+        helper.textContent = 'Nenhum usuário elegível encontrado para esse termo.';
+        return;
+    }
+
+    candidates.forEach(candidate => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'invite-user-result-item';
+        button.innerHTML = `
+            <div class="invite-user-result-avatar">
+                <img src="${candidate.avatar || './assets/img/placeholder-avatar.png'}" alt="Avatar de ${candidate.name || 'usuário'}" />
+            </div>
+            <div class="invite-user-result-info">
+                <strong>${candidate.name || 'Usuário'}</strong>
+                <span>${candidate.email || 'Sem e-mail'}</span>
+            </div>
+        `;
+
+        button.addEventListener('click', () => {
+            const hiddenInput = document.getElementById('convite-user-id');
+            const searchInput = document.getElementById('convite-user-search');
+            if (hiddenInput) hiddenInput.value = String(candidate.id);
+            if (searchInput) searchInput.value = candidate.name || candidate.email || 'Usuário selecionado';
+            helper.textContent = `Usuário selecionado: ${candidate.name || candidate.email}.`;
+            results.classList.add('inativo');
+            results.innerHTML = '';
+        });
+
+        const avatarImg = button.querySelector('img');
+        avatarImg?.addEventListener('error', () => {
+            avatarImg.src = './assets/img/placeholder-avatar.png';
+        }, { once: true });
+
+        results.appendChild(button);
+    });
+
+    if (response?.hasNext) {
+        const more = document.createElement('div');
+        more.className = 'invite-user-more';
+        more.textContent = 'Existem mais resultados. Continue digitando para refinar a busca.';
+        results.appendChild(more);
+    }
+
+    results.classList.remove('inativo');
+    helper.textContent = `${candidates.length} usuário(s) elegível(is) encontrado(s).`;
+}
+
+async function executarBuscaCandidatosConvite(rawQuery) {
+    const query = rawQuery?.trim() || '';
+    const results = document.getElementById('convite-user-results');
+    const helper = document.getElementById('convite-user-helper');
+    if (!results || !helper) return;
+
+    if (query.length < 2) {
+        resetInviteCandidateSelection();
+        return;
+    }
+
+    helper.textContent = 'Buscando usuários elegíveis...';
+    results.classList.remove('inativo');
+    results.innerHTML = '<div class="invite-user-empty">Buscando usuários...</div>';
+
+    try {
+        const response = await groupService.buscarCandidatosConvite(state.groupId, {
+            query,
+            page: 0,
+            size: 8
+        });
+
+        if (state.gestaoSubtab !== 'convites') {
+            return;
+        }
+
+        renderInviteCandidateResults(response);
+    } catch (err) {
+        if (state.gestaoSubtab !== 'convites') {
+            return;
+        }
+
+        results.classList.remove('inativo');
+        results.innerHTML = '<div class="invite-user-empty">Não foi possível buscar usuários agora.</div>';
+        helper.textContent = 'Erro ao buscar usuários elegíveis.';
+        handleUiError(err, 'Não foi possível buscar usuários para convite.');
+    }
+}
+
+function configurarBuscaCandidatosConvite() {
+    const searchInput = document.getElementById('convite-user-search');
+    const hiddenInput = document.getElementById('convite-user-id');
+    const results = document.getElementById('convite-user-results');
+    if (!searchInput || !hiddenInput || !results) return;
+    if (searchInput.dataset.bound === 'true') return;
+
+    searchInput.dataset.bound = 'true';
+
+    searchInput.addEventListener('input', () => {
+        hiddenInput.value = '';
+        searchInviteCandidatesDebounced(searchInput.value);
+    });
+
+    searchInput.addEventListener('focus', () => {
+        if (searchInput.value.trim().length >= 2) {
+            searchInviteCandidatesDebounced(searchInput.value);
+        }
+    });
+
+    document.addEventListener('click', (event) => {
+        if (!event.target.closest('.invite-user-autocomplete')) {
+            results.classList.add('inativo');
+        }
+    });
+}
+
+function formatarExpiracaoRelativa(dataStr) {
+    if (!dataStr) return '';
+
+    const expiresAt = new Date(dataStr);
+    const expiresTime = expiresAt.getTime();
+    if (!Number.isFinite(expiresTime)) return '';
+
+    const diff = expiresTime - Date.now();
+    if (diff <= 0) return 'expira hoje';
+
+    const oneDayInMs = 1000 * 60 * 60 * 24;
+    const remainingDays = Math.ceil(diff / oneDayInMs);
+
+    if (remainingDays === 1) return 'expira em 1 dia';
+    return `expira em ${remainingDays} dias`;
 }
 
 async function copyTextToClipboard(text) {
@@ -1301,7 +1456,6 @@ function renderMembers() {
         sectionHeader.className = 'membros-role-header';
         sectionHeader.innerHTML = `
             <h3>${getRoleSectionLabel(role)}</h3>
-            <span>${members.length}</span>
         `;
 
         const sectionGrid = document.createElement('div');
@@ -1374,6 +1528,38 @@ function criarCardGestaoVazio(texto) {
     return empty;
 }
 
+function ativarSubabaGestao(tabName = 'convites') {
+    const previousTab = state.gestaoSubtab;
+
+    if (previousTab !== tabName && (previousTab === 'convites' || tabName === 'convites')) {
+        resetInviteCandidateSelection({ clearInput: true });
+    }
+
+    state.gestaoSubtab = tabName;
+
+    document.querySelectorAll('.gestao-subtab').forEach(tab => {
+        const isActive = tab.dataset.gestaoTab === tabName;
+        tab.classList.toggle('active', isActive);
+        tab.setAttribute('aria-selected', String(isActive));
+    });
+
+    document.querySelectorAll('.gestao-subtab-content').forEach(content => {
+        content.classList.toggle('active', content.id === `gestao-subtab-${tabName}`);
+    });
+}
+
+function configurarSubabasGestao() {
+    const tabs = document.querySelectorAll('.gestao-subtab');
+    if (!tabs.length || tabs[0]?.dataset.bound === 'true') return;
+
+    tabs.forEach(tab => {
+        tab.dataset.bound = 'true';
+        tab.addEventListener('click', () => {
+            ativarSubabaGestao(tab.dataset.gestaoTab || 'convites');
+        });
+    });
+}
+
 function renderSolicitacoesPendentes() {
     const container = document.getElementById('solicitacoes-lista');
     if (!container) return;
@@ -1389,7 +1575,7 @@ function renderSolicitacoesPendentes() {
         const card = document.createElement('article');
         card.className = 'gestao-item-card';
 
-        const requesterName = getUserNameById(request.userId);
+        const requesterName = obterNomeSolicitante(request);
 
         card.innerHTML = `
             <div class="gestao-item-info">
@@ -1447,7 +1633,7 @@ function renderConvitesPendentes() {
         card.className = `gestao-item-card ${isDirectInvite ? '' : 'is-copyable-token'}`.trim();
         card.title = isDirectInvite ? '' : 'Clique para copiar o token';
 
-        const invitedUser = invite.invitedUserId ? getUserNameById(invite.invitedUserId) : 'Qualquer usuário';
+        const invitedUser = obterNomeConvidado(invite);
         const expires = formatarDataHora(invite.expiresAt);
         const inviteTypeLabel = isDirectInvite ? 'Convite específico' : 'Convite genérico';
         const inviteTypeCss = isDirectInvite ? 'invite-type-direct' : 'invite-type-generic';
@@ -1502,55 +1688,7 @@ function renderConvitesPendentes() {
     });
 }
 
-function popularSelectUsuariosConvite() {
-    const select = document.getElementById('convite-user-id');
-    if (!select) return;
-
-    const activeMemberIds = new Set(state.members.filter(member => member.active).map(member => Number(member.member?.id)));
-    const candidatos = state.users
-        .filter(user => !activeMemberIds.has(Number(user.id)))
-        .sort((a, b) => (a.name || '').localeCompare(b.name || '', 'pt-BR', { sensitivity: 'base' }));
-
-    select.innerHTML = '';
-
-    if (!candidatos.length) {
-        const option = document.createElement('option');
-        option.value = '';
-        option.textContent = 'Nenhum usuário disponível para convite';
-        select.appendChild(option);
-        select.disabled = true;
-        return;
-    }
-
-    select.disabled = false;
-
-    const placeholder = document.createElement('option');
-    placeholder.value = '';
-    placeholder.textContent = 'Selecione um usuário';
-    placeholder.selected = true;
-    placeholder.disabled = true;
-    select.appendChild(placeholder);
-
-    candidatos.forEach(user => {
-        const option = document.createElement('option');
-        option.value = String(user.id);
-        option.textContent = user.name;
-        select.appendChild(option);
-    });
-}
-
-function renderBanimentosAtivos() {
-    const container = document.getElementById('banimentos-lista');
-    if (!container) return;
-
-    container.innerHTML = '';
-
-    if (!state.bans.length) {
-        container.appendChild(criarCardGestaoVazio('Nenhum banimento ativo no momento.'));
-        return;
-    }
-
-    state.bans.forEach(ban => {
+function createBanimentoCard(ban) {
         const card = document.createElement('article');
         card.className = 'gestao-item-card';
 
@@ -1558,6 +1696,7 @@ function renderBanimentosAtivos() {
         const bannedByName = ban.bannedBy?.name || '—';
         const isTemporaryBan = Boolean(ban.expiresAt);
         const expires = formatarDataHora(ban.expiresAt);
+        const expiresRelative = formatarExpiracaoRelativa(ban.expiresAt);
 
         card.innerHTML = `
             <div class="gestao-item-info">
@@ -1569,7 +1708,7 @@ function renderBanimentosAtivos() {
                     </span>
                 </div>
                 <span>Motivo: ${ban.reason}</span>
-                <span>Banido por: ${bannedByName} • ${isTemporaryBan ? `Expira em: ${expires}` : 'Sem expiração'}</span>
+                <span>Banido por: ${bannedByName} • ${isTemporaryBan ? `Expira em: ${expires}${expiresRelative ? ` (${expiresRelative})` : ''}` : 'Sem expiração'}</span>
             </div>
             <div class="gestao-item-acoes">
                 <button type="button" class="btn-membro-action danger-light" data-action="desbanir">Desbanir</button>
@@ -1589,8 +1728,41 @@ function renderBanimentosAtivos() {
             }
         });
 
-        container.appendChild(card);
-    });
+        return card;
+}
+
+function renderBanimentosAtivos() {
+    const temporaryContainer = document.getElementById('banimentos-temporarios-lista');
+    const permanentContainer = document.getElementById('banimentos-permanentes-lista');
+    if (!temporaryContainer || !permanentContainer) return;
+
+    temporaryContainer.innerHTML = '';
+    permanentContainer.innerHTML = '';
+
+    const temporaryBans = state.bans
+        .filter(ban => Boolean(ban?.expiresAt))
+        .sort((a, b) => {
+            const aTime = Number.isFinite(new Date(a?.expiresAt).getTime())
+                ? new Date(a.expiresAt).getTime()
+                : Number.MAX_SAFE_INTEGER;
+            const bTime = Number.isFinite(new Date(b?.expiresAt).getTime())
+                ? new Date(b.expiresAt).getTime()
+                : Number.MAX_SAFE_INTEGER;
+            return aTime - bTime;
+        });
+    const permanentBans = state.bans.filter(ban => !ban?.expiresAt);
+
+    if (!temporaryBans.length) {
+        temporaryContainer.appendChild(criarCardGestaoVazio('Nenhum banimento temporário ativo no momento.'));
+    } else {
+        temporaryBans.forEach(ban => temporaryContainer.appendChild(createBanimentoCard(ban)));
+    }
+
+    if (!permanentBans.length) {
+        permanentContainer.appendChild(criarCardGestaoVazio('Nenhum banimento permanente ativo no momento.'));
+    } else {
+        permanentBans.forEach(ban => permanentContainer.appendChild(createBanimentoCard(ban)));
+    }
 }
 
 function renderGestao() {
@@ -1615,7 +1787,8 @@ function renderGestao() {
     renderSolicitacoesPendentes();
     renderConvitesPendentes();
     renderBanimentosAtivos();
-    popularSelectUsuariosConvite();
+    configurarBuscaCandidatosConvite();
+    ativarSubabaGestao(state.gestaoSubtab || 'convites');
 }
 
 function preencherFormularioEdicao() {
@@ -1821,6 +1994,11 @@ function configurarTabs() {
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
             const tabName = tab.dataset.tab;
+
+            if (tabName !== 'gestao') {
+                resetInviteCandidateSelection({ clearInput: true });
+            }
+
             tabs.forEach(item => item.classList.remove('active'));
             contents.forEach(content => content.classList.remove('active'));
             tab.classList.add('active');
@@ -2086,6 +2264,7 @@ function configurarGestaoHandlers() {
             await groupService.criarConvite(state.groupId, payload);
             criarMensagem('Convite específico criado com sucesso.', MensagemTipo.SUCCESS);
             formConviteUsuario.reset();
+            resetInviteCandidateSelection({ clearInput: true });
             ocultarConviteGerado();
             await carregarPagina();
         } catch (err) {
@@ -2137,8 +2316,6 @@ async function carregarDados() {
     state.bans = [];
     state.groupVotes = [];
     state.globalVotes = [];
-    state.users = [];
-    state.usersById = new Map();
 
     const [groupVotesResult, globalVotesResult] = await Promise.allSettled([
         votoService.buscarTiposVotosDoGrupo(state.groupId),
@@ -2154,11 +2331,10 @@ async function carregarDados() {
     }
 
     if (state.permissions?.canManage) {
-        const [pendingRequestsResult, pendingInvitesResult, bansResult, usersResult] = await Promise.allSettled([
+        const [pendingRequestsResult, pendingInvitesResult, bansResult] = await Promise.allSettled([
             groupService.buscarSolicitacoesPendentes(state.groupId),
             groupService.buscarConvitesPendentes(state.groupId),
-            groupService.buscarBanimentosAtivos(state.groupId),
-            usuarioService.buscarUsuarios(false)
+            groupService.buscarBanimentosAtivos(state.groupId)
         ]);
 
         if (pendingRequestsResult.status === 'fulfilled') {
@@ -2171,11 +2347,6 @@ async function carregarDados() {
 
         if (bansResult.status === 'fulfilled') {
             state.bans = bansResult.value || [];
-        }
-
-        if (usersResult.status === 'fulfilled') {
-            state.users = usersResult.value || [];
-            state.usersById = new Map(state.users.map(user => [Number(user.id), user]));
         }
     }
 }
@@ -2228,9 +2399,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         configurarFiltroFilmesGrupo();
         await carregarPagina();
         configurarTabs();
+        configurarSubabasGestao();
         configurarModais();
         configurarModalVotoGrupoInteractions();
         configurarGestaoHandlers();
+        ativarSubabaGestao(state.gestaoSubtab || 'convites');
     } catch (err) {
         if (err instanceof ApiError && [403, 404].includes(err.status)) {
             setFlashMessage(err.detail || 'Você não possui acesso a este grupo.', 'ALERT');

@@ -188,83 +188,111 @@
 
                 <!-- Aba: Gestão -->
                 <div id="tab-gestao" class="tab-content">
-                    <section class="gestao-grid">
-                        <article class="gestao-card">
-                            <header class="gestao-card-header">
-                                <h3>Solicitações de entrada</h3>
-                                <p>Aprove ou rejeite pedidos pendentes para este grupo.</p>
-                            </header>
-                            <div id="solicitacoes-lista" class="gestao-list"></div>
-                        </article>
+                    <div class="gestao-subtabs" id="gestao-subtabs">
+                        <button type="button" class="gestao-subtab active" data-gestao-tab="convites">
+                            <i class="fa-solid fa-envelope-open-text"></i>
+                            Convites
+                        </button>
+                        <button type="button" class="gestao-subtab" data-gestao-tab="banimentos">
+                            <i class="fa-solid fa-ban"></i>
+                            Membros banidos
+                        </button>
+                    </div>
 
-                        <article class="gestao-card">
-                            <header class="gestao-card-header">
-                                <h3>Convites pendentes</h3>
-                                <p>Gerencie convites específicos e genéricos ativos.</p>
-                            </header>
-                            <div id="convites-lista" class="gestao-list"></div>
-                        </article>
-                    </section>
+                    <div id="gestao-subtab-convites" class="gestao-subtab-content active">
+                        <section class="gestao-grid">
+                            <article class="gestao-card">
+                                <header class="gestao-card-header">
+                                    <h3>Solicitações de entrada</h3>
+                                    <p>Aprove ou rejeite pedidos pendentes para este grupo.</p>
+                                </header>
+                                <div id="solicitacoes-lista" class="gestao-list"></div>
+                            </article>
 
-                    <section class="gestao-grid mt-16">
-                        <article class="gestao-card gestao-card-full">
-                            <header class="gestao-card-header">
-                                <h3>Banimentos ativos</h3>
-                                <p>Membros atualmente banidos deste grupo, incluindo banimentos permanentes e temporários ainda não expirados.</p>
-                            </header>
-                            <div id="banimentos-lista" class="gestao-list"></div>
-                        </article>
-                    </section>
+                            <article class="gestao-card">
+                                <header class="gestao-card-header">
+                                    <h3>Convites pendentes</h3>
+                                    <p>Gerencie convites específicos e genéricos ativos.</p>
+                                </header>
+                                <div id="convites-lista" class="gestao-list"></div>
+                            </article>
+                        </section>
 
-                    <section class="gestao-grid mt-16">
-                        <article class="gestao-card">
-                            <header class="gestao-card-header">
-                                <h3>Convidar usuário específico</h3>
-                                <p>Cria convite individual para um usuário não membro.</p>
-                            </header>
+                        <section class="gestao-grid mt-16">
+                            <article class="gestao-card">
+                                <header class="gestao-card-header">
+                                    <h3>Convidar usuário específico</h3>
+                                    <p>Cria convite individual para um usuário não membro.</p>
+                                </header>
 
-                            <form id="form-convite-usuario">
-                                <div class="campo">
-                                    <label for="convite-user-id">Usuário</label>
-                                    <select id="convite-user-id" required></select>
-                                </div>
-                                <div class="modal-acoes">
-                                    <button type="submit" class="btn-modal-salvar">
-                                        <i class="fa-solid fa-user-plus"></i>
-                                        Criar convite específico
-                                    </button>
-                                </div>
-                            </form>
-                        </article>
-
-                        <article class="gestao-card">
-                            <header class="gestao-card-header">
-                                <h3>Convite genérico</h3>
-                                <p>Cria token reutilizável para compartilhar com qualquer usuário.</p>
-                            </header>
-
-                            <form id="form-convite-generico">
-                                <div class="form-grid-2">
+                                <form id="form-convite-usuario">
                                     <div class="campo">
-                                        <label for="convite-generico-max-uses">Máx. usos (opcional)</label>
-                                        <input id="convite-generico-max-uses" type="number" min="1" />
+                                        <label for="convite-user-search">Usuário</label>
+                                        <div class="invite-user-autocomplete">
+                                            <input id="convite-user-search" type="text" autocomplete="off" placeholder="Digite nome ou e-mail do usuário" />
+                                            <input id="convite-user-id" type="hidden" />
+                                            <div id="convite-user-results" class="invite-user-results inativo"></div>
+                                        </div>
+                                        <span id="convite-user-helper" class="field-helper">Digite pelo menos 2 caracteres para buscar usuários elegíveis.</span>
                                     </div>
-                                    <div class="campo">
-                                        <label for="convite-generico-expires">Expira em (opcional)</label>
-                                        <input id="convite-generico-expires" type="datetime-local" />
+                                    <div class="modal-acoes">
+                                        <button type="submit" class="btn-modal-salvar">
+                                            <i class="fa-solid fa-user-plus"></i>
+                                            Criar convite específico
+                                        </button>
                                     </div>
-                                </div>
-                                <div class="modal-acoes">
-                                    <button type="submit" class="btn-modal-salvar">
-                                        <i class="fa-solid fa-ticket"></i>
-                                        Criar convite genérico
-                                    </button>
-                                </div>
-                            </form>
+                                </form>
+                            </article>
 
-                            <div id="convite-gerado-resultado" class="convite-gerado-resultado inativo"></div>
-                        </article>
-                    </section>
+                            <article class="gestao-card">
+                                <header class="gestao-card-header">
+                                    <h3>Convite genérico</h3>
+                                    <p>Cria token reutilizável para compartilhar com qualquer usuário.</p>
+                                </header>
+
+                                <form id="form-convite-generico">
+                                    <div class="form-grid-2">
+                                        <div class="campo">
+                                            <label for="convite-generico-max-uses">Máx. usos (opcional)</label>
+                                            <input id="convite-generico-max-uses" type="number" min="1" />
+                                        </div>
+                                        <div class="campo">
+                                            <label for="convite-generico-expires">Expira em (opcional)</label>
+                                            <input id="convite-generico-expires" type="datetime-local" />
+                                        </div>
+                                    </div>
+                                    <div class="modal-acoes">
+                                        <button type="submit" class="btn-modal-salvar">
+                                            <i class="fa-solid fa-ticket"></i>
+                                            Criar convite genérico
+                                        </button>
+                                    </div>
+                                </form>
+
+                                <div id="convite-gerado-resultado" class="convite-gerado-resultado inativo"></div>
+                            </article>
+                        </section>
+                    </div>
+
+                    <div id="gestao-subtab-banimentos" class="gestao-subtab-content">
+                        <section class="gestao-grid gestao-grid-banimentos">
+                            <article class="gestao-card">
+                                <header class="gestao-card-header">
+                                    <h3>Banimentos permanentes</h3>
+                                    <p>Membros banidos sem data de expiração.</p>
+                                </header>
+                                <div id="banimentos-permanentes-lista" class="gestao-list"></div>
+                            </article>
+
+                            <article class="gestao-card">
+                                <header class="gestao-card-header">
+                                    <h3>Banimentos temporários</h3>
+                                    <p>Membros banidos com expiração definida.</p>
+                                </header>
+                                <div id="banimentos-temporarios-lista" class="gestao-list"></div>
+                            </article>
+                        </section>
+                    </div>
                 </div>
 
             </main>

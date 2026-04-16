@@ -389,6 +389,7 @@ function renderPublicGroupCard(group) {
     appendMeta(meta, 'Política', getJoinPolicyLabel(group.joinPolicy));
     appendMeta(meta, 'Dono', group.owner?.name || '—');
     appendMeta(meta, 'Status', group.active === false ? 'Indisponível' : 'Disponível');
+    appendMeta(meta, 'Membros', group.totalMembers ?? 0);
 
     const action = document.createElement('button');
     action.type = 'button';
