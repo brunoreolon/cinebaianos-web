@@ -129,15 +129,16 @@ export class GroupService {
         const groups = await this.buscarMeusGrupos();
 
         return await Promise.all(groups.map(async group => {
-            const [membershipResult, totalMembersResult] = await Promise.allSettled([
-                this.buscarMembroDoGrupo(group.id, userId),
-                this.buscarTotalMembros(group.id)
-            ]);
-
+            let membership = null;
+            try {
+                membership = await this.buscarMembroDoGrupo(group.id, userId);
+            } catch (err) {
+                membership = null;
+            }
             return {
                 ...group,
-                membership: membershipResult.status === 'fulfilled' ? membershipResult.value : null,
-                totalMembers: totalMembersResult.status === 'fulfilled' ? totalMembersResult.value : null
+                membership,
+                totalMembers: group.totalMembers
             };
         }));
     }
@@ -235,6 +236,16 @@ export class GroupService {
 
     async buscarConvitesPendentes(groupId) {
         const response = await authService.apiFetch(`/api/groups/${groupId}/invites`);
+        return await response.json();
+    }
+
+    async buscarCandidatosConvite(groupId, { query = '', page = 0, size = 10 } = {}) {
+        const url = new URL(`/api/groups/${groupId}/invite-candidates`, window.location.origin);
+        url.searchParams.set('q', query);
+        url.searchParams.set('page', String(page));
+        url.searchParams.set('size', String(size));
+
+        const response = await authService.apiFetch(url);
         return await response.json();
     }
 
