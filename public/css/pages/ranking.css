@@ -1,3 +1,245 @@
+/* Novo padrão visual para tela de ranking */
+main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 12px 32px 12px;
+}
+
+.container-dropdown-grupos.card {
+  background: #f8f9fa;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  margin-bottom: 18px;
+  margin-top: 24px;
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+#dropdown-grupos.form-select {
+  min-width: 220px;
+  max-width: 350px;
+  padding: 8px 16px;
+  font-size: 1.08rem;
+  border-radius: 8px;
+  border: 1px solid #b0b0b0;
+  background: #fff;
+  margin-right: 16px;
+}
+
+.filtro-ordem .filtros {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.filtro-ordem .filtro.btn {
+  border-radius: 8px;
+  border: 1.5px solid #007bff44;
+  background: #f4f8ff;
+  color: #007bff;
+  font-weight: 500;
+  font-size: 1.08rem;
+  padding: 7px 18px;
+  transition: background 0.15s, color 0.15s, border 0.15s;
+  outline: none;
+  box-shadow: none;
+}
+.filtro-ordem .filtro.ativo {
+  background: #007bff;
+  color: #fff;
+  border-color: #007bff;
+}
+.filtro-ordem .filtro.btn:hover {
+  background: #eaf4ff;
+  color: #0056b3;
+  border-color: #007bff;
+}
+
+/* Mantém cards, resumo e mensagens do ranking como antes */
+/* Dropdown de grupos */
+.container-dropdown-grupos {
+  display: flex;
+  align-items: center;
+  margin: 24px 0 12px 0;
+  gap: 8px;
+}
+
+#dropdown-grupos {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  background: #fff;
+  min-width: 180px;
+}
+
+/* Cards de ranking */
+.card-ranking {
+  display: flex;
+  align-items: stretch;
+  background: #f8f9fa;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  margin-bottom: 18px;
+  padding: 18px 24px;
+  transition: box-shadow 0.2s;
+  border-left: 6px solid #e0e0e0;
+}
+.card-ranking.voce {
+  border-left: 6px solid #007bff;
+  background: #eaf4ff;
+  box-shadow: 0 4px 16px rgba(0,123,255,0.08);
+}
+.card-ranking .parte-1 {
+  display: flex;
+  align-items: center;
+  flex: 1 1 0%;
+  gap: 18px;
+}
+.card-ranking .usuario-avatar img {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+}
+.card-ranking .usuario-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.card-ranking .usuario h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+.badge-voce {
+  background: #007bff;
+  color: #fff;
+  border-radius: 8px;
+  padding: 2px 8px;
+  font-size: 0.85em;
+  margin-left: 8px;
+}
+.card-ranking .info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  min-width: 70px;
+  margin-left: 18px;
+}
+.card-ranking .info div {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #007bff;
+}
+.card-ranking .info .fonte-secundaria {
+  font-size: 0.95rem;
+  color: #666;
+}
+.card-ranking .separador {
+  width: 2px;
+  background: #e0e0e0;
+  margin: 0 18px;
+}
+.card-ranking .votos {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.card-ranking .voto {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #fff;
+  border-radius: 8px;
+  padding: 6px 10px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.card-ranking .voto-info {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+.card-ranking .voto-info i {
+  font-size: 1.2em;
+}
+.card-ranking .voto p {
+  margin: 2px 0 0 0;
+  font-size: 0.95em;
+  color: #444;
+}
+.posicao {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  font-size: 1.3rem;
+  font-weight: bold;
+  background: #e0e0e0;
+  color: #555;
+  margin-right: 10px;
+}
+.posicao.primeiro {
+  background: gold;
+  color: #fff;
+}
+.posicao.segundo {
+  background: silver;
+  color: #fff;
+}
+.posicao.terceiro {
+  background: #cd7f32;
+  color: #fff;
+}
+.mensagem-sem-grupo, .mensagem-sem-usuarios, .mensagem-erro {
+  text-align: center;
+  color: #888;
+  font-size: 1.1rem;
+  margin: 32px 0;
+}
+.resumo-vencedores {
+  display: flex;
+  gap: 18px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+.resumo-item {
+  background: #fffbe6;
+  border-radius: 8px;
+  padding: 6px 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.05rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+@media (max-width: 700px) {
+  .card-ranking {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 14px 8px;
+  }
+  .card-ranking .parte-1 {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .card-ranking .separador {
+    display: none;
+  }
+  .card-ranking .votos {
+    margin-top: 10px;
+    gap: 8px;
+  }
+}
 /* ================= CABEÇALHO ================= */
 
 .cabecalho {

@@ -61,14 +61,18 @@ export class UsuarioService {
     }
 
     /**
-     * Busca estatísticas de um usuário.
+     * Busca estatísticas de um usuário pelo id (id do banco), podendo filtrar por grupo.
      *
-     * @param {string} discordId - ID do usuário
+     * @param {number} userId - ID do usuário (id do banco)
+     * @param {number} [groupId] - ID do grupo (opcional)
      * @returns {Promise<Object>} - Estatísticas do usuário
      * @throws {ApiError} - Se a requisição falhar
      */
-    async buscarStatisticasUsuario(discordId) {
-        const url = new URL(`/api/users/${discordId}/summary`, window.location.origin);
+    async buscarStatisticasUsuario(userId, groupId = null) {
+        const url = new URL(`/api/users/${userId}/summary`, window.location.origin);
+        if (groupId) {
+            url.searchParams.append('groupId', groupId);
+        }
         const response = await authService.apiFetch(url);
 
         return await response.json();

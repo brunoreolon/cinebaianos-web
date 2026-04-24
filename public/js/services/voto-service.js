@@ -267,6 +267,18 @@ export class VotoService {
         });
         return true;
     }
+
+    /**
+     * Retorna os votos recebidos pelos usuários de um grupo específico.
+     * @param {number|string} groupId - ID do grupo
+     * @returns {Promise<Array>} - Lista de usuários com votos recebidos no grupo
+     * @throws {ApiError} - Se a requisição falhar
+     */
+    async buscarStatisticasVotosRecebidosUsuariosPorGrupo(groupId) {
+        const url = new URL(`/api/groups/${groupId}/votes/received`, window.location.origin);
+        const response = await authService.apiFetch(url);
+        return await response.json();
+    }
 }
 
 export const votoService = new VotoService();

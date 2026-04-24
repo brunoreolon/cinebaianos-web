@@ -2418,3 +2418,130 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
+// --- Ranking do Grupo ---
+async function carregarRankingGrupo() {
+    const groupId = state.groupId;
+    if (!groupId) return;
+
+    const filtrosContainer = document.getElementById('ranking-grupo-filtros');
+    const cardsContainer = document.getElementById('ranking-grupo-cards');
+    if (!filtrosContainer || !cardsContainer) return;
+
+    filtrosContainer.innerHTML = '';
+    cardsContainer.innerHTML = '';
+
+    // Busca tipos de votos do grupo
+    let tiposVotos = [];
+    try {
+        tiposVotos = await votoService.buscarTiposVotosDoGrupo(groupId);
+    } catch (e) {
+        filtrosContainer.innerHTML = '<span class="fonte-secundaria">Erro ao carregar tipos de voto.</span>';
+        return;
+    }
+    if (!tiposVotos.length) {
+        filtrosContainer.innerHTML = '<span class="fonte-secundaria">Nenhum tipo de voto cadastrado para este grupo.</span>';
+        return;
+    }
+
+    // Busca ranking dos membros do grupo
+    let stats = [];
+    try {
+        stats = await votoService.buscarStatisticasVotosRecebidosUsuariosPorGrupo(groupId);
+    } catch (e) {
+        cardsContainer.innerHTML = '<span class="fonte-secundaria">Erro ao carregar ranking do grupo.</span>';
+        return;
+    }
+
+    // Renderiza filtros de voto
+    tiposVotos.forEach((v, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'filtro' + (index === 0 ? ' ativo' : '');
+        btn.style.backgroundColor = v.color;
+        btn.innerHTML = `<i>${v.emoji}</i> <span>${v.description}</span>`;
+        btn.addEventListener('click', () => {
+            filtrosContainer.querySelectorAll('.filtro').forEach(b => b.classList.remove('ativo'));
+            btn.classList.add('ativo');
+            renderizarRankingGrupo(stats, v);
+        });
+        filtrosContainer.appendChild(btn);
+    });
+
+    // Renderiza cards do ranking para o primeiro tipo de voto
+    renderizarRankingGrupo(stats, tiposVotos[0]);
+}
+
+function renderizarRankingGrupo(stats, votoSelecionado) {
+    const cardsContainer = document.getElementById('ranking-grupo-cards');
+    if (!cardsContainer) return;
+    cardsContainer.innerHTML = '';
+
+    // Ordena usuários por votos recebidos do tipo selecionado
+    const ordenados = [...stats].sort((a, b) => {
+        const votosA = a.votes.find(v => v.type.id === votoSelecionado.id)?.totalVotes ?? 0;
+        const votosB = b.votes.find(v => v.type.id === votoSelecionado.id)?.totalVotes ?? 0;
+        return votosB - votosA || a.user.name.localeCompare(b.user.name);
+    });
+
+    ordenados.forEach((usuarioStats, idx) => {
+        const usuario = usuarioStats.user;
+        const usuarioVotos = usuarioStats.votes;
+        const card = document.createElement('div');
+        card.className = 'card-ranking' + (usuario.discordId === state.usuario?.discordId ? ' voce' : '');
+
+        // Posição
+        const pos = document.createElement('div');
+        pos.className = 'posicao';
+        if (idx === 0) pos.innerHTML = '<i class="fa-solid fa-trophy fa-2x"></i>';
+        else if (idx === 1) pos.innerHTML = '<i class="fa-solid fa-medal fa-2x"></i>';
+        else if (idx === 2) pos.innerHTML = '<i class="fa-solid fa-medal fa-2x"></i>';
+        else pos.textContent = `#${idx + 1}`;
+
+        // Avatar
+        const avatar = document.createElement('img');
+        avatar.className = 'usuario-avatar';
+        avatar.src = usuario.avatar;
+        avatar.alt = 'Avatar';
+
+        // Nome
+        const nome = document.createElement('h3');
+        nome.textContent = usuario.name;
+        if (usuario.discordId === state.usuario?.discordId) {
+            const badge = document.createElement('span');
+            badge.className = 'badge-voce';
+            badge.textContent = 'Você';
+            nome.append(' ', badge);
+        }
+
+        // Total de filmes adicionados
+        const filmes = document.createElement('p');
+        filmes.textContent = (usuarioStats.userStats?.totalMoviesAdded || 0) + ' filmes adicionados';
+
+        // Valor do voto selecionado
+        const votos = usuarioVotos.find(v => v.type.id === votoSelecionado.id);
+        const valor = document.createElement('div');
+        valor.textContent = votos ? votos.totalVotes : 0;
+
+        // Descrição do voto
+        const desc = document.createElement('p');
+        desc.className = 'fonte-secundaria';
+        desc.textContent = votoSelecionado.description;
+
+        // Monta card
+        card.append(pos, avatar, nome, filmes, valor, desc);
+        cardsContainer.appendChild(card);
+    });
+}
+
+function configurarAbaRankingGrupo() {
+    // Ativa carregamento do ranking ao clicar na aba
+    document.querySelectorAll('.grupo-tab').forEach(tab => {
+        if (tab.dataset.tab === 'ranking') {
+            tab.addEventListener('click', () => carregarRankingGrupo());
+        }
+    });
+}
+
+// Inicialização da aba Ranking
+document.addEventListener('DOMContentLoaded', () => {
+    configurarAbaRankingGrupo();
+});

@@ -60,6 +60,10 @@
                         <i class="fa-solid fa-star-half-stroke"></i>
                         Votos
                     </button>
+                    <button class="grupo-tab" data-tab="ranking">
+                        <i class="fa-solid fa-trophy"></i>
+                        Ranking
+                    </button>
                     <button class="grupo-tab" data-tab="gestao" id="tab-gestao-btn">
                         <i class="fa-solid fa-user-gear"></i>
                         Gestão
@@ -293,6 +297,24 @@
                             </article>
                         </section>
                     </div>
+                </div>
+
+                <!-- Aba: Ranking do Grupo -->
+                <div id="tab-ranking" class="tab-content">
+                    <section class="ranking-grupo-section">
+                        <div class="cabecalho">
+                            <div class="titulo">
+                                <i class="fa-solid fa-trophy fa-2x"></i>
+                                <h2>Ranking do Grupo</h2>
+                            </div>
+                            <p class="fonte-secundaria">Classificação dos membros baseada nos votos recebidos neste grupo.</p>
+                        </div>
+                        <div class="filtro-ordem">
+                            <span class="fonte-secundaria">Ordenar por:</span>
+                            <div class="filtros" id="ranking-grupo-filtros"></div>
+                        </div>
+                        <div class="cards" id="ranking-grupo-cards"></div>
+                    </section>
                 </div>
 
             </main>
