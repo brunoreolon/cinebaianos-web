@@ -46,7 +46,7 @@
     margin-top: 20px;
 }
 
-#separator {
+.separator {
     width: 100%;
     margin: 16px 0px;
     border: 1px solid var(--cor-cinza-3);
