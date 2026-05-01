@@ -8,7 +8,7 @@ import { MensagemTipo } from '../components/mensagem-tipo.js';
 document.addEventListener('DOMContentLoaded', async () => {
     const container = document.getElementById('container');
     const loader = document.getElementById('loader');
-    if (loader) loader.style.display = 'block';
+    if (loader) loader.style.display = 'flex';
 
     try {
         authService.requireLogin();
