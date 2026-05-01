@@ -30,8 +30,12 @@ export function montarMenuUsuario(usuario, grupoAtual = null) {
     ` : '';
 
     menu.innerHTML = `
+        <div class="dropdown-menu-header">
+            <p>Conta</p>
+            <strong>${usuario.name}</strong>
+        </div>
         <nav>
-            <ul>
+            <ul class="dropdown-menu-list">
                 <li>
                     <a href="./meus-grupos.html">
                         <i class="fa-solid fa-layer-group space"></i>
