@@ -2,7 +2,7 @@ import { authService } from '../../services/auth-service.js';
 import { usuarioService } from '../../services/usuario-service.js';
 import { votoService } from '../../services/voto-service.js';
 import { adminService } from '../../services/admin-service.js';
-import { formatarData, ordenarVotosPorDescricao, ordenarUsuariosPorNome } from '../../global.js';
+import { formatarData, ordenarVotosPorDescricao, ordenarUsuariosPorNome, buildPerfilUrl } from '../../global.js';
 import { abrirModalVoto } from './modal-cadastrar-voto.js';
 import { abrirModalRedefinirSenha } from './modal-redefinir-senha.js';
 import { abrirModalPermissoes } from './modal-permissoes.js';
@@ -401,7 +401,7 @@ async function handleUserBanToggle(user) {
         targetType: 'user',
         targetLabel: 'usuário',
         name: user.name,
-        identifier: user.email || `Discord ID: ${user.discordId}`,
+        identifier: user.email || `Usuário #${user.id}`,
         avatar: user.avatar || './assets/img/placeholder-avatar.png'
     });
 
@@ -427,26 +427,26 @@ function buildUserRow(usuario, isBot = false) {
     const isSystemAdmin = isUserAdmin(usuario);
     const tr = document.createElement('tr');
     tr.className = 'admin-entity-row';
-    tr.dataset.discordId = usuario.discordId;
+    tr.dataset.userId = String(usuario.id);
     tr.dataset.userId = String(usuario.id);
     tr.dataset.isAdmin = String(isSystemAdmin);
     tr.dataset.isSuperAdmin = String(isGlobalSuperAdmin);
     tr.dataset.isAtivo = String(usuario.active);
-    tr.dataset.isLogado = String(usuario.discordId === state.currentUser?.discordId);
+    tr.dataset.isLogado = String(Number(usuario.id) === Number(state.currentUser?.id));
 
     tr.innerHTML = `
         <td data-label="${isBot ? 'Bot' : 'Usuário'}" class="admin-entity-main-cell">
-            <a href="./perfil.html?id=${usuario.discordId}" class="link-perfil admin-entity-link">
+            <a href="${buildPerfilUrl(usuario)}" class="link-perfil admin-entity-link">
                 <div class="${isBot ? 'bots-info' : 'usuarios-info'} admin-entity-summary">
                     <img src="${usuario.avatar || './assets/img/placeholder-avatar.png'}" alt="Avatar ${usuario.name}">
                     <div class="usuario-texto">
                         <div class="nome-badge">
                             <span class="nome">${usuario.name}</span>
-                            ${usuario.discordId === state.currentUser?.discordId ? '<span class="badge badge-voce">Você</span>' : ''}
+                            ${Number(usuario.id) === Number(state.currentUser?.id) ? '<span class="badge badge-voce">Você</span>' : ''}
                             ${isBot ? '<span class="badge badge-bot"><i class="fa-solid fa-robot"></i> Bot</span>' : ''}
                             ${!isBot && isSystemAdmin ? '<span class="badge badge-admin"><i class="fa-solid fa-shield"></i> Admin</span>' : ''}
                         </div>
-                        <div class="usuario-meta-secundaria">Discord ID: ${usuario.discordId}</div>
+                        <div class="usuario-meta-secundaria">ID: ${usuario.id}</div>
                         ${usuario.banned ? `<div class="banimento-info">Conta banida globalmente${usuario.active === false ? ' e inativa' : ''}.</div>` : ''}
                     </div>
                 </div>
@@ -484,13 +484,19 @@ function buildUserRow(usuario, isBot = false) {
         </td>
     `;
 
+    const avatarImg = tr.querySelector('img');
+    if (avatarImg) {
+        avatarImg.addEventListener('error', () => {
+            avatarImg.src = './assets/img/placeholder-avatar.png';
+        }, { once: true });
+    }
+
     tr.querySelector('.btn-redefinir')?.addEventListener('click', () => {
         abrirModalRedefinirSenha({
             nome: usuario.name,
             email: usuario.email,
             avatar: usuario.avatar || './assets/img/placeholder-avatar.png',
-            userId: usuario.id,
-            discordId: usuario.discordId
+            userId: usuario.id
         });
     });
 
@@ -499,12 +505,11 @@ function buildUserRow(usuario, isBot = false) {
             nome: usuario.name,
             email: usuario.email,
             userId: usuario.id,
-            discordId: usuario.discordId,
             avatar: usuario.avatar || './assets/img/placeholder-avatar.png',
             isAdmin: isSystemAdmin,
             superAdmin: isGlobalSuperAdmin,
             isAtivo: usuario.active,
-            isLogado: usuario.discordId === state.currentUser?.discordId
+            isLogado: Number(usuario.id) === Number(state.currentUser?.id)
         }, state.currentUser, async () => {
             await refreshUsersData();
         });
@@ -657,7 +662,7 @@ function handleUiError(err, fallbackMessage) {
 document.addEventListener('DOMContentLoaded', async () => {
     const container = document.getElementById('container');
     const loader = document.getElementById('loader');
-    if (loader) loader.style.display = 'block';
+    if (loader) loader.style.display = 'flex';
 
     try {
         await authService.requireLogin();

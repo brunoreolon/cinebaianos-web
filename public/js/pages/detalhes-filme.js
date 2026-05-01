@@ -1,11 +1,12 @@
 import { authService } from '../services/auth-service.js';
 import { filmeService } from '../services/filme-service.js';
 import { abrirModalAvaliacao } from './modal-avaliar.js';
-import { getQueryParam, formatarData, isUsuarioVotouNoFilme, criarElemento, ordenarVotosPorNomeUsuario, deduplicarVotosPorUsuario } from '../global.js';
+import { getQueryParam, formatarData, isUsuarioVotouNoFilme, criarElemento, ordenarVotosPorNomeUsuario, deduplicarVotosPorUsuario, buildPerfilUrl, isInactiveMembershipStatus, createMembershipStatusBadge } from '../global.js';
 import { ApiError } from '../exception/api-error.js';
 import { criarMensagem } from '../components/mensagens.js';
 import { MensagemTipo } from '../components/mensagem-tipo.js';
 import { getCurrentGroup, loadCurrentGroup, setFlashMessage } from '../services/group-context.js';
+import {groupService} from "../services/group-service.js";
 
 // ID do grupo atual — preenchido na inicialização
 let currentGroupId = null;
@@ -69,13 +70,32 @@ function renderizarEstadoVazioFilme({ groupId, groupName }) {
 
 function getVotoDoUsuarioNoFilme(filme, usuarioId) {
     const votos = deduplicarVotosPorUsuario(filme.votes || []);
-    return votos.find(v => v.voter.discordId === usuarioId);
+    return votos.find(v => Number(v?.voter?.id) === Number(usuarioId));
 }
 
-function preencherDetalhes(filme, usuario) {
-    const btnRemoverFilme = document.querySelector('.btn-remover-filme');
+function appendStatusBadge(container, status) {
+    if (!container) return;
 
-    if (filme.chooser.discordId === usuario.discordId) {
+    container.querySelector('.card-member-status-badge')?.remove();
+
+    const badge = createMembershipStatusBadge(status);
+    if (badge) container.appendChild(badge);
+}
+
+async function preencherDetalhes(filme, usuario) {
+    const btnRemoverFilme = document.querySelector('.btn-remover-filme');
+    const isChooser = Number(filme?.chooser?.id) === Number(usuario?.id);
+    
+    let canRemove = false;
+
+    try {
+        const perms = await groupService.buscarPermissoes(currentGroupId);
+        canRemove = perms.canManage;
+    } catch (err) {
+        console.error("Erro ao buscar permissões:", err);
+    }
+
+    if (isChooser || canRemove) {
         btnRemoverFilme.classList.remove('disable');
 
         btnRemoverFilme?.addEventListener('click', async () => {
@@ -121,8 +141,11 @@ function preencherDetalhes(filme, usuario) {
     document.querySelector('.diretor .nome-diretor').textContent = filme.director || 'Peter Jackson';
     document.querySelector('.duracao p').textContent = filme.duration || '2 horas';
     const linkPerfil = document.querySelector('.responsavel .link-perfil');
-    linkPerfil.textContent = filme.chooser.name;
-    linkPerfil.href = `./perfil.html?id=${filme.chooser.discordId}`;
+    const chooserStatus = filme?.chooserMembershipStatus || 'ACTIVE';
+    linkPerfil.textContent = filme?.chooser?.name || 'Usuario';
+    linkPerfil.classList.toggle('link-perfil--inactive-member', isInactiveMembershipStatus(chooserStatus));
+    linkPerfil.href = buildPerfilUrl(filme.chooser);
+    appendStatusBadge(document.querySelector('.responsavel .meta-value-row'), chooserStatus);
     document.querySelector('.data-adicionado p').textContent = formatarData(filme.dateAdded);
 
     // Sinopse
@@ -142,13 +165,13 @@ function preencherAvaliacoes(filme, usuario) {
 
 export function atualizarBotaoEMinhaAvaliacao(filme, usuario, botao, minhaAvaliacao) {
     const votosDeduplicados = deduplicarVotosPorUsuario(filme.votes || []);
-    const usuarioVotou = isUsuarioVotouNoFilme(votosDeduplicados, usuario.discordId);
+    const usuarioVotou = isUsuarioVotouNoFilme(votosDeduplicados, usuario.id);
 
     if (usuarioVotou) {
         botao.innerHTML = '<i class="fa-solid fa-pen"></i><span>Alterar avaliação</span>';
         minhaAvaliacao.style.display = 'block';
 
-        const voto = getVotoDoUsuarioNoFilme(filme, usuario.discordId);
+        const voto = getVotoDoUsuarioNoFilme(filme, usuario.id);
         const span = minhaAvaliacao.querySelector('span');
         span.textContent = voto.vote.emoji + voto.vote.description;
         span.style.color = voto.vote.color;
@@ -216,7 +239,7 @@ export function renderizarAvaliacoesRecebidas(votos) {
         const li = criarElemento('li');
 
         const a = criarElemento('a', ['item-voto']);
-        a.href = `./perfil.html?id=${v.voter.discordId}`;
+        a.href = buildPerfilUrl(v.voter);
 
         const article = criarElemento('article', ['avaliacao-feita']);
         const infoUsuario = criarElemento('div', ['info-usuario']);
@@ -227,10 +250,17 @@ export function renderizarAvaliacoesRecebidas(votos) {
         img.alt = `Avatar de ${votante.name}`;
 
         const divInfo = criarElemento('div', ['dados-usuario']);
-        const pNome = criarElemento('p', [], votante.name);
+        const nomeLinha = criarElemento('div', ['nome-status-linha']);
+        const voterStatus = v?.voterMembershipStatus || 'ACTIVE';
+        const pNome = criarElemento('p', ['votante-nome'], votante?.name || 'Usuario');
+        if (isInactiveMembershipStatus(voterStatus)) {
+            pNome.classList.add('link-perfil--inactive-member');
+        }
+        nomeLinha.appendChild(pNome);
+        appendStatusBadge(nomeLinha, voterStatus);
         const pData = criarElemento('p', [], formatarData(v.vote.votedAt));
 
-        divInfo.append(pNome, pData);
+        divInfo.append(nomeLinha, pData);
         infoUsuario.append(img, divInfo);
 
         // voto
@@ -255,7 +285,7 @@ export function renderizarAvaliacoesRecebidas(votos) {
 document.addEventListener('DOMContentLoaded', async () => {
     const container = document.getElementById('container');
     const loader = document.getElementById('loader');
-    if (loader) loader.style.display = 'block';
+    if (loader) loader.style.display = 'flex';
 
     try {
         authService.requireLogin();

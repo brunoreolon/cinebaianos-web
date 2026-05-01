@@ -39,7 +39,8 @@ export function montarSeletorGrupo(grupos = [], grupoAtual = null) {
                 </button>
                 <div class="group-dropdown border">
                     <div class="group-dropdown-header">
-                        <span>Trocar grupo</span>
+                        <p>Grupo atual</p>
+                        <strong>${nomeGrupoAtual}</strong>
                     </div>
                     <ul class="group-dropdown-list"></ul>
                     <div class="separator"></div>

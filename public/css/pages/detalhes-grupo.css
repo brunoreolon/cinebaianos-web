@@ -243,6 +243,23 @@
     display: none;
 }
 
+.grupo-ranking-wrap {
+    display: grid;
+    gap: 16px;
+}
+
+.grupo-ranking-header {
+    margin-bottom: 0;
+}
+
+.grupo-ranking-filtro {
+    margin-bottom: 0;
+}
+
+#grupo-ranking-cards .card-ranking {
+    background: oklch(var(--cor-preto-1-params) / 0.1);
+}
+
 .membros-grid,
 .filmes-grupo-grid {
     display: grid;
@@ -297,7 +314,8 @@
 }
 
 .membro-card-topo {
-    grid-area: top;
+    grid-column: 1;
+    grid-row: 1;
     display: flex;
     gap: 14px;
     align-items: center;
@@ -342,6 +360,16 @@
     font-size: 16px;
 }
 
+.membro-link-perfil {
+    color: inherit;
+    text-decoration: none;
+}
+
+.membro-link-perfil:hover {
+    color: var(--cor-roxo-1);
+    text-decoration: underline;
+}
+
 .membro-you {
     padding: 3px 9px;
     border-radius: 999px;
@@ -352,7 +380,8 @@
 }
 
 .membro-meta {
-    grid-area: meta;
+    grid-column: 1;
+    grid-row: 2;
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-start;
@@ -392,7 +421,8 @@
 }
 
 .membro-card-actions {
-    grid-area: actions;
+    grid-column: 2;
+    grid-row: 1 / span 2;
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-end;
@@ -1161,7 +1191,7 @@
 
     .grupo-tabs {
         display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-template-columns: repeat(5, minmax(0, 1fr));
         width: 100%;
         box-sizing: border-box;
         border-radius: 18px;
@@ -1229,12 +1259,21 @@
     }
 
     .membro-meta {
+        grid-column: 1;
+        grid-row: auto;
         justify-content: flex-start;
         padding-left: 0;
         padding-right: 0;
     }
 
+    .membro-card-topo {
+        grid-column: 1;
+        grid-row: auto;
+    }
+
     .membro-card-actions {
+        grid-column: 1;
+        grid-row: auto;
         justify-content: flex-start;
         padding-left: 0;
         border-left: 0;

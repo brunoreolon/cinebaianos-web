@@ -314,6 +314,11 @@ main section header h2 {
     color: var(--cor-cinza-2);
 }
 
+.link-perfil--inactive-member {
+    color: var(--cor-cinza-2) !important;
+    opacity: 0.9;
+}
+
 .responsavel {
     margin-left: 0;
     margin-bottom: 0;
@@ -340,6 +345,40 @@ main section header h2 {
 
 .card-meta-item .link-perfil {
     font-weight: 600;
+}
+
+/* Mantem compatibilidade com seletores antigos de card */
+.card-meta-item .link-perfil--inactive-member {
+    color: var(--cor-cinza-2);
+    opacity: 0.9;
+}
+
+.card-member-status-badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 22px;
+    padding: 0 8px;
+    border-radius: 999px;
+    border: 1px solid var(--cor-cinza-3);
+    background: oklch(var(--cor-preto-1-params) / 0.2);
+    color: var(--cor-branco-2);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0.01em;
+    margin-left: 4px;
+}
+
+.card-member-status-badge.is-left {
+    border-color: var(--cor-cinza-3);
+    color: var(--cor-branco-2);
+}
+
+.card-member-status-badge.is-banned-temp,
+.card-member-status-badge.is-banned-perm,
+.card-member-status-badge.is-out {
+    border-color: oklch(0.66 0.17 27 / 0.42);
+    color: oklch(0.78 0.11 30);
 }
 
 .card-meta-item .thin {

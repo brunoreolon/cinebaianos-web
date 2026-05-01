@@ -625,6 +625,21 @@
     gap: 4px;
 }
 
+.nome-status-linha {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.nome-status-linha .card-member-status-badge {
+    margin-left: 0;
+}
+
+.votante-nome {
+    margin: 0;
+}
+
 .avaliacao-feita p:first-child {
     font-size: 16px;
     font-weight: 700;

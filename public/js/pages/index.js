@@ -89,7 +89,7 @@ function criarCardsAguardandoAvaliacao(usuario, filmes) {
 }
 
 function obterFilmesAguardandoAvaliacao(filmes, usuario) {
-    return filmes.filter(f => !f.votes.some(v => v.voter.discordId === usuario.discordId));
+    return filmes.filter(f => !f.votes.some(v => Number(v?.voter?.id) === Number(usuario.id)));
 }
 
 // ====================== SEÇÃO "TODOS OS FILMES" ======================
@@ -119,7 +119,7 @@ function filtrarEOrdenarFilmes() {
 
     let filmes = [...filmesDoGrupo];
 
-    if (filtroUsuario) filmes = filmes.filter(f => f.chooser?.discordId === filtroUsuario);
+    if (filtroUsuario) filmes = filmes.filter(f => Number(f?.chooser?.id) === Number(filtroUsuario));
     if (filtroVoto) filmes = filmes.filter(f => f.votes.some(v => v.vote.id === Number(filtroVoto)));
     if (filtroGenero) filmes = filmes.filter(f => f.genres?.some(g => g.id === Number(filtroGenero)));
     if (buscarTitulo) filmes = filmes.filter(f => f.title.toLowerCase().includes(buscarTitulo.toLowerCase()));
@@ -208,15 +208,15 @@ function popularFiltroUsuarios(filmes) {
 
     const uniqueChooserMap = new Map();
     filmes.forEach(f => {
-        if (f.chooser && !uniqueChooserMap.has(f.chooser.discordId)) {
-            uniqueChooserMap.set(f.chooser.discordId, f.chooser);
+        if (f?.chooser?.id && !uniqueChooserMap.has(f.chooser.id)) {
+            uniqueChooserMap.set(f.chooser.id, f.chooser);
         }
     });
 
     const usuarios = ordenarUsuariosPorNome([...uniqueChooserMap.values()]);
     usuarios.forEach(u => {
         const option = criarElemento('option', [], u.name);
-        option.value = u.discordId;
+        option.value = String(u.id);
         filtroUsuarioSelect.appendChild(option);
     });
 
@@ -370,8 +370,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const container = document.getElementById('container');
     const loader = document.getElementById('loader');
-    if (loader) loader.style.display = 'block';
-    
+    if (loader) loader.style.display = 'flex';
+
     try {
         await authService.requireLogin();
 

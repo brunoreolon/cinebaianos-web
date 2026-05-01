@@ -1,5 +1,4 @@
 import { adminService } from '../../services/admin-service.js';
-import { MY_DISCORD_ID } from '../../../config.js';
 import { ApiError } from '../../exception/api-error.js';
 import { criarMensagem } from '../../components/mensagens.js';
 import { MensagemTipo } from '../../components/mensagem-tipo.js';
@@ -11,7 +10,14 @@ export function abrirModalPermissoes(dados, usuarioLogado, onSaveSuccess) {
 
     modal.querySelector(".nome").textContent = dados.nome;
     modal.querySelector(".email").textContent = dados.email;
-    modal.querySelector("img").src = dados.avatar;
+    const avatar = modal.querySelector("img");
+    if (avatar) {
+        avatar.src = dados.avatar || './assets/img/placeholder-avatar.png';
+        avatar.alt = `Avatar de ${dados?.nome || 'usuário'}`;
+        avatar.addEventListener('error', () => {
+            avatar.src = './assets/img/placeholder-avatar.png';
+        }, { once: true });
+    }
 
     const alerta = modal.querySelector(".alerta-permissao");
 
@@ -57,11 +63,6 @@ export function abrirModalPermissoes(dados, usuarioLogado, onSaveSuccess) {
     const btnConcluir = modal.querySelector(".btn-concluir");
     btnConcluir.onclick = async () => {
         try {
-            if (dados.discordId === MY_DISCORD_ID && dados.discordId !== usuarioLogado?.discordId) {
-                criarMensagem("Você tentou… e falhou miseravelmente 😎", MensagemTipo.ERROR);
-                return;
-            }
-
             const promises = [];
 
             if (dados.isAtivo !== estadoInicial.ativo) {
@@ -84,7 +85,6 @@ export function abrirModalPermissoes(dados, usuarioLogado, onSaveSuccess) {
             if (typeof onSaveSuccess === 'function') {
                 await onSaveSuccess({
                     userId: dados.userId,
-                    discordId: dados.discordId,
                     isAdmin: !!dados.isAdmin,
                     superAdmin: !!dados.superAdmin,
                     isAtivo: !!dados.isAtivo

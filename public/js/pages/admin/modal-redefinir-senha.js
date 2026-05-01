@@ -22,7 +22,13 @@ export function abrirModalRedefinirSenha(dados) {
     // Preenche as informações
     nomeEl.textContent = dados.nome;
     emailEl.textContent = dados.email;
-    if (avatarEl) avatarEl.src = dados.avatar || './assets/img/placeholder-avatar.png';
+    if (avatarEl) {
+        avatarEl.src = dados.avatar || './assets/img/placeholder-avatar.png';
+        avatarEl.alt = `Avatar de ${dados?.nome || 'usuário'}`;
+        avatarEl.addEventListener('error', () => {
+            avatarEl.src = './assets/img/placeholder-avatar.png';
+        }, { once: true });
+    }
     if (nomeCardEl) nomeCardEl.textContent = dados.nome;
     if (emailCardEl) emailCardEl.textContent = dados.email || 'Sem email cadastrado';
 

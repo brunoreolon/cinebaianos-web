@@ -36,16 +36,16 @@ export async function abrirModalAvaliacao(filme, usuario, atualizarTelaDetalhes 
                     let resultado;
 
                     const votosDoFilme = Array.isArray(filme.votes) ? filme.votes : [];
-                    const usuarioVotou = votosDoFilme.some(v => v.voter.discordId === usuario.discordId);
+                    const usuarioVotou = votosDoFilme.some(v => Number(v?.voter?.id) === Number(usuario.id));
                     if (usuarioVotou) {
                         resultado = normalizedGroupId
                             ? await votoService.alterarVotoNoGrupo(normalizedGroupId, usuario.id, filme.id, votoId)
-                            : await votoService.alterarVoto(filme.id, usuario.discordId, votoId);
+                            : await votoService.alterarVoto(filme.id, usuario.id, votoId);
                         criarMensagem(`Voto alterado para ${resultado.vote.description} no filme "${filme.title}"!`, MensagemTipo.SUCCESS);
                     } else {
                         resultado = normalizedGroupId
                             ? await votoService.votarNoGrupo(normalizedGroupId, usuario.id, filme.id, votoId)
-                            : await votoService.votar(filme.id, usuario.discordId, votoId);
+                            : await votoService.votar(filme.id, usuario.id, votoId);
                         criarMensagem(`Voto ${resultado.vote.description} registrado para "${filme.title}"!`, MensagemTipo.SUCCESS);
                     }
 

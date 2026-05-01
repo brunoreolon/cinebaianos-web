@@ -1,4 +1,4 @@
-import { form, criarElemento } from '../global.js';
+import { form, criarElemento, buildPerfilUrl } from '../global.js';
 import { authService } from '../services/auth-service.js';
 
 export function montarMenuUsuario(usuario, grupoAtual = null) {
@@ -12,6 +12,10 @@ export function montarMenuUsuario(usuario, grupoAtual = null) {
 
     const img = criarElemento('img', ['avatar']);
     img.src = usuario.avatar || './assets/img/placeholder-avatar.png';
+    img.alt = `Avatar de ${usuario?.name || 'usuario'}`;
+    img.addEventListener('error', () => {
+        img.src = './assets/img/placeholder-avatar.png';
+    }, { once: true });
 
     const nomeUsuario = criarElemento('p', ['nome-usuario'], usuario.name);
 
@@ -30,8 +34,12 @@ export function montarMenuUsuario(usuario, grupoAtual = null) {
     ` : '';
 
     menu.innerHTML = `
+        <div class="dropdown-menu-header">
+            <p>Conta</p>
+            <strong>${usuario.name}</strong>
+        </div>
         <nav>
-            <ul>
+            <ul class="dropdown-menu-list">
                 <li>
                     <a href="./meus-grupos.html">
                         <i class="fa-solid fa-layer-group space"></i>
@@ -41,13 +49,13 @@ export function montarMenuUsuario(usuario, grupoAtual = null) {
                 ${currentGroupEntry}
                 <li class="separator"></li>
                 <li>
-                    <a href="./perfil.html?id=${usuario.discordId}">
+                    <a href="${buildPerfilUrl(usuario)}">
                         <i class="fa-regular fa-user space"></i>
                         Meu Perfil
                     </a>
                 </li>
                 <li>
-                    <a href="./edicao-perfil.html?id=${usuario.discordId}">
+                    <a href="./edicao-perfil.html?id=${encodeURIComponent(String(usuario?.id ?? ''))}">
                         <i class="fa-solid fa-gear space"></i>
                         Editar perfil
                     </a>
