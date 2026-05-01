@@ -357,7 +357,7 @@ function criarCardsFilmes(filmesUsuario, usuario, votoId, filmes, groupId) {
     container.classList.remove('borda-padrao', 'mensagem');
     container.innerHTML = '';
 
-    const filmesFiltrados = filtrarFilmes(filmes, usuario, votoId, filmesUsuario);
+    const filmesFiltrados = filtrarFilmes(filmes, usuarioPerfil, votoId, filmesUsuario);
 
     if (filmesFiltrados.length === 0) {
         container.classList.add('borda-padrao', 'mensagem');

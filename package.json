@@ -1,6 +1,6 @@
 {
   "name": "cinebaianos-web",
-  "version": "2.1.0-SNAPSHOT",
+  "version": "2.1.0",
   "type": "module",
   "description": "",
   "main": "index.js",
