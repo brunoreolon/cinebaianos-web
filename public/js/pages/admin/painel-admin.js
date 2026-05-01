@@ -484,6 +484,13 @@ function buildUserRow(usuario, isBot = false) {
         </td>
     `;
 
+    const avatarImg = tr.querySelector('img');
+    if (avatarImg) {
+        avatarImg.addEventListener('error', () => {
+            avatarImg.src = './assets/img/placeholder-avatar.png';
+        }, { once: true });
+    }
+
     tr.querySelector('.btn-redefinir')?.addEventListener('click', () => {
         abrirModalRedefinirSenha({
             nome: usuario.name,

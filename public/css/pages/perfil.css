@@ -98,6 +98,57 @@
     color: var(--cor-roxo-1);
 }
 
+.perfil-status-banner {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1px solid oklch(var(--cor-preto-1-params) / 0.2);
+    background: oklch(var(--cor-preto-1-params) / 0.16);
+    font-size: 13px;
+    line-height: 1.35;
+    color: var(--cor-branco-1);
+}
+
+.perfil-status-banner i {
+    width: 16px;
+    min-width: 16px;
+    text-align: center;
+}
+
+.perfil-status-banner.is-active {
+    border-color: var(--cor-verde-2);
+    background: oklch(var(--cor-preto-1-params) / 0.12);
+}
+
+.perfil-status-banner.is-active i {
+    color: var(--cor-verde-1);
+}
+
+.perfil-status-banner.is-left {
+    border-color: var(--cor-cinza-3);
+    background: oklch(var(--cor-preto-1-params) / 0.14);
+}
+
+.perfil-status-banner.is-left i {
+    color: var(--cor-branco-2);
+}
+
+.perfil-status-banner.is-banned-temp,
+.perfil-status-banner.is-banned-perm,
+.perfil-status-banner.is-not-member {
+    border-color: var(--cor-vermelho-1);
+    background: oklch(var(--cor-preto-1-params) / 0.14);
+}
+
+.perfil-status-banner.is-banned-temp i,
+.perfil-status-banner.is-banned-perm i,
+.perfil-status-banner.is-not-member i {
+    color: var(--cor-vermelho-1);
+}
+
 /* ─── Section divider ──────────────────────────────────────────────────── */
 .separator {
     width: 100%;

@@ -63,6 +63,10 @@ export function abrirModalBanimento(config) {
     }
     if (usuarioAvatar) {
         usuarioAvatar.src = config.avatar || './assets/img/placeholder-avatar.png';
+        usuarioAvatar.alt = `Avatar de ${config?.name || 'usuário'}`;
+        usuarioAvatar.addEventListener('error', () => {
+            usuarioAvatar.src = './assets/img/placeholder-avatar.png';
+        }, { once: true });
     }
     if (usuarioNome) {
         usuarioNome.textContent = config.name || '-';

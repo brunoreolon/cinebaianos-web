@@ -127,9 +127,19 @@ export function criarFigure(filme, usuario = '', options = {}) {
 
     const divUsuario = criarElemento('div', ['responsavel', 'card-meta-item']);
     const iconeUsuario = criarElemento('i', ['fa-regular', 'fa-user']);
-    const linkPerfil = criarElemento('a', ['link-perfil'], filme.chooser.name);
+    const chooserStatus = filme?.chooserMembershipStatus || 'ACTIVE';
+    const linkPerfil = criarElemento('a', ['link-perfil'], filme?.chooser?.name || 'Usuario');
+    if (isInactiveMembershipStatus(chooserStatus)) {
+        linkPerfil.classList.add('link-perfil--inactive-member');
+    }
     linkPerfil.href = buildPerfilUrl(filme.chooser);
+
     divUsuario.append(iconeUsuario, linkPerfil);
+
+    const statusBadge = createMembershipStatusBadge(chooserStatus);
+    if (statusBadge) {
+        divUsuario.appendChild(statusBadge);
+    }
 
     const divDataAdicionado = criarElemento('div', ['responsavel', 'card-meta-item']);
     const iconeCalendario = criarElemento('i', ['fa-regular', 'fa-calendar']);
@@ -242,6 +252,40 @@ export function formatarDataExtenso(dataStr) {
     });
 }
 
+export function formatMembershipStatusLabel(status, expiresAt = null, { includeExpiry = true, includeTime = false } = {}) {
+    if (!status || status === 'ACTIVE') return '';
+
+    if (status === 'LEFT') {
+        return 'saiu do grupo';
+    }
+
+    if (status === 'BANNED_PERMANENT') {
+        return 'banido permanentemente';
+    }
+
+    if (status === 'BANNED_TEMPORARY') {
+        if (!expiresAt || !includeExpiry) return 'banido temporariamente';
+        const expires = new Date(expiresAt);
+        if (Number.isNaN(expires.getTime())) return 'banido temporariamente';
+        const formatted = includeTime
+            ? expires.toLocaleString('pt-BR')
+            : expires.toLocaleDateString('pt-BR');
+        return `banido temporariamente ate ${formatted}`;
+    }
+
+    return 'nao participa do grupo';
+}
+
+export function isInactiveMembershipStatus(status) {
+    return status === 'LEFT' || status === 'BANNED_TEMPORARY' || status === 'BANNED_PERMANENT' || status === 'NOT_MEMBER';
+}
+
+export function buildUserNameWithMembershipStatus(name, status, expiresAt = null, options = {}) {
+    const baseName = name || 'Usuario';
+    const label = formatMembershipStatusLabel(status, expiresAt, options);
+    return label ? `${baseName} (${label})` : baseName;
+}
+
 export function ordenarUsuariosPorNome(usuarios) {
     return [...usuarios].sort((a, b) =>
         a.name.localeCompare(b.name, 'pt-BR', { sensitivity: 'base' })
@@ -274,3 +318,30 @@ export const form = {
     filmesRecentes: () => document.querySelector('.recentes .inline'),
     modalNovoFilme: () => document.getElementById('modal-novo-filme')
 }
+
+export function formatMembershipBadgeLabel(status) {
+    if (status === 'LEFT') return 'saiu';
+    if (status === 'BANNED_TEMPORARY') return 'banido temporariamente';
+    if (status === 'BANNED_PERMANENT') return 'banido permanentemente';
+    if (status === 'NOT_MEMBER') return 'fora do grupo';
+    return '';
+}
+
+export function createMembershipStatusBadge(status) {
+    const badgeText = formatMembershipBadgeLabel(status);
+    if (!badgeText) return null;
+
+    const badge = criarElemento('span', ['card-member-status-badge'], badgeText);
+    if (status === 'LEFT') {
+        badge.classList.add('is-left');
+    } else if (status === 'BANNED_TEMPORARY') {
+        badge.classList.add('is-banned-temp');
+    } else if (status === 'BANNED_PERMANENT') {
+        badge.classList.add('is-banned-perm');
+    } else {
+        badge.classList.add('is-out');
+    }
+
+    return badge;
+}
+

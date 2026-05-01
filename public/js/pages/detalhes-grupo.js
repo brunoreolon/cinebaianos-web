@@ -4,7 +4,7 @@ import { filmeService } from '../services/filme-service.js';
 import { votoService } from '../services/voto-service.js';
 import { emojis } from '../emojis.js';
 import { getCurrentGroup, loadCurrentGroup, setFlashMessage } from '../services/group-context.js';
-import { criarFigure, formatarData, formatarDataExtenso, getQueryParam } from '../global.js';
+import { criarFigure, formatarData, formatarDataExtenso, getQueryParam, buildUserNameWithMembershipStatus, formatMembershipStatusLabel, createMembershipStatusBadge } from '../global.js';
 import { ApiError } from '../exception/api-error.js';
 import { criarMensagem } from '../components/mensagens.js';
 import { MensagemTipo } from '../components/mensagem-tipo.js';
@@ -1394,6 +1394,10 @@ function sortGroupRanking(stats, voteTypeId) {
     });
 }
 
+function filtrarRankingMembrosAtivos(stats = []) {
+    return stats.filter(item => (item?.membershipStatus || 'ACTIVE') === 'ACTIVE');
+}
+
 function createGroupRankingPosition(position) {
     const container = document.createElement('div');
     container.className = 'posicao ranking-position';
@@ -1428,7 +1432,7 @@ function renderRankingResumoRecebidos() {
     resumo.className = 'resumo-vencedores';
 
     state.rankingVoteTypes.forEach(voteType => {
-        const ordenados = sortGroupRanking(state.rankingSummaryStats, voteType.id);
+        const ordenados = sortGroupRanking(filtrarRankingMembrosAtivos(state.rankingSummaryStats), voteType.id);
         const vencedor = ordenados[0];
         const total = vencedor ? getGroupRankingVoteTotal(vencedor, voteType.id) : 0;
 
@@ -1462,7 +1466,7 @@ function renderRankingCardsRecebidos() {
         return;
     }
 
-    const sorted = sortGroupRanking(state.rankingStats, voteType.id);
+    const sorted = sortGroupRanking(filtrarRankingMembrosAtivos(state.rankingStats), voteType.id);
     const hasAnyVotes = sorted.some(item => getGroupRankingVoteTotal(item, voteType.id) > 0);
     if (!hasAnyVotes) {
         container.innerHTML = '<p class="fonte-secundaria">Ainda não há votos recebidos para este filtro.</p>';
@@ -1504,6 +1508,8 @@ function renderRankingCardsRecebidos() {
         const nome = document.createElement('h3');
         nome.textContent = item?.user?.name || 'Usuário';
         linhaUsuario.appendChild(nome);
+        const statusBadge = createMembershipStatusBadge(item?.membershipStatus || 'ACTIVE');
+        if (statusBadge) linhaUsuario.appendChild(statusBadge);
         if (isCurrentUserCard) {
             const badge = document.createElement('span');
             badge.className = 'badge-voce';
@@ -1709,6 +1715,7 @@ function renderMembers() {
             : '#';
 
         card.className = 'membro-card';
+        const statusLabel = formatMembershipStatusLabel(member?.membershipStatus, member?.banExpiresAt, { includeTime: true });
         card.innerHTML = `
             <div class="membro-card-topo">
                 <div class="membro-avatar">
@@ -1716,7 +1723,7 @@ function renderMembers() {
                 </div>
                 <div class="membro-identidade">
                     <div class="membro-nome-linha">
-                        <h3><a class="membro-link-perfil" href="${profileHref}">${member.member?.name || 'Membro'}</a></h3>
+                        <h3><a class="membro-link-perfil" href="${profileHref}">${buildUserNameWithMembershipStatus(member.member?.name, member?.membershipStatus, member?.banExpiresAt)}</a></h3>
                         ${isCurrentUser(member) ? '<span class="membro-you">Você</span>' : ''}
                     </div>
                     <div class="membro-badges">
@@ -1730,6 +1737,12 @@ function renderMembers() {
                                 Grupo padrão
                             </span>
                         ` : ''}
+                        ${statusLabel ? `
+                            <span class="grupo-badge role-member">
+                                <i class="fa-solid fa-circle-info"></i>
+                                ${statusLabel}
+                            </span>
+                        ` : ''}
                     </div>
                 </div>
             </div>
@@ -1740,7 +1753,7 @@ function renderMembers() {
                 </div>
                 <div class="membro-meta-item">
                     <span>Status</span>
-                    <strong>${member.active ? 'Ativo' : 'Inativo'}</strong>
+                    <strong>${member.active ? 'Ativo' : 'Inativo'}${statusLabel ? ` - ${statusLabel}` : ''}</strong>
                 </div>
             </div>
         `;

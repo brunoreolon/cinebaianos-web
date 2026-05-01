@@ -1,7 +1,7 @@
 import { authService } from '../services/auth-service.js';
 import { filmeService } from '../services/filme-service.js';
 import { abrirModalAvaliacao } from './modal-avaliar.js';
-import { getQueryParam, formatarData, isUsuarioVotouNoFilme, criarElemento, ordenarVotosPorNomeUsuario, deduplicarVotosPorUsuario, buildPerfilUrl } from '../global.js';
+import { getQueryParam, formatarData, isUsuarioVotouNoFilme, criarElemento, ordenarVotosPorNomeUsuario, deduplicarVotosPorUsuario, buildPerfilUrl, isInactiveMembershipStatus, createMembershipStatusBadge } from '../global.js';
 import { ApiError } from '../exception/api-error.js';
 import { criarMensagem } from '../components/mensagens.js';
 import { MensagemTipo } from '../components/mensagem-tipo.js';
@@ -73,6 +73,15 @@ function getVotoDoUsuarioNoFilme(filme, usuarioId) {
     return votos.find(v => Number(v?.voter?.id) === Number(usuarioId));
 }
 
+function appendStatusBadge(container, status) {
+    if (!container) return;
+
+    container.querySelector('.card-member-status-badge')?.remove();
+
+    const badge = createMembershipStatusBadge(status);
+    if (badge) container.appendChild(badge);
+}
+
 async function preencherDetalhes(filme, usuario) {
     const btnRemoverFilme = document.querySelector('.btn-remover-filme');
     const isChooser = Number(filme?.chooser?.id) === Number(usuario?.id);
@@ -132,8 +141,11 @@ async function preencherDetalhes(filme, usuario) {
     document.querySelector('.diretor .nome-diretor').textContent = filme.director || 'Peter Jackson';
     document.querySelector('.duracao p').textContent = filme.duration || '2 horas';
     const linkPerfil = document.querySelector('.responsavel .link-perfil');
-    linkPerfil.textContent = filme.chooser.name;
+    const chooserStatus = filme?.chooserMembershipStatus || 'ACTIVE';
+    linkPerfil.textContent = filme?.chooser?.name || 'Usuario';
+    linkPerfil.classList.toggle('link-perfil--inactive-member', isInactiveMembershipStatus(chooserStatus));
     linkPerfil.href = buildPerfilUrl(filme.chooser);
+    appendStatusBadge(document.querySelector('.responsavel .meta-value-row'), chooserStatus);
     document.querySelector('.data-adicionado p').textContent = formatarData(filme.dateAdded);
 
     // Sinopse
@@ -238,10 +250,17 @@ export function renderizarAvaliacoesRecebidas(votos) {
         img.alt = `Avatar de ${votante.name}`;
 
         const divInfo = criarElemento('div', ['dados-usuario']);
-        const pNome = criarElemento('p', [], votante.name);
+        const nomeLinha = criarElemento('div', ['nome-status-linha']);
+        const voterStatus = v?.voterMembershipStatus || 'ACTIVE';
+        const pNome = criarElemento('p', ['votante-nome'], votante?.name || 'Usuario');
+        if (isInactiveMembershipStatus(voterStatus)) {
+            pNome.classList.add('link-perfil--inactive-member');
+        }
+        nomeLinha.appendChild(pNome);
+        appendStatusBadge(nomeLinha, voterStatus);
         const pData = criarElemento('p', [], formatarData(v.vote.votedAt));
 
-        divInfo.append(pNome, pData);
+        divInfo.append(nomeLinha, pData);
         infoUsuario.append(img, divInfo);
 
         // voto

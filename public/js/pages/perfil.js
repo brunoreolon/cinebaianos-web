@@ -4,7 +4,7 @@ import { filmeService } from '../services/filme-service.js';
 import { votoService } from '../services/voto-service.js';
 import { groupService } from '../services/group-service.js';
 import { ensureCurrentGroup } from '../services/group-context.js';
-import { getQueryParam, form, criarElemento, criarFigure, formatarData } from '../global.js';
+import { getQueryParam, form, criarElemento, criarFigure, formatarData, formatMembershipStatusLabel } from '../global.js';
 import { ApiError } from '../exception/api-error.js';
 import { criarMensagem } from '../components/mensagens.js';
 import { MensagemTipo } from '../components/mensagem-tipo.js';
@@ -52,6 +52,8 @@ function criarPainelDadosUsuario(usuario, currentGroup, profileContext) {
     const nome = criarElemento('p', ['fonte-primaria', 'grande', 'nome'], usuario.name);
     const biografia = criarElemento('p', ['fonte-secundaria', 'bio'], usuario.biography || "Sem biografia");
 
+    const statusBanner = criarStatusGrupoBanner(usuario, currentGroup, profileContext);
+
     const contaCriadaDesde = criarLinhaIconeTexto(
         'fa-solid fa-id-badge',
         `Conta no CineBaianos desde: ${formatarDataSegura(resolveDataContaCriada(usuario))}`
@@ -67,7 +69,11 @@ function criarPainelDadosUsuario(usuario, currentGroup, profileContext) {
         divInformacoes.append(nome, biografia, contaCriadaDesde);
     }
 
-    if (!profileContext.canSeeGroupData && currentGroup?.name) {
+    if (statusBanner) {
+        divInformacoes.appendChild(statusBanner);
+    }
+
+    if (!profileContext.canSeeGroupData && !profileContext.isMemberCurrentGroup && currentGroup?.name) {
         const aviso = criarLinhaIconeTexto(
             'fa-solid fa-circle-info',
             `${usuario.name} não participa do grupo atual (${currentGroup.name}).`
@@ -95,6 +101,42 @@ function criarLinhaIconeTexto(classeIcone, texto) {
     container.appendChild(p);
 
     return container;
+}
+
+function criarStatusGrupoBanner(usuario, currentGroup, profileContext) {
+    if (!currentGroup?.name) return null;
+
+    const status = profileContext?.membershipStatus || 'NOT_MEMBER';
+    const statusLabel = status === 'ACTIVE'
+        ? 'membro ativo'
+        : (formatMembershipStatusLabel(status, profileContext?.banExpiresAt) || 'nao participa do grupo');
+
+    const banner = criarElemento('div', ['perfil-status-banner']);
+    if (status === 'ACTIVE') {
+        banner.classList.add('is-active');
+    } else if (status === 'LEFT') {
+        banner.classList.add('is-left');
+    } else if (status === 'BANNED_TEMPORARY') {
+        banner.classList.add('is-banned-temp');
+    } else if (status === 'BANNED_PERMANENT') {
+        banner.classList.add('is-banned-perm');
+    } else {
+        banner.classList.add('is-not-member');
+    }
+
+    const iconClass = status === 'ACTIVE'
+        ? 'fa-solid fa-circle-check'
+        : status === 'LEFT'
+            ? 'fa-solid fa-right-from-bracket'
+            : status === 'BANNED_TEMPORARY' || status === 'BANNED_PERMANENT'
+                ? 'fa-solid fa-ban'
+                : 'fa-solid fa-user-slash';
+
+    const icone = criarElemento('i', iconClass.split(' '));
+    const texto = criarElemento('span', [], `${usuario?.name || 'Usuario'} no grupo ${currentGroup.name}: ${statusLabel}`);
+    banner.append(icone, texto);
+
+    return banner;
 }
 
 function criarCard({ descricao, quantidade, emoji = null, iconClass = null, iconGrande = false }) {
@@ -237,8 +279,52 @@ function getMembershipInfo(members, usuario) {
     return {
         isMember: Boolean(membership),
         joinedAt: membership?.joinedAt || null,
-        role: membership?.role || null
+        role: membership?.role || null,
+        membershipStatus: membership?.membershipStatus || (membership ? 'ACTIVE' : 'NOT_MEMBER'),
+        banExpiresAt: membership?.banExpiresAt || null
     };
+}
+
+function isMemberByStatus(status) {
+    return status === 'ACTIVE' || status === 'BANNED_TEMPORARY';
+}
+
+async function resolveMembershipInfo(groupId, members, usuario, permissions = null, isSelf = false) {
+    const fallback = getMembershipInfo(members, usuario);
+    const loggedUserIsMember = Boolean(permissions?.member);
+
+    try {
+        const member = await groupService.buscarMembroDoGrupo(groupId, usuario?.id);
+        let membershipStatus = member?.membershipStatus || (member?.active === false ? 'LEFT' : 'ACTIVE');
+
+        if (membershipStatus === 'NOT_MEMBER' && (fallback.isMember || (isSelf && loggedUserIsMember))) {
+            membershipStatus = fallback.membershipStatus || 'ACTIVE';
+        }
+
+        return {
+            isMember: isMemberByStatus(membershipStatus) || (isSelf && loggedUserIsMember),
+            joinedAt: member?.joinedAt || fallback.joinedAt || null,
+            role: member?.role || fallback.role || null,
+            membershipStatus,
+            banExpiresAt: member?.banExpiresAt || fallback.banExpiresAt || null
+        };
+    } catch (err) {
+        if (err instanceof ApiError && err.status === 404) {
+            return {
+                ...fallback,
+                isMember: fallback.isMember || (isSelf && loggedUserIsMember),
+                membershipStatus: fallback.membershipStatus || ((isSelf && loggedUserIsMember) ? 'ACTIVE' : 'NOT_MEMBER'),
+                banExpiresAt: fallback.banExpiresAt || null
+            };
+        }
+
+        return {
+            ...fallback,
+            isMember: fallback.isMember || (isSelf && loggedUserIsMember),
+            membershipStatus: fallback.membershipStatus || ((isSelf && loggedUserIsMember) ? 'ACTIVE' : 'NOT_MEMBER'),
+            banExpiresAt: fallback.banExpiresAt || null
+        };
+    }
 }
 
 function aplicarVisibilidadeConteudoGrupo(profileContext) {
@@ -356,22 +442,31 @@ async function carregarPagina() {
     }
 
     const idParam = getQueryParam('id');
-    const [usuarioLogado, usuario, groupWithMovies, voteTypes, groupWithMembers] = await Promise.all([
+    const [usuarioLogado, usuario, groupWithMovies, voteTypes, groupWithMembers, permissions] = await Promise.all([
         authService.getUsuarioLogado(),
         resolveUsuarioFromQuery(idParam),
         filmeService.buscarFilmesDoGrupo(currentGroup.id),
         votoService.buscarTiposVotosDisponiveis(currentGroup.id),
-        groupService.buscarMembrosDoGrupo(currentGroup.id)
+        groupService.buscarMembrosDoGrupo(currentGroup.id),
+        groupService.buscarPermissoes(currentGroup.id)
     ]);
 
     const movies = groupWithMovies?.movies || [];
-    const membershipInfo = getMembershipInfo(groupWithMembers?.members || [], usuario);
     const isSelf = isSameUser(usuario, usuarioLogado);
+    const membershipInfo = await resolveMembershipInfo(
+        currentGroup.id,
+        groupWithMembers?.members || [],
+        usuario,
+        permissions,
+        isSelf
+    );
     const profileContext = {
         isSelf,
         displayName: usuario?.name || 'este usuário',
         isMemberCurrentGroup: membershipInfo.isMember,
         joinedAtCurrentGroup: membershipInfo.joinedAt,
+        membershipStatus: membershipInfo.membershipStatus,
+        banExpiresAt: membershipInfo.banExpiresAt,
         canSeeGroupData: isSelf || membershipInfo.isMember
     };
 

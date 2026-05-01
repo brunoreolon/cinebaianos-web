@@ -12,6 +12,10 @@ export function montarMenuUsuario(usuario, grupoAtual = null) {
 
     const img = criarElemento('img', ['avatar']);
     img.src = usuario.avatar || './assets/img/placeholder-avatar.png';
+    img.alt = `Avatar de ${usuario?.name || 'usuario'}`;
+    img.addEventListener('error', () => {
+        img.src = './assets/img/placeholder-avatar.png';
+    }, { once: true });
 
     const nomeUsuario = criarElemento('p', ['nome-usuario'], usuario.name);
 

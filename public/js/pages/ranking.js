@@ -2,6 +2,7 @@ import { authService } from '../services/auth-service.js';
 import { votoService } from '../services/voto-service.js';
 import { groupService } from '../services/group-service.js';
 import { getCurrentGroup, loadCurrentGroup } from '../services/group-context.js';
+import { createMembershipStatusBadge } from '../global.js';
 import { ApiError } from '../exception/api-error.js';
 import { criarMensagem } from '../components/mensagens.js';
 import { MensagemTipo } from '../components/mensagem-tipo.js';
@@ -73,7 +74,8 @@ function renderRankingCards() {
         return;
     }
 
-    const sorted = sortRanking(state.rankingStats, selectedVoteType.id);
+    const activeOnly = (state.rankingStats || []).filter(item => (item?.membershipStatus || 'ACTIVE') === 'ACTIVE');
+    const sorted = sortRanking(activeOnly, selectedVoteType.id);
     const hasAnyVotes = sorted.some(item => getVoteTotal(item, selectedVoteType.id) > 0);
 
     if (!hasAnyVotes) {
@@ -117,6 +119,8 @@ function renderRankingCards() {
         const userName = document.createElement('h3');
         userName.textContent = item?.user?.name || 'Usuário';
         userNameLine.appendChild(userName);
+        const statusBadge = createMembershipStatusBadge(item?.membershipStatus || 'ACTIVE');
+        if (statusBadge) userNameLine.appendChild(statusBadge);
         if (isCurrentUser) {
             const badge = document.createElement('span');
             badge.className = 'badge-voce';

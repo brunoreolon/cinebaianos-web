@@ -10,7 +10,14 @@ export function abrirModalPermissoes(dados, usuarioLogado, onSaveSuccess) {
 
     modal.querySelector(".nome").textContent = dados.nome;
     modal.querySelector(".email").textContent = dados.email;
-    modal.querySelector("img").src = dados.avatar;
+    const avatar = modal.querySelector("img");
+    if (avatar) {
+        avatar.src = dados.avatar || './assets/img/placeholder-avatar.png';
+        avatar.alt = `Avatar de ${dados?.nome || 'usuário'}`;
+        avatar.addEventListener('error', () => {
+            avatar.src = './assets/img/placeholder-avatar.png';
+        }, { once: true });
+    }
 
     const alerta = modal.querySelector(".alerta-permissao");
 
