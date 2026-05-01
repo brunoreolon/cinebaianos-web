@@ -1521,7 +1521,7 @@ function renderRankingCardsRecebidos() {
         infoUsuario.append(linhaUsuario, cargo);
 
         const infoTotal = document.createElement('div');
-        infoTotal.className = 'info';
+        infoTotal.className = 'ranking-total-info';
         const valor = document.createElement('div');
         valor.textContent = String(totalVotes);
         const descricao = document.createElement('p');

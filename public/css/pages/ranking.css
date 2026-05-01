@@ -185,16 +185,16 @@
 }
 
 /* info final */
-.info {
+.ranking-total-info {
     flex: 0 0 130px;
     text-align: right;
 }
 
-.info > div {
+.ranking-total-info > div {
     font-size: 38px;
 }
 
-.info > p {
+.ranking-total-info > p {
     margin: 0px;
     font-size: 22px;
 }
@@ -277,7 +277,7 @@
         flex-wrap: wrap;
     }
 
-    .info {
+    .ranking-total-info {
         flex: 1 1 100%;
         text-align: left;
         margin-top: 8px;

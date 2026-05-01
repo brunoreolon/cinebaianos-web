@@ -134,7 +134,7 @@ function renderRankingCards() {
         userInfo.append(userNameLine, subtitle);
 
         const totalInfo = document.createElement('div');
-        totalInfo.className = 'info';
+        totalInfo.className = 'ranking-total-info';
         const value = document.createElement('div');
         value.textContent = String(totalVotes);
         const description = document.createElement('p');
