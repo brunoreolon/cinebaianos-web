@@ -6,6 +6,7 @@ import { ApiError } from '../exception/api-error.js';
 import { criarMensagem } from '../components/mensagens.js';
 import { MensagemTipo } from '../components/mensagem-tipo.js';
 import { getCurrentGroup, loadCurrentGroup, setFlashMessage } from '../services/group-context.js';
+import {groupService} from "../services/group-service.js";
 
 // ID do grupo atual — preenchido na inicialização
 let currentGroupId = null;
@@ -72,10 +73,20 @@ function getVotoDoUsuarioNoFilme(filme, usuarioId) {
     return votos.find(v => Number(v?.voter?.id) === Number(usuarioId));
 }
 
-function preencherDetalhes(filme, usuario) {
+async function preencherDetalhes(filme, usuario) {
     const btnRemoverFilme = document.querySelector('.btn-remover-filme');
+    const isChooser = Number(filme?.chooser?.id) === Number(usuario?.id);
+    
+    let canRemove = false;
 
-    if (Number(filme?.chooser?.id) === Number(usuario?.id)) {
+    try {
+        const perms = await groupService.buscarPermissoes(currentGroupId);
+        canRemove = perms.canManage;
+    } catch (err) {
+        console.error("Erro ao buscar permissões:", err);
+    }
+
+    if (isChooser || canRemove) {
         btnRemoverFilme.classList.remove('disable');
 
         btnRemoverFilme?.addEventListener('click', async () => {
