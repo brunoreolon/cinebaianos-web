@@ -36,14 +36,14 @@ export class VotoService {
      * Registra o voto de um usuário em um filme.
      *
      * @param {number|string} movieId - ID do filme
-     * @param {string} discordId - ID do usuário
+     * @param {number|string} userId - ID do usuário
      * @param {number|string} votoId - ID do voto escolhido
      * @returns {Promise<Object>} - Objeto do voto registrado
      * @throws {ApiError} - Se a requisição falhar
      */
-    async votar(movieId, discordId, votoId) {
+    async votar(movieId, userId, votoId) {
         const corpo = {
-            voter: { discordId },
+            voter: { id: Number(userId) },
             movie: { id: Number(movieId) },
             vote: Number(votoId)
         };
@@ -63,15 +63,15 @@ export class VotoService {
      * Altera o voto de um usuário em um filme.
      *
      * @param {number|string} movieId - ID do filme
-     * @param {string} discordId - ID do usuário
+     * @param {number|string} userId - ID do usuário
      * @param {number|string} votoId - ID do voto escolhido
      * @returns {Promise<Object>} - Objeto do voto atualizado
      * @throws {ApiError} - Se a requisição falhar
      */
-    async alterarVoto(movieId, discordId, votoId) {
+    async alterarVoto(movieId, userId, votoId) {
         const corpo = { id: Number(votoId) };
 
-        const url = new URL(`/api/votes/users/${discordId}/movies/${movieId}`, window.location.origin);
+        const url = new URL(`/api/votes/users/${userId}/movies/${movieId}`, window.location.origin);
 
         const response = await authService.apiFetch(url, {
             method: 'PUT',

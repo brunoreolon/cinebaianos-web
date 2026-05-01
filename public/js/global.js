@@ -5,27 +5,29 @@ export function getQueryParam(param) {
     return parametros.get(param);
 }
 
-export function isUsuarioVotouNoFilme(votes, discordId) {
-    return deduplicarVotosPorUsuario(votes).some(v => v.voter && v.voter.discordId === discordId);
+export function isUsuarioVotouNoFilme(votes, userId) {
+    return deduplicarVotosPorUsuario(votes).some(v => Number(v?.voter?.id) === Number(userId));
 }
 
 export function deduplicarVotosPorUsuario(votos = []) {
     const porUsuario = new Map();
 
     votos.forEach(voto => {
-        const discordId = voto?.voter?.discordId;
-        if (!discordId) return;
+        const userId = voto?.voter?.id;
+        if (userId === null || userId === undefined) return;
 
-        const atual = porUsuario.get(discordId);
+        const key = String(userId);
+
+        const atual = porUsuario.get(key);
         if (!atual) {
-            porUsuario.set(discordId, voto);
+            porUsuario.set(key, voto);
             return;
         }
 
         const atualData = new Date(atual?.vote?.votedAt || 0).getTime();
         const novaData = new Date(voto?.vote?.votedAt || 0).getTime();
         if (novaData >= atualData) {
-            porUsuario.set(discordId, voto);
+            porUsuario.set(key, voto);
         }
     });
 
@@ -84,11 +86,20 @@ export function buildDetalhesFilmeUrl(filmeId, options = {}) {
     return `${url.pathname}${url.search}`;
 }
 
+export function buildPerfilUrl(userOrId) {
+    const rawId = typeof userOrId === 'object'
+        ? userOrId?.id
+        : userOrId;
+
+    const id = rawId !== null && rawId !== undefined && rawId !== '' ? String(rawId) : '';
+    return `./perfil.html?id=${encodeURIComponent(id)}`;
+}
+
 export function criarFigure(filme, usuario = '', options = {}) {
     const figure = criarElemento('figure', ['card']);
     figure.dataset.tmdbId = filme.tmdbId;
 
-    const usuarioJaVotou = usuario?.discordId ? isUsuarioVotouNoFilme(filme.votes || [], usuario.discordId) : false;
+    const usuarioJaVotou = usuario?.id ? isUsuarioVotouNoFilme(filme.votes || [], usuario.id) : false;
     if (usuarioJaVotou) {
         figure.classList.add('card-has-user-vote');
     }
@@ -117,7 +128,7 @@ export function criarFigure(filme, usuario = '', options = {}) {
     const divUsuario = criarElemento('div', ['responsavel', 'card-meta-item']);
     const iconeUsuario = criarElemento('i', ['fa-regular', 'fa-user']);
     const linkPerfil = criarElemento('a', ['link-perfil'], filme.chooser.name);
-    linkPerfil.href = `./perfil.html?id=${filme.chooser.discordId}`;
+    linkPerfil.href = buildPerfilUrl(filme.chooser);
     divUsuario.append(iconeUsuario, linkPerfil);
 
     const divDataAdicionado = criarElemento('div', ['responsavel', 'card-meta-item']);
@@ -169,12 +180,12 @@ export function criarFooter(filme, usuario, options = {}) {
         divVotos.appendChild(span);
     });
 
-    if (!isUsuarioVotouNoFilme(votos, usuario.discordId)) {
+    if (!isUsuarioVotouNoFilme(votos, usuario.id)) {
         const botao = criarBotaoAvaliar(filme, options);
         divMeuVoto.appendChild(botao);
     } else {
         divMeuVoto.classList.add('has-vote');
-        const voto = getVotoDoUsuarioFilme(usuario.discordId, votos);
+        const voto = getVotoDoUsuarioFilme(usuario.id, votos);
         const v = criarElemento('span', ['card-user-vote-emoji', 'card-user-vote-emoji--active'], voto.vote.emoji);
         v.title = `Seu voto: ${voto.vote.description || voto.vote.name || voto.vote.emoji}`;
         divMeuVoto.appendChild(v);
@@ -185,9 +196,9 @@ export function criarFooter(filme, usuario, options = {}) {
     return footer;
 }
 
-function getVotoDoUsuarioFilme(discordId, votos) {
+function getVotoDoUsuarioFilme(userId, votos) {
     const votosDeduplicados = deduplicarVotosPorUsuario(votos || []);
-    return votosDeduplicados.find(v => String(v.voter.discordId) === String(discordId));
+    return votosDeduplicados.find(v => Number(v?.voter?.id) === Number(userId));
 }
 
 function criarBotaoAvaliar(filme, options = {}) {

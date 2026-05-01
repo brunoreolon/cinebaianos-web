@@ -1,5 +1,4 @@
 import { adminService } from '../../services/admin-service.js';
-import { MY_DISCORD_ID } from '../../../config.js';
 import { ApiError } from '../../exception/api-error.js';
 import { criarMensagem } from '../../components/mensagens.js';
 import { MensagemTipo } from '../../components/mensagem-tipo.js';
@@ -57,11 +56,6 @@ export function abrirModalPermissoes(dados, usuarioLogado, onSaveSuccess) {
     const btnConcluir = modal.querySelector(".btn-concluir");
     btnConcluir.onclick = async () => {
         try {
-            if (dados.discordId === MY_DISCORD_ID && dados.discordId !== usuarioLogado?.discordId) {
-                criarMensagem("Você tentou… e falhou miseravelmente 😎", MensagemTipo.ERROR);
-                return;
-            }
-
             const promises = [];
 
             if (dados.isAtivo !== estadoInicial.ativo) {
@@ -84,7 +78,6 @@ export function abrirModalPermissoes(dados, usuarioLogado, onSaveSuccess) {
             if (typeof onSaveSuccess === 'function') {
                 await onSaveSuccess({
                     userId: dados.userId,
-                    discordId: dados.discordId,
                     isAdmin: !!dados.isAdmin,
                     superAdmin: !!dados.superAdmin,
                     isAtivo: !!dados.isAtivo

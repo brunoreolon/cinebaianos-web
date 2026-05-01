@@ -4,10 +4,10 @@ function normalizarVotos(votes = []) {
     const votosPorUsuario = new Map();
 
     votes.forEach(vote => {
-        const discordId = vote?.voter?.discordId;
-        if (!discordId) return;
+        const userId = vote?.voter?.id;
+        if (userId === null || userId === undefined) return;
 
-        const key = String(discordId);
+        const key = String(userId);
         const atual = votosPorUsuario.get(key);
         if (!atual) {
             votosPorUsuario.set(key, vote);
@@ -62,19 +62,19 @@ export class FilmeService {
      * @param {number} [params.size=100] - Quantidade de filmes por página
      * @param {string} [params.sortBy='dateAdded'] - Campo para ordenação
      * @param {string} [params.sortDir='desc'] - Direção da ordenação ('asc' ou 'desc')
-     * @param {string} [params.discordId] - Filtrar por usuário que escolheu o filme
+     * @param {number|string} [params.chooserId] - Filtrar por usuário que escolheu o filme
      * @param {string} [params.title] - Filtrar por título do filme
      * @returns {Promise<Object>} - Objeto com filmes e informações de paginação
      * @throws {ApiError} - Se a requisição falhar
      */
-    async buscarFilmes({ page = 0, size = 100, sortBy = 'dateAdded', sortDir = 'desc', discordId, voteTypeId, genreId, title } = {}) {
+    async buscarFilmes({ page = 0, size = 100, sortBy = 'dateAdded', sortDir = 'desc', chooserId, voteTypeId, genreId, title } = {}) {
         const url = new URL(`/api/movies`, window.location.origin);
         url.searchParams.append('page', page);
         url.searchParams.append('size', size);
         url.searchParams.append('sortBy', sortBy);
         url.searchParams.append('sortDir', sortDir);
 
-        if (discordId) url.searchParams.append('chooserDiscordId', discordId);
+        if (chooserId) url.searchParams.append('chooserId', chooserId);
         if (title) url.searchParams.append('title', title);
         if (voteTypeId) url.searchParams.append('voteTypeId', voteTypeId);
         if (genreId) url.searchParams.append('genreId', genreId);
@@ -93,19 +93,19 @@ export class FilmeService {
      * @param {number} [params.size=100]
      * @param {string} [params.sortBy='dateAdded']
      * @param {string} [params.sortDir='desc']
-     * @param {string} [params.discordId] - Filtrar por usuário
+     * @param {number|string} [params.userId] - Filtrar por usuário
      * @param {string} [params.title] - Filtrar por título
      * @returns {Promise<Array>} - Lista de filmes aguardando avaliação
      * @throws {ApiError} - Se a requisição falhar
      */
-    async buscarFilmesAguardandoAvaliacao({ page = 0, size = 100, sortBy = 'dateAdded', sortDir = 'desc', discordId, title } = {}) {
+    async buscarFilmesAguardandoAvaliacao({ page = 0, size = 100, sortBy = 'dateAdded', sortDir = 'desc', userId, title } = {}) {
         const url = new URL(`/api/movies/awaiting-review`, window.location.origin);
         url.searchParams.append('page', page);
         url.searchParams.append('size', size);
         url.searchParams.append('sortBy', sortBy);
         url.searchParams.append('sortDir', sortDir);
 
-        if (discordId) url.searchParams.append('discordId', discordId);
+        if (userId) url.searchParams.append('userId', userId);
         if (title) url.searchParams.append('title', title);
 
         const response = await authService.apiFetch(url);
@@ -148,15 +148,15 @@ export class FilmeService {
      * Adiciona um filme ao sistema.
      *
      * @param {number|string} tmdbId - ID do filme na TMDB
-     * @param {string} discordId - Discord ID do usuário que escolheu
+     * @param {number|string} userId - ID do usuário que escolheu
      * @param {string|number|null} [votoId=null] - ID do voto, se houver
      * @returns {Promise<Object>} - Objeto do filme adicionado
      * @throws {ApiError} - Se a requisição falhar
      */
-    async adicionarFilme(tmdbId, discordId, votoId = null) {
+    async adicionarFilme(tmdbId, userId, votoId = null) {
         const corpo = {
             movie: { id: tmdbId },
-            chooser: { discordId }
+            chooser: { id: Number(userId) }
         };
 
         if (votoId !== null) {

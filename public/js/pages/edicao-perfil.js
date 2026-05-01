@@ -1,6 +1,6 @@
 import { authService } from '../services/auth-service.js';
 import { usuarioService } from '../services/usuario-service.js';
-import { formatarDataExtenso } from '../global.js';
+import { formatarDataExtenso, buildPerfilUrl } from '../global.js';
 import { ApiError } from '../exception/api-error.js';
 import { criarMensagem } from '../components/mensagens.js';
 import { MensagemTipo } from '../components/mensagem-tipo.js';
@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 dados.password = novaSenha;
             }
 
-            const response = await usuarioService.alterarDadosUsuario(usuario.discordId, dados);
+            await usuarioService.alterarDadosUsuario(usuario.id, dados);
 
             inputNovaSenha.value = '';
             inputConfirmacaoSenha.value = '';
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         document.querySelector('.btn-cancelar').addEventListener('click', async () => {
             const usuario = await authService.getUsuarioLogado();
-            window.location.href = `perfil.html?id=${usuario.discordId}`;
+            window.location.href = buildPerfilUrl(usuario);
         });
     } catch (err) {
         if (err instanceof ApiError) {

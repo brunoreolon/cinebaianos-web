@@ -1,4 +1,4 @@
-import { form, criarElemento } from '../global.js';
+import { form, criarElemento, buildPerfilUrl } from '../global.js';
 import { authService } from '../services/auth-service.js';
 
 export function montarMenuUsuario(usuario, grupoAtual = null) {
@@ -41,13 +41,13 @@ export function montarMenuUsuario(usuario, grupoAtual = null) {
                 ${currentGroupEntry}
                 <li class="separator"></li>
                 <li>
-                    <a href="./perfil.html?id=${usuario.discordId}">
+                    <a href="${buildPerfilUrl(usuario)}">
                         <i class="fa-regular fa-user space"></i>
                         Meu Perfil
                     </a>
                 </li>
                 <li>
-                    <a href="./edicao-perfil.html?id=${usuario.discordId}">
+                    <a href="./edicao-perfil.html?id=${encodeURIComponent(String(usuario?.id ?? ''))}">
                         <i class="fa-solid fa-gear space"></i>
                         Editar perfil
                     </a>

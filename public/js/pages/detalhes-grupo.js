@@ -1040,16 +1040,16 @@ function popularFiltroUsuariosFilmesGrupo() {
     const usersMap = new Map();
     state.movies.forEach(movie => {
         const chooser = movie.chooser;
-        if (chooser?.discordId && !usersMap.has(chooser.discordId)) {
-            usersMap.set(chooser.discordId, chooser.name || `Usuário ${chooser.discordId}`);
+        if (chooser?.id && !usersMap.has(chooser.id)) {
+            usersMap.set(chooser.id, chooser.name || `Usuário ${chooser.id}`);
         }
     });
 
     [...usersMap.entries()]
         .sort((a, b) => a[1].localeCompare(b[1], 'pt-BR', { sensitivity: 'base' }))
-        .forEach(([discordId, name]) => {
+        .forEach(([userId, name]) => {
             const option = document.createElement('option');
-            option.value = discordId;
+            option.value = String(userId);
             option.textContent = name;
             select.appendChild(option);
         });
@@ -1120,7 +1120,7 @@ function filtrarEOrdenarFilmesGrupo() {
     let movies = [...state.movies];
 
     if (filtroUsuario) {
-        movies = movies.filter(movie => movie.chooser?.discordId === filtroUsuario);
+        movies = movies.filter(movie => Number(movie?.chooser?.id) === Number(filtroUsuario));
     }
 
     if (filtroVoto) {

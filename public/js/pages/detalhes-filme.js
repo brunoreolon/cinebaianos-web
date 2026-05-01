@@ -1,7 +1,7 @@
 import { authService } from '../services/auth-service.js';
 import { filmeService } from '../services/filme-service.js';
 import { abrirModalAvaliacao } from './modal-avaliar.js';
-import { getQueryParam, formatarData, isUsuarioVotouNoFilme, criarElemento, ordenarVotosPorNomeUsuario, deduplicarVotosPorUsuario } from '../global.js';
+import { getQueryParam, formatarData, isUsuarioVotouNoFilme, criarElemento, ordenarVotosPorNomeUsuario, deduplicarVotosPorUsuario, buildPerfilUrl } from '../global.js';
 import { ApiError } from '../exception/api-error.js';
 import { criarMensagem } from '../components/mensagens.js';
 import { MensagemTipo } from '../components/mensagem-tipo.js';
@@ -69,13 +69,13 @@ function renderizarEstadoVazioFilme({ groupId, groupName }) {
 
 function getVotoDoUsuarioNoFilme(filme, usuarioId) {
     const votos = deduplicarVotosPorUsuario(filme.votes || []);
-    return votos.find(v => v.voter.discordId === usuarioId);
+    return votos.find(v => Number(v?.voter?.id) === Number(usuarioId));
 }
 
 function preencherDetalhes(filme, usuario) {
     const btnRemoverFilme = document.querySelector('.btn-remover-filme');
 
-    if (filme.chooser.discordId === usuario.discordId) {
+    if (Number(filme?.chooser?.id) === Number(usuario?.id)) {
         btnRemoverFilme.classList.remove('disable');
 
         btnRemoverFilme?.addEventListener('click', async () => {
@@ -122,7 +122,7 @@ function preencherDetalhes(filme, usuario) {
     document.querySelector('.duracao p').textContent = filme.duration || '2 horas';
     const linkPerfil = document.querySelector('.responsavel .link-perfil');
     linkPerfil.textContent = filme.chooser.name;
-    linkPerfil.href = `./perfil.html?id=${filme.chooser.discordId}`;
+    linkPerfil.href = buildPerfilUrl(filme.chooser);
     document.querySelector('.data-adicionado p').textContent = formatarData(filme.dateAdded);
 
     // Sinopse
@@ -142,13 +142,13 @@ function preencherAvaliacoes(filme, usuario) {
 
 export function atualizarBotaoEMinhaAvaliacao(filme, usuario, botao, minhaAvaliacao) {
     const votosDeduplicados = deduplicarVotosPorUsuario(filme.votes || []);
-    const usuarioVotou = isUsuarioVotouNoFilme(votosDeduplicados, usuario.discordId);
+    const usuarioVotou = isUsuarioVotouNoFilme(votosDeduplicados, usuario.id);
 
     if (usuarioVotou) {
         botao.innerHTML = '<i class="fa-solid fa-pen"></i><span>Alterar avaliação</span>';
         minhaAvaliacao.style.display = 'block';
 
-        const voto = getVotoDoUsuarioNoFilme(filme, usuario.discordId);
+        const voto = getVotoDoUsuarioNoFilme(filme, usuario.id);
         const span = minhaAvaliacao.querySelector('span');
         span.textContent = voto.vote.emoji + voto.vote.description;
         span.style.color = voto.vote.color;
@@ -216,7 +216,7 @@ export function renderizarAvaliacoesRecebidas(votos) {
         const li = criarElemento('li');
 
         const a = criarElemento('a', ['item-voto']);
-        a.href = `./perfil.html?id=${v.voter.discordId}`;
+        a.href = buildPerfilUrl(v.voter);
 
         const article = criarElemento('article', ['avaliacao-feita']);
         const infoUsuario = criarElemento('div', ['info-usuario']);
