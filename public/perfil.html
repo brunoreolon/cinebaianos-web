@@ -14,7 +14,7 @@
 
         <link rel="icon" type="image/png" href="assets/icons/favicon.png" />
 
-        <title>Meu Perfil</title>
+        <title>Perfil</title>
     </head>
     <body>
         <div id="loader">
@@ -22,38 +22,66 @@
                 <p>Carregando página...</p>
             </div>
         </div>
-        
+
         <div id="container" class="inativo-js">
             <div id="header-container"></div>
             <div class="mensagem-container"></div>
-            
-            <main>
-                <section id="painel-usuario" class="border">
+
+            <main class="perfil-page">
+
+                <!-- Hero: dados do usuário + stats -->
+                <section id="painel-usuario">
+
+                    <!-- Avatar + nome + bio + meta linhas -->
                     <div id="dados-usuario"></div>
-                    <div class="separator"></div>
+
+                    <!-- Votos recebidos -->
                     <div id="votos-recebidos">
-                        <div class="flex titulo">
-                            <i class="fa-solid fa-award icone-award"></i>
-                            <h3 class="titulo-votos-recebidos">Votos Recebidos</h3>
-                            <span id="votos-recebidos-contexto" class="fonte-secundaria">(contexto do grupo atual)</span>
+                        <div class="separator"></div>
+                        <div class="perfil-secao-header">
+                            <div class="perfil-secao-titulo-linha">
+                                <i class="fa-solid fa-award perfil-icone-award"></i>
+                                <h3 class="perfil-secao-titulo">Votos Recebidos</h3>
+                            </div>
+                            <p id="votos-recebidos-contexto" class="perfil-secao-subtitulo"></p>
                         </div>
                         <div id="dados-votos"></div>
                     </div>
-                    <div class="separator"></div>
-                    <div id="dados-filmes"></div>
+
+                    <!-- Estatísticas de filmes -->
+                    <div id="dados-filmes-wrapper">
+                        <div class="separator"></div>
+                        <div class="perfil-secao-header">
+                            <div class="perfil-secao-titulo-linha">
+                                <i class="fa-solid fa-film perfil-icone-filme"></i>
+                                <h3 class="perfil-secao-titulo">Atividade no Grupo</h3>
+                            </div>
+                        </div>
+                        <div id="dados-filmes"></div>
+                    </div>
+
                 </section>
+
+                <!-- Abas de filmes -->
                 <section id="abas">
                     <div id="menu-mobile">
-                        <button id="menu-toggle">☰</button>
+                        <button id="menu-toggle">
+                            <i class="fa-solid fa-filter"></i>
+                            <span>Filtrar</span>
+                        </button>
                         <ul id="lista"></ul>
                     </div>
                 </section>
+
+                <!-- Grid de filmes -->
                 <section id="filmes">
                     <div class="inline"></div>
                 </section>
+
             </main>
             <div id="footer-container"></div>
         </div>
+
         <div id="modal-avaliar" class="modal inativo">
             <div class="modal-content">
                 <h3>Como você avalia este filme?</h3>

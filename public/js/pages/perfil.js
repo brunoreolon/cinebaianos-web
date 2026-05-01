@@ -243,20 +243,16 @@ function getMembershipInfo(members, usuario) {
 
 function aplicarVisibilidadeConteudoGrupo(profileContext) {
     const votosRecebidos = document.getElementById('votos-recebidos');
-    const dadosFilmes = document.getElementById('dados-filmes');
+    const dadosFilmesWrapper = document.getElementById('dados-filmes-wrapper');
     const abas = document.getElementById('abas');
     const filmes = document.getElementById('filmes');
-    const separadores = document.querySelectorAll('#painel-usuario .separator');
 
     const displayValue = profileContext.canSeeGroupData ? '' : 'none';
 
     if (votosRecebidos) votosRecebidos.style.display = displayValue;
-    if (dadosFilmes) dadosFilmes.style.display = displayValue;
+    if (dadosFilmesWrapper) dadosFilmesWrapper.style.display = displayValue;
     if (abas) abas.style.display = displayValue;
     if (filmes) filmes.style.display = displayValue;
-    separadores.forEach(separator => {
-        separator.style.display = displayValue;
-    });
 }
 
 function filtrarFilmes(filmes, usuario, votoId, filmesUsuario) {
