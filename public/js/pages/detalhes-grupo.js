@@ -1704,6 +1704,9 @@ function renderMembers() {
         const card = document.createElement('article');
         const roleMeta = getRoleMeta(member.role);
         const avatar = member.member?.avatar || './assets/img/placeholder-avatar.png';
+        const profileHref = Number.isFinite(Number(member?.member?.id))
+            ? `./perfil.html?id=${member.member.id}`
+            : '#';
 
         card.className = 'membro-card';
         card.innerHTML = `
@@ -1713,7 +1716,7 @@ function renderMembers() {
                 </div>
                 <div class="membro-identidade">
                     <div class="membro-nome-linha">
-                        <h3>${member.member?.name || 'Membro'}</h3>
+                        <h3><a class="membro-link-perfil" href="${profileHref}">${member.member?.name || 'Membro'}</a></h3>
                         ${isCurrentUser(member) ? '<span class="membro-you">Você</span>' : ''}
                     </div>
                     <div class="membro-badges">

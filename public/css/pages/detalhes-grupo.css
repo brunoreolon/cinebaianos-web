@@ -314,7 +314,8 @@
 }
 
 .membro-card-topo {
-    grid-area: top;
+    grid-column: 1;
+    grid-row: 1;
     display: flex;
     gap: 14px;
     align-items: center;
@@ -359,6 +360,16 @@
     font-size: 16px;
 }
 
+.membro-link-perfil {
+    color: inherit;
+    text-decoration: none;
+}
+
+.membro-link-perfil:hover {
+    color: var(--cor-roxo-1);
+    text-decoration: underline;
+}
+
 .membro-you {
     padding: 3px 9px;
     border-radius: 999px;
@@ -369,7 +380,8 @@
 }
 
 .membro-meta {
-    grid-area: meta;
+    grid-column: 1;
+    grid-row: 2;
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-start;
@@ -409,7 +421,8 @@
 }
 
 .membro-card-actions {
-    grid-area: actions;
+    grid-column: 2;
+    grid-row: 1 / span 2;
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-end;
@@ -1246,12 +1259,21 @@
     }
 
     .membro-meta {
+        grid-column: 1;
+        grid-row: auto;
         justify-content: flex-start;
         padding-left: 0;
         padding-right: 0;
     }
 
+    .membro-card-topo {
+        grid-column: 1;
+        grid-row: auto;
+    }
+
     .membro-card-actions {
+        grid-column: 1;
+        grid-row: auto;
         justify-content: flex-start;
         padding-left: 0;
         border-left: 0;

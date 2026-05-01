@@ -40,6 +40,10 @@ function criarPainelDadosUsuario(usuario, currentGroup, profileContext) {
     const divImagemPerfil = criarElemento('div', ['image']);
     const img = criarElemento('img');
     img.src = usuario.avatar || './assets/img/placeholder-avatar.png';
+    img.alt = `Avatar de ${usuario.name || 'usuário'}`;
+    img.addEventListener('error', () => {
+        img.src = './assets/img/placeholder-avatar.png';
+    }, { once: true });
     divImagemPerfil.appendChild(img);
 
     // Informações do usuário

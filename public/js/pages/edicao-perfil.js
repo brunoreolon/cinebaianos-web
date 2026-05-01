@@ -20,7 +20,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         document.getElementById("fotoUrl").value = usuario.avatar || "";
-        document.querySelector(".foto-atual img").src = usuario.avatar || "./assets/img/placeholder-avatar.png";
+        const fotoAtualImg = document.querySelector(".foto-atual img");
+        fotoAtualImg.src = usuario.avatar || "./assets/img/placeholder-avatar.png";
+        fotoAtualImg.onerror = () => {
+            fotoAtualImg.onerror = null;
+            fotoAtualImg.src = "./assets/img/placeholder-avatar.png";
+        };
         document.getElementById("nome").value = usuario.name || "";
         document.getElementById("email").value = usuario.email || "";
         document.getElementById("bio").value = usuario.biography || "";
