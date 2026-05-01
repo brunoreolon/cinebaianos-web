@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+        <link rel="stylesheet" href="./css/components/mensagem-container.css" type="text/css">
+        <link rel="stylesheet" href="./css/global.css" type="text/css">
+        <link rel="stylesheet" href="./css/components/header.css" type="text/css">
+        <link rel="stylesheet" href="./css/components/footer.css" type="text/css">
+        <link rel="stylesheet" href="./css/components/group-preview-card.css" type="text/css">
+        <link rel="stylesheet" href="./css/pages/meus-grupos.css" type="text/css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+        <link rel="icon" type="image/png" href="assets/icons/favicon.png" />
+
+        <title>CineBaianos | Meus Grupos</title>
+    </head>
+    <body>
+        <div id="loader">
+            <div class="spinner">
+                <p>Carregando meus grupos...</p>
+            </div>
+        </div>
+
+        <div id="container" class="inativo-js">
+            <div id="header-container"></div>
+            <div class="mensagem-container"></div>
+
+            <main class="groups-page">
+                <section class="groups-hero border">
+                    <div>
+                        <p class="hero-eyebrow">MULTI-TENANT</p>
+                        <h1>Meus grupos</h1>
+                        <p class="hero-description">
+                            Escolha em qual grupo você quer navegar, veja seu papel em cada um
+                            e descubra grupos públicos para entrar ou solicitar participação.
+                        </p>
+                    </div>
+                    <button type="button" id="btn-abrir-criar-grupo" class="group-btn-primary groups-hero-action">
+                        <i class="fa-solid fa-plus"></i>
+                        Criar grupo
+                    </button>
+                </section>
+
+                <div class="groups-tabs" role="tablist" aria-label="Navegação de grupos">
+                    <button class="groups-tab active" data-tab="grupos" role="tab" aria-selected="true">
+                        <i class="fa-solid fa-users"></i>
+                        Grupos
+                    </button>
+                    <button class="groups-tab" data-tab="convites" role="tab" aria-selected="false">
+                        <i class="fa-solid fa-envelope-open-text"></i>
+                        Convites
+                        <span id="convites-tab-badge" class="groups-tab-badge inativo">0</span>
+                    </button>
+                </div>
+
+                <div id="tab-grupos" class="groups-tab-content active" role="tabpanel">
+                    <section class="groups-section">
+                        <header class="groups-section-header">
+                            <div>
+                                <h2>Seus grupos</h2>
+                                <p>Use a estrela para marcar o grupo atual. Os demais grupos continuam acessíveis a qualquer momento.</p>
+                            </div>
+                        </header>
+                        <div id="meus-grupos-lista" class="groups-role-list"></div>
+                    </section>
+
+                    <section class="groups-section">
+                        <header class="groups-section-header">
+                            <div>
+                                <h2>Descobrir grupos</h2>
+                                <p>Veja grupos públicos disponíveis para entrar imediatamente ou enviar uma solicitação.</p>
+                            </div>
+                        </header>
+                        <div id="grupos-publicos-lista" class="groups-grid"></div>
+                    </section>
+                </div>
+
+                <div id="tab-convites" class="groups-tab-content" role="tabpanel">
+                    <section class="groups-section">
+                        <header class="groups-section-header">
+                            <div>
+                                <h2>Convites recebidos</h2>
+                                <p>Convites diretos pendentes enviados para voce entrar em grupos.</p>
+                            </div>
+                        </header>
+                        <div id="convites-recebidos-lista" class="groups-grid"></div>
+                    </section>
+
+                    <section class="groups-section">
+                        <header class="groups-section-header">
+                            <div>
+                                <h2>Entrar com token</h2>
+                                <p>Use um token de convite genérico para entrar em um grupo.</p>
+                            </div>
+                        </header>
+                        <form id="form-entrar-token" class="token-entry-form border">
+                            <label for="token-convite-input">Token do convite</label>
+                            <input id="token-convite-input" type="text" placeholder="Cole o token do convite" required />
+                            <button type="submit" class="group-btn-primary">
+                                <i class="fa-solid fa-right-to-bracket"></i>
+                                Entrar no grupo
+                            </button>
+                        </form>
+                    </section>
+                </div>
+            </main>
+
+            <div id="modal-criar-grupo" class="modal inativo">
+                <div class="modal-content groups-modal-content modal-content-sm">
+                    <h3>Criar grupo</h3>
+                    <p class="groups-modal-subtitle">Defina os dados básicos e veja uma prévia antes de criar.</p>
+                    <span class="close" id="fechar-modal-criar-grupo">&times;</span>
+                    <form id="form-criar-grupo">
+                        <div class="campo">
+                            <label for="grupo-name">Nome *</label>
+                            <input id="grupo-name" type="text" required />
+                            <span id="grupo-name-helper" class="field-helper">Informe um nome claro para o grupo.</span>
+                        </div>
+                        <div class="form-grid-2">
+                            <div class="campo">
+                                <div class="field-label-row">
+                                    <label for="grupo-tag">Tag *</label>
+                                    <span id="grupo-tag-counter" class="field-counter">0/6</span>
+                                </div>
+                                <input id="grupo-tag" type="text" minlength="4" maxlength="6" required />
+                                <span id="grupo-tag-helper" class="field-helper">Use de 4 a 6 caracteres alfanuméricos ou _.</span>
+                            </div>
+                            <div class="campo">
+                                <div class="field-label-row">
+                                    <label for="grupo-slug">Slug *</label>
+                                    <span id="grupo-slug-counter" class="field-counter">0/30</span>
+                                </div>
+                                <input id="grupo-slug" type="text" minlength="4" maxlength="30" required />
+                                <span id="grupo-slug-helper" class="field-helper">Use de 4 a 30 caracteres minúsculos, números e hífen.</span>
+                            </div>
+                        </div>
+                        <div class="form-grid-2">
+                            <div class="campo">
+                                <label for="grupo-visibility">Visibilidade *</label>
+                                <select id="grupo-visibility">
+                                    <option value="PUBLIC">Público</option>
+                                    <option value="PRIVATE">Privado</option>
+                                </select>
+                            </div>
+                            <div class="campo">
+                                <label for="grupo-join-policy">Política de entrada *</label>
+                                <select id="grupo-join-policy">
+                                    <option value="OPEN">Aberto</option>
+                                    <option value="REQUEST">Solicitação</option>
+                                    <option value="INVITE_ONLY">Somente convite</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="group-preview-wrapper">
+                            <span class="group-preview-label">Prévia do card</span>
+                            <div id="create-group-preview-card" class="group-preview-card-shell"></div>
+                        </div>
+                        <div class="modal-acoes">
+                            <button type="button" id="btn-cancelar-criar-grupo" class="btn-modal-cancelar">Cancelar</button>
+                            <button type="submit" id="btn-salvar-criar-grupo" class="btn-modal-salvar">
+                                <i class="fa-solid fa-plus"></i>
+                                Criar grupo
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div id="footer-container"></div>
+        </div>
+
+        <script type="module" src="./js/include.js"></script>
+        <script type="module" src="./js/pages/meus-grupos.js"></script>
+    </body>
+</html>
+

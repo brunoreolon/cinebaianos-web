@@ -1,17 +1,23 @@
 import { adminService } from '../../services/admin-service.js';
-import { MY_DISCORD_ID } from '../../../config.js';
 import { ApiError } from '../../exception/api-error.js';
 import { criarMensagem } from '../../components/mensagens.js';
 import { MensagemTipo } from '../../components/mensagem-tipo.js';
 
-export function abrirModalPermissoes(dados, usuarioLogado) {
+export function abrirModalPermissoes(dados, usuarioLogado, onSaveSuccess) {
     const modal = document.getElementById('modal-gerenciar-permissoes');
     modal.classList.remove("inativo");
     modal.classList.add("ativo");
 
     modal.querySelector(".nome").textContent = dados.nome;
     modal.querySelector(".email").textContent = dados.email;
-    modal.querySelector("img").src = dados.avatar;
+    const avatar = modal.querySelector("img");
+    if (avatar) {
+        avatar.src = dados.avatar || './assets/img/placeholder-avatar.png';
+        avatar.alt = `Avatar de ${dados?.nome || 'usuário'}`;
+        avatar.addEventListener('error', () => {
+            avatar.src = './assets/img/placeholder-avatar.png';
+        }, { once: true });
+    }
 
     const alerta = modal.querySelector(".alerta-permissao");
 
@@ -28,7 +34,8 @@ export function abrirModalPermissoes(dados, usuarioLogado) {
     // Define estados iniciais
     const estadoInicial = {
         ativo: !!dados.isAtivo,
-        admin: !!dados.isAdmin
+        admin: !!dados.isAdmin,
+        superAdmin: !!dados.superAdmin
     };
 
     // Preenche os checkboxes
@@ -56,19 +63,14 @@ export function abrirModalPermissoes(dados, usuarioLogado) {
     const btnConcluir = modal.querySelector(".btn-concluir");
     btnConcluir.onclick = async () => {
         try {
-            if (dados.discordId === MY_DISCORD_ID && dados.discordId != usuarioLogado.discordId) {
-                criarMensagem("Você tentou… e falhou miseravelmente 😎", MensagemTipo.ERROR);
-                return;
-            }
-
             const promises = [];
 
             if (dados.isAtivo !== estadoInicial.ativo) {
-                promises.push(adminService.atualizarAtivacaoConta(dados.discordId, dados.isAtivo));
+                promises.push(adminService.atualizarAtivacaoConta(dados.userId, dados.isAtivo));
             }
 
             if (dados.isAdmin !== estadoInicial.admin) {
-                promises.push(adminService.atualizarAdmin(dados.discordId, dados.isAdmin));
+                promises.push(adminService.atualizarAdmin(dados.userId, dados.isAdmin));
             }
 
             if (promises.length === 0) {
@@ -80,26 +82,13 @@ export function abrirModalPermissoes(dados, usuarioLogado) {
 
             criarMensagem("Permissões atualizadas com sucesso.", MensagemTipo.SUCCESS);
 
-            const tr = document.querySelector(`tr[data-discord-id="${dados.discordId}"]`);
-            if (tr) {
-                // Atualiza badge de status
-                const spanStatus = tr.querySelector('[data-label="Status"] .badge');
-                spanStatus.className = `badge ${dados.isAtivo ? "badge-ativo" : "badge-inativo"}`;
-                spanStatus.innerHTML = dados.isAtivo
-                    ? "<i class='fa-regular fa-circle-check'></i> Ativo"
-                    : "<i class='fa-solid fa-ban'></i> Inativo";
-
-                // Atualiza badge de admin
-                const spanAdmin = tr.querySelector('[data-label="Usuário"] .role .badge');
-                if (spanAdmin) {
-                    if (dados.isAdmin) {
-                        spanAdmin.classList.add("badge-admin");
-                        spanAdmin.innerHTML = '<i class="fa-solid fa-shield"></i> Admin';
-                    } else {
-                        spanAdmin.classList.remove("badge-admin");
-                        spanAdmin.innerHTML = "";
-                    }
-                }
+            if (typeof onSaveSuccess === 'function') {
+                await onSaveSuccess({
+                    userId: dados.userId,
+                    isAdmin: !!dados.isAdmin,
+                    superAdmin: !!dados.superAdmin,
+                    isAtivo: !!dados.isAtivo
+                });
             }
 
             fecharModal(modal);

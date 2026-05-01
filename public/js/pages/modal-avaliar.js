@@ -5,48 +5,66 @@ import { ApiError } from '../exception/api-error.js';
 import { criarMensagem } from '../components/mensagens.js';
 import { MensagemTipo } from '../components/mensagem-tipo.js';
 
-export async function abrirModalAvaliacao(filme, usuario, atualizarTelaDetalhes = false, index) {
+export async function abrirModalAvaliacao(filme, usuario, atualizarTelaDetalhes = false, index, groupId = null) {
     const modal = document.querySelector('#modal-avaliar');
+    const normalizedGroupId = groupId !== null && groupId !== undefined && groupId !== '' ? Number(groupId) : null;
     modal.classList.remove('inativo');
+    modal.classList.remove('fechando');
     modal.classList.add('ativo');
 
     const opcoesContainer = modal.querySelector('#opcoes-voto ul');
     opcoesContainer.innerHTML = '';
 
     try {
-        const votos = ordenarVotosPorDescricao(await votoService.buscarTiposVotos());
+        const votos = ordenarVotosPorDescricao(await votoService.buscarTiposVotosDisponiveis(normalizedGroupId));
 
         votos.forEach(v => {
             const li = document.createElement('li');
             li.dataset.votoId = v.id;
-            li.textContent = v.emoji + v.description;
             li.style.background = v.color;
-            li.style.cursor = 'pointer';
+            li.innerHTML = `
+                <span class="modal-vote-emoji">${v.emoji}</span>
+                <span class="modal-vote-text">
+                    <span class="modal-vote-title">${v.description}</span>
+                    <span class="modal-vote-subtitle">Selecionar esta avaliação</span>
+                </span>
+            `;
 
             li.addEventListener('click', async () => {
                 try {
                     const votoId = li.dataset.votoId;
                     let resultado;
 
-                    const usuarioVotou = filme.votes.some(v => v.voter.discordId === usuario.discordId);
+                    const votosDoFilme = Array.isArray(filme.votes) ? filme.votes : [];
+                    const usuarioVotou = votosDoFilme.some(v => Number(v?.voter?.id) === Number(usuario.id));
                     if (usuarioVotou) {
-                        resultado = await votoService.alterarVoto(filme.id, usuario.discordId, votoId);
+                        resultado = normalizedGroupId
+                            ? await votoService.alterarVotoNoGrupo(normalizedGroupId, usuario.id, filme.id, votoId)
+                            : await votoService.alterarVoto(filme.id, usuario.id, votoId);
                         criarMensagem(`Voto alterado para ${resultado.vote.description} no filme "${filme.title}"!`, MensagemTipo.SUCCESS);
                     } else {
-                        resultado = await votoService.votar(filme.id, usuario.discordId, votoId);
+                        resultado = normalizedGroupId
+                            ? await votoService.votarNoGrupo(normalizedGroupId, usuario.id, filme.id, votoId)
+                            : await votoService.votar(filme.id, usuario.id, votoId);
                         criarMensagem(`Voto ${resultado.vote.description} registrado para "${filme.title}"!`, MensagemTipo.SUCCESS);
                     }
 
                     fecharModal(modal);
 
-                    const filmeAtualizado = await filmeService.buscarFilmePorId(filme.id);
-                    filme.votes = filmeAtualizado.votes;
+                    // Atualiza dados do filme a partir do grupo
+                    let filmeAtualizado = filme;
+                    if (normalizedGroupId) {
+                        const atualizado = await filmeService.buscarFilmeDoGrupo(normalizedGroupId, filme.id);
+                        if (atualizado) {
+                            filmeAtualizado = atualizado;
+                            filme.votes = atualizado.votes;
+                        }
+                    }
 
                     if (atualizarTelaDetalhes) {
-                        const evento = new CustomEvent('filmeAtualizado', {
+                        window.dispatchEvent(new CustomEvent('filmeAtualizado', {
                             detail: filmeAtualizado
-                        });
-                        window.dispatchEvent(evento);
+                        }));
                     }
 
                     if (index) {
@@ -84,14 +102,18 @@ export async function abrirModalAvaliacao(filme, usuario, atualizarTelaDetalhes 
     }
 
     modal.querySelector('.close').onclick = () => fecharModal(modal);
-    modal.addEventListener('click', e => {
+    modal.onclick = e => {
         if (e.target === modal) fecharModal(modal);
-    });
+    };
 }
 
 function fecharModal(modal) {
+    if (!modal || modal.classList.contains('fechando') || modal.classList.contains('inativo')) return;
+
     modal.classList.remove('ativo');
+    modal.classList.add('fechando');
     setTimeout(() => {
+        modal.classList.remove('fechando');
         modal.classList.add('inativo');
-    }, 300); 
+    }, 280);
 }

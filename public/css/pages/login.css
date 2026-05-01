@@ -129,6 +129,22 @@ body, html {
     border-radius: 10px;
 }
 
+.auth-switch {
+    margin: 16px 0 0;
+    color: var(--cor-branco-2);
+    text-align: center;
+}
+
+.auth-switch-link {
+    color: var(--cor-roxo-2);
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+.auth-switch-link:hover {
+    color: var(--cor-roxo-1);
+}
+
 @media (max-width: 480px) {
     .form-actions {
         flex-direction: column;

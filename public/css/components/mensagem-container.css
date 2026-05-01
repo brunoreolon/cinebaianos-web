@@ -34,7 +34,9 @@
 }
 
 .alert .alert-text {
-    flex: 1; 
+    flex: 1;
+    font-size: 14px;
+    line-height: 1.35;
 }
 
 .alert.show {

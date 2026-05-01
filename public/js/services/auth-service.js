@@ -146,6 +146,21 @@ export class AuthService {
         return usuario;
     }
 
+    async requireSuperAdmin() {
+        const usuario = await this.getUsuarioLogado();
+
+        if (!usuario || usuario.superAdmin !== true) {
+            throw new ApiError({
+                status: 403,
+                title: 'Acesso negado',
+                detail: 'Você não tem permissão para acessar esta página.',
+                errorCode: 'access_denied'
+            });
+        }
+
+        return usuario;
+    }
+
     /**
      * Renova o token de acesso usando o refresh token.
      *
@@ -231,7 +246,13 @@ export class AuthService {
         if (!response.ok) {
             let data = {};
             try { data = await response.json(); } catch (_) {}
-            throw new ApiError(data);
+            throw new ApiError({
+                status: response.status,
+                title: data.title || response.statusText || 'Erro na API',
+                detail: data.detail,
+                errorCode: data.errorCode,
+                instance: data.instance
+            });
         }
 
         return response;
@@ -251,6 +272,100 @@ export class AuthService {
             return null;
         }
     }
+
+    /**
+     * Inicia cadastro público e solicita envio de código de verificação por email.
+     *
+     * @param {{name: string, email: string, password: string}} payload
+     * @returns {Promise<boolean>}
+     */
+    async signupStart(payload) {
+        const response = await fetch('/api/auth/signup/start', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        let data = {};
+        try {
+            data = await response.json();
+        } catch (_) {}
+
+        if (!response.ok) {
+            throw new ApiError({
+                status: response.status,
+                title: data.title || response.statusText || 'Erro na API',
+                detail: data.detail,
+                errorCode: data.errorCode,
+                instance: data.instance
+            });
+        }
+
+        return true;
+    }
+
+    /**
+     * Confirma o código de verificação e conclui o cadastro.
+     *
+     * @param {{email: string, code: string}} payload
+     * @returns {Promise<boolean>}
+     */
+    async signupVerify(payload) {
+        const response = await fetch('/api/auth/signup/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        let data = {};
+        try {
+            data = await response.json();
+        } catch (_) {}
+
+        if (!response.ok) {
+            throw new ApiError({
+                status: response.status,
+                title: data.title || response.statusText || 'Erro na API',
+                detail: data.detail,
+                errorCode: data.errorCode,
+                instance: data.instance
+            });
+        }
+
+        return true;
+    }
+
+    /**
+     * Reenvia código de verificação de cadastro.
+     *
+     * @param {string} email
+     * @returns {Promise<boolean>}
+     */
+    async signupResend(email) {
+        const response = await fetch('/api/auth/signup/resend', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+        });
+
+        let data = {};
+        try {
+            data = await response.json();
+        } catch (_) {}
+
+        if (!response.ok) {
+            throw new ApiError({
+                status: response.status,
+                title: data.title || response.statusText || 'Erro na API',
+                detail: data.detail,
+                errorCode: data.errorCode,
+                instance: data.instance
+            });
+        }
+
+        return true;
+    }
+
 
     /**
      * Inicia processo de recuperação de login (envia e-mail de recuperação).

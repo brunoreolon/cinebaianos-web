@@ -1,6 +1,6 @@
 import { authService } from '../services/auth-service.js';
 import { usuarioService } from '../services/usuario-service.js';
-import { formatarDataExtenso } from '../global.js';
+import { formatarDataExtenso, buildPerfilUrl } from '../global.js';
 import { ApiError } from '../exception/api-error.js';
 import { criarMensagem } from '../components/mensagens.js';
 import { MensagemTipo } from '../components/mensagem-tipo.js';
@@ -8,7 +8,7 @@ import { MensagemTipo } from '../components/mensagem-tipo.js';
 document.addEventListener('DOMContentLoaded', async () => {
     const container = document.getElementById('container');
     const loader = document.getElementById('loader');
-    if (loader) loader.style.display = 'block';
+    if (loader) loader.style.display = 'flex';
 
     try {
         authService.requireLogin();
@@ -20,7 +20,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         document.getElementById("fotoUrl").value = usuario.avatar || "";
-        document.querySelector(".foto-atual img").src = usuario.avatar || "./assets/img/placeholder-avatar.png";
+        const fotoAtualImg = document.querySelector(".foto-atual img");
+        fotoAtualImg.src = usuario.avatar || "./assets/img/placeholder-avatar.png";
+        fotoAtualImg.onerror = () => {
+            fotoAtualImg.onerror = null;
+            fotoAtualImg.src = "./assets/img/placeholder-avatar.png";
+        };
         document.getElementById("nome").value = usuario.name || "";
         document.getElementById("email").value = usuario.email || "";
         document.getElementById("bio").value = usuario.biography || "";
@@ -56,7 +61,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 dados.password = novaSenha;
             }
 
-            const response = await usuarioService.alterarDadosUsuario(usuario.discordId, dados);
+            await usuarioService.alterarDadosUsuario(usuario.id, dados);
 
             inputNovaSenha.value = '';
             inputConfirmacaoSenha.value = '';
@@ -66,7 +71,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         document.querySelector('.btn-cancelar').addEventListener('click', async () => {
             const usuario = await authService.getUsuarioLogado();
-            window.location.href = `perfil.html?id=${usuario.discordId}`;
+            window.location.href = buildPerfilUrl(usuario);
         });
     } catch (err) {
         if (err instanceof ApiError) {

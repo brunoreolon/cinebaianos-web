@@ -19,7 +19,7 @@
     <body>
         <div id="loader">
             <div class="spinner">
-                <p>Carregando página...</p>
+                <p>Carregando detalhes do filme...</p>
             </div>
         </div>
 
@@ -27,11 +27,11 @@
             <div id="header-container"></div>
             <div class="mensagem-container"></div>
             <main>
-                <article id="detalhes-filme">
-                    <figure id="poster">
+                <article id="detalhes-filme" class="filme-page-layout">
+                    <figure id="poster" class="filme-poster-card">
                         <img src="" alt="Poster do filme">
                     </figure>
-                    <section id="detalhes">
+                    <section id="detalhes" class="filme-hero-card">
                         <div class="topo-detalhes">
                             <div class="info-filme">
                                 <header class="parte1">
@@ -52,43 +52,61 @@
                             </button>
                         </div>
                         
-                        <section class="parte3">
+                        <section class="parte3-wrapper">
+                            <section class="parte3 filme-meta-grid">
                             <div class="diretor">
-                                <p>Diretor</p>
-                                <p></p>
+                                 <span class="meta-label">Diretor</span>
+                                 <div class="meta-value-row">
+                                     <i class="fa-solid fa-clapperboard"></i>
+                                     <p class="nome-diretor"></p>
+                                 </div>
                             </div>
                             <div class="duracao">
-                                <i class="fa-regular fa-clock"></i>
-                                <p>2h 2m</p>
+                                <span class="meta-label">Duração</span>
+                                <div class="meta-value-row">
+                                    <i class="fa-regular fa-clock"></i>
+                                    <p>2h 2m</p>
+                                </div>
                             </div>
                             <div class="responsavel">
-                                <i class="fa-regular fa-user"></i>
-                                Adicionado por <span class="nome"><a href="" class="link-perfil"></a></span>
+                                <span class="meta-label">Adicionado por</span>
+                                <div class="meta-value-row">
+                                    <i class="fa-regular fa-user"></i>
+                                    <span class="nome"><a href="" class="link-perfil"></a></span>
+                                </div>
                             </div>
                             <div class="data-adicionado">
-                                <i class="fa-regular fa-calendar"></i>
-                                <p></p>
+                                <span class="meta-label">Data de adição</span>
+                                <div class="meta-value-row">
+                                    <i class="fa-regular fa-calendar"></i>
+                                    <p></p>
+                                </div>
                             </div>
+                            </section>
                         </section>
                     </section >
-                    <section id="sinopse">
-                        <h3 class="fonte-primaria">Sinopse</h3>
+                    <section id="sinopse" class="filme-section-card">
+                        <div class="filme-section-header">
+                            <h3 class="fonte-primaria">Sinopse</h3>
+                        </div>
                         <p class="fonte-secundaria"></p>
                     </section >
-                    <section id="avaliacao">
-                        <section id="botao-avaliar">
+                    <section id="avaliacao" class="filme-section-card filme-avaliacao-card">
+                        <div class="filme-section-header filme-section-header-inline">
+                            <h3 class="filme-avaliacao-title">Avaliações</h3>
+                            <span class="filme-section-divider"></span>
+                        </div>
+                        <section id="botao-avaliar" class="filme-avaliacao-cta">
                             <button type="button"></button>
                         </section>
                         <section id="minha-avaliacao" class="inativo">
                             <h3>Sua avaliação</h3>
                             <div>
-                                <!-- <i class="fa-regular fa-thumbs-up"></i> -->
                                 <span></span>
                             </div>
                         </section>
                         <section id="avaliacoes">
                             <div>
-                                <!-- <i class="fa-regular fa-thumbs-up"></i> -->
                                 <span></span>
                             </div>
                         </section>

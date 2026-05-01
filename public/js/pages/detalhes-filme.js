@@ -1,19 +1,101 @@
 import { authService } from '../services/auth-service.js';
 import { filmeService } from '../services/filme-service.js';
 import { abrirModalAvaliacao } from './modal-avaliar.js';
-import { getQueryParam, formatarData, isUsuarioVotouNoFilme, criarElemento, ordenarVotosPorNomeUsuario } from '../global.js';
+import { getQueryParam, formatarData, isUsuarioVotouNoFilme, criarElemento, ordenarVotosPorNomeUsuario, deduplicarVotosPorUsuario, buildPerfilUrl, isInactiveMembershipStatus, createMembershipStatusBadge } from '../global.js';
 import { ApiError } from '../exception/api-error.js';
 import { criarMensagem } from '../components/mensagens.js';
 import { MensagemTipo } from '../components/mensagem-tipo.js';
+import { getCurrentGroup, loadCurrentGroup, setFlashMessage } from '../services/group-context.js';
+import {groupService} from "../services/group-service.js";
 
-function getVotoDoUsuarioNoFilme(filme, usuarioId) {
-    return filme.votes.find(v => v.voter.discordId === usuarioId);
+// ID do grupo atual — preenchido na inicialização
+let currentGroupId = null;
+
+function parseNullableNumber(value) {
+    if (value === null || value === undefined || value === '') return null;
+    const parsed = Number(value);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
 }
 
-function preencherDetalhes(filme, usuario) {
-    const btnRemoverFilme = document.querySelector('.btn-remover-filme');
+function normalizeDetalhesFilmeUrl(filmeId, groupId, shouldKeepAvaliar) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('id', String(filmeId));
+    url.searchParams.set('groupId', String(groupId));
 
-    if (filme.chooser.discordId === usuario.discordId) {
+    if (shouldKeepAvaliar) {
+        url.searchParams.set('avaliar', '1');
+    } else {
+        url.searchParams.delete('avaliar');
+    }
+
+    window.history.replaceState({}, '', `${url.pathname}${url.search}`);
+}
+
+function criarAcaoEstadoVazio(href, iconClass, texto) {
+    const link = criarElemento('a', ['detalhes-filme-empty-action']);
+    link.href = href;
+    link.innerHTML = `<i class="${iconClass}"></i><span>${texto}</span>`;
+    return link;
+}
+
+function renderizarEstadoVazioFilme({ groupId, groupName }) {
+    const detalhesFilme = document.getElementById('detalhes-filme');
+    if (!detalhesFilme) return;
+
+    detalhesFilme.classList.add('detalhes-filme-empty');
+    detalhesFilme.innerHTML = '';
+
+    const emptyState = criarElemento('div', ['catalog-empty-state', 'detalhes-filme-empty-state']);
+
+    const icon = criarElemento('i', ['fa-solid', 'fa-film']);
+    const titulo = criarElemento('strong', [], 'Este filme não está disponível no grupo atual');
+    const descricao = criarElemento(
+        'span',
+        [],
+        groupName
+            ? `O filme que você tentou abrir não foi encontrado em "${groupName}". Você pode voltar para a lista de filmes do grupo atual ou abrir os detalhes do grupo para explorar outras opções.`
+            : 'O filme que você tentou abrir não foi encontrado no grupo selecionado. Volte para a lista de filmes e escolha outro título.'
+    );
+    const actions = criarElemento('div', ['detalhes-filme-empty-actions']);
+
+    actions.appendChild(criarAcaoEstadoVazio('./catalogo.html', 'fa-solid fa-house', 'Ver filmes do grupo'));
+
+    if (groupId) {
+        actions.appendChild(criarAcaoEstadoVazio(`./detalhes-grupo.html?id=${groupId}`, 'fa-solid fa-people-group', 'Abrir detalhes do grupo'));
+    }
+
+    emptyState.append(icon, titulo, descricao, actions);
+    detalhesFilme.appendChild(emptyState);
+}
+
+function getVotoDoUsuarioNoFilme(filme, usuarioId) {
+    const votos = deduplicarVotosPorUsuario(filme.votes || []);
+    return votos.find(v => Number(v?.voter?.id) === Number(usuarioId));
+}
+
+function appendStatusBadge(container, status) {
+    if (!container) return;
+
+    container.querySelector('.card-member-status-badge')?.remove();
+
+    const badge = createMembershipStatusBadge(status);
+    if (badge) container.appendChild(badge);
+}
+
+async function preencherDetalhes(filme, usuario) {
+    const btnRemoverFilme = document.querySelector('.btn-remover-filme');
+    const isChooser = Number(filme?.chooser?.id) === Number(usuario?.id);
+    
+    let canRemove = false;
+
+    try {
+        const perms = await groupService.buscarPermissoes(currentGroupId);
+        canRemove = perms.canManage;
+    } catch (err) {
+        console.error("Erro ao buscar permissões:", err);
+    }
+
+    if (isChooser || canRemove) {
         btnRemoverFilme.classList.remove('disable');
 
         btnRemoverFilme?.addEventListener('click', async () => {
@@ -21,12 +103,12 @@ function preencherDetalhes(filme, usuario) {
         if (!confirmar) return;
 
         try {
-            await filmeService.excluirFilme(filme.id);
+            await filmeService.removerFilmeDoGrupo(currentGroupId, filme.id);
             sessionStorage.setItem("flashMessage", JSON.stringify({
                 texto: "Filme removido com sucesso.",
                 tipo: "SUCCESS"
             }));
-            window.location.href = "./index.html";
+            window.location.href = "./catalogo.html";
         } catch (err) {
             if (err instanceof ApiError) {
                 criarMensagem(err.detail || "Erro ao excluir filme.", MensagemTipo.ERROR);
@@ -56,11 +138,14 @@ function preencherDetalhes(filme, usuario) {
     });
 
     // Parte3: Diretor, duração, usuário e data
-    document.querySelector('.diretor p:last-child').textContent = filme.director || 'Peter Jackson';
+    document.querySelector('.diretor .nome-diretor').textContent = filme.director || 'Peter Jackson';
     document.querySelector('.duracao p').textContent = filme.duration || '2 horas';
     const linkPerfil = document.querySelector('.responsavel .link-perfil');
-    linkPerfil.textContent = filme.chooser.name;
-    linkPerfil.href = `./perfil.html?id=${filme.chooser.discordId}`;
+    const chooserStatus = filme?.chooserMembershipStatus || 'ACTIVE';
+    linkPerfil.textContent = filme?.chooser?.name || 'Usuario';
+    linkPerfil.classList.toggle('link-perfil--inactive-member', isInactiveMembershipStatus(chooserStatus));
+    linkPerfil.href = buildPerfilUrl(filme.chooser);
+    appendStatusBadge(document.querySelector('.responsavel .meta-value-row'), chooserStatus);
     document.querySelector('.data-adicionado p').textContent = formatarData(filme.dateAdded);
 
     // Sinopse
@@ -74,18 +159,19 @@ function preencherAvaliacoes(filme, usuario) {
     atualizarBotaoEMinhaAvaliacao(filme, usuario, botao, minhaAvaliacao);
 
     botao.addEventListener('click', () => {
-        abrirModalAvaliacao(filme, usuario, true, false);
+        abrirModalAvaliacao(filme, usuario, true, false, currentGroupId);
     });
 }
 
 export function atualizarBotaoEMinhaAvaliacao(filme, usuario, botao, minhaAvaliacao) {
-    const usuarioVotou = isUsuarioVotouNoFilme(filme.votes, usuario.discordId);
+    const votosDeduplicados = deduplicarVotosPorUsuario(filme.votes || []);
+    const usuarioVotou = isUsuarioVotouNoFilme(votosDeduplicados, usuario.id);
 
     if (usuarioVotou) {
-        botao.textContent = 'Alterar Avaliação';
+        botao.innerHTML = '<i class="fa-solid fa-pen"></i><span>Alterar avaliação</span>';
         minhaAvaliacao.style.display = 'block';
 
-        const voto = getVotoDoUsuarioNoFilme(filme, usuario.discordId);
+        const voto = getVotoDoUsuarioNoFilme(filme, usuario.id);
         const span = minhaAvaliacao.querySelector('span');
         span.textContent = voto.vote.emoji + voto.vote.description;
         span.style.color = voto.vote.color;
@@ -93,20 +179,21 @@ export function atualizarBotaoEMinhaAvaliacao(filme, usuario, botao, minhaAvalia
         const aviso = document.querySelector('#avaliacoes-recebidas .sem-avaliacoes');
         if (aviso) aviso.textContent = '';
     } else {
-        botao.textContent = 'Avaliar Filme';
+        botao.innerHTML = '<i class="fa-solid fa-star"></i><span>Avaliar filme</span>';
         minhaAvaliacao.style.display = 'none';
     }
 
-    const votosOrdenadosPorUsuario = ordenarVotosPorNomeUsuario(filme.votes);
+    const votosOrdenadosPorUsuario = ordenarVotosPorNomeUsuario(votosDeduplicados);
 
-    renderizarResumoVotos(filme.votes);
+    renderizarResumoVotos(votosDeduplicados);
     renderizarAvaliacoesRecebidas(votosOrdenadosPorUsuario);
 }
 
 export function renderizarResumoVotos(votos) {
+    const votosDeduplicados = deduplicarVotosPorUsuario(votos || []);
     const contagem = {};
 
-    votos.forEach(voto => {
+    votosDeduplicados.forEach(voto => {
         const key = `${voto.vote.emoji} ${voto.vote.description}`;
         if (contagem[key]) {
             contagem[key].qtd++;
@@ -128,31 +215,31 @@ export function renderizarResumoVotos(votos) {
     votosOrdenados.forEach(data => {
         const span = criarElemento('span', [], `${data.emoji} ${data.qtd} ${data.descricao}`);
         span.style.color = data.color;
-        span.style.marginRight = '15px';
         container.appendChild(span);
     });
 }
 
 export function renderizarAvaliacoesRecebidas(votos) {
+    const votosDeduplicados = deduplicarVotosPorUsuario(votos || []);
     const listaAvaliacoes = document.querySelector('#avaliacoes-recebidas');
     const h3 = listaAvaliacoes.querySelector('h3');
     const ul = listaAvaliacoes.querySelector('ul');
+    listaAvaliacoes.querySelector('.sem-avaliacoes')?.remove();
 
-    h3.textContent = `Avaliações (${votos.length})`;
+    h3.textContent = `Avaliações (${votosDeduplicados.length})`;
     ul.innerHTML = '';
 
-    if (votos.length === 0) {
+    if (votosDeduplicados.length === 0) {
         const p = criarElemento('p', ['fonte-secundaria', 'sem-avaliacoes'], 'Nenhuma avaliação recebida ainda.');
-        p.style.textAlign = 'center';
         listaAvaliacoes.appendChild(p);
         return;
     }
 
-    votos.forEach(v => {
+    votosDeduplicados.forEach(v => {
         const li = criarElemento('li');
 
         const a = criarElemento('a', ['item-voto']);
-        a.href = `./perfil.html?id=${v.voter.discordId}`;
+        a.href = buildPerfilUrl(v.voter);
 
         const article = criarElemento('article', ['avaliacao-feita']);
         const infoUsuario = criarElemento('div', ['info-usuario']);
@@ -163,16 +250,24 @@ export function renderizarAvaliacoesRecebidas(votos) {
         img.alt = `Avatar de ${votante.name}`;
 
         const divInfo = criarElemento('div', ['dados-usuario']);
-        const pNome = criarElemento('p', [], votante.name);
+        const nomeLinha = criarElemento('div', ['nome-status-linha']);
+        const voterStatus = v?.voterMembershipStatus || 'ACTIVE';
+        const pNome = criarElemento('p', ['votante-nome'], votante?.name || 'Usuario');
+        if (isInactiveMembershipStatus(voterStatus)) {
+            pNome.classList.add('link-perfil--inactive-member');
+        }
+        nomeLinha.appendChild(pNome);
+        appendStatusBadge(nomeLinha, voterStatus);
         const pData = criarElemento('p', [], formatarData(v.vote.votedAt));
 
-        divInfo.append(pNome, pData);
+        divInfo.append(nomeLinha, pData);
         infoUsuario.append(img, divInfo);
 
         // voto
         const divVoto = criarElemento('div');
         const spanVoto = criarElemento('span', ['voto-usuario']);
         spanVoto.style.color = v.vote.color;
+        spanVoto.title = v.vote.description;
 
         const emoji = document.createTextNode(v.vote.emoji);
         const descVoto = criarElemento('span', ['descricao'], v.vote.description);
@@ -190,7 +285,7 @@ export function renderizarAvaliacoesRecebidas(votos) {
 document.addEventListener('DOMContentLoaded', async () => {
     const container = document.getElementById('container');
     const loader = document.getElementById('loader');
-    if (loader) loader.style.display = 'block';
+    if (loader) loader.style.display = 'flex';
 
     try {
         authService.requireLogin();
@@ -202,18 +297,45 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const filmeId = getQueryParam('id');
+        const groupIdFromQuery = parseNullableNumber(getQueryParam('groupId'));
+        const avaliarFromQuery = getQueryParam('avaliar') === '1';
 
-        if (!filmeId) throw new Error('ID do filme não encontrado na URL');
+        let grupo = getCurrentGroup();
+        if (!grupo) {
+            grupo = await loadCurrentGroup();
+        }
 
-        const filme = await filmeService.buscarFilmePorId(filmeId);
-        if (!filme) throw new Error('Filme não encontrado');
+        const currentSelectedGroupId = parseNullableNumber(grupo?.id);
+        currentGroupId = currentSelectedGroupId || groupIdFromQuery || null;
 
-        const deveAvaliar = getQueryParam('avaliar');
-        if (deveAvaliar === '1') {
-            abrirModalAvaliacao(filme, usuario, true, false);
+        if (!filmeId) {
+            setFlashMessage('Filme inválido para exibir detalhes.', 'ALERT');
+            window.location.href = './catalogo.html';
+            return;
+        }
 
-            const novaURL = window.location.pathname + window.location.search.replace(/(&)?avaliar=1/, '');
-            window.history.replaceState({}, '', novaURL);
+        if (!currentGroupId) {
+            setFlashMessage('Selecione um grupo para visualizar os detalhes do filme.', 'ALERT');
+            window.location.href = './meus-grupos.html';
+            return;
+        }
+
+        if (groupIdFromQuery !== currentGroupId) {
+            normalizeDetalhesFilmeUrl(filmeId, currentGroupId, avaliarFromQuery);
+        }
+
+        const filme = await filmeService.buscarFilmeDoGrupo(currentGroupId, filmeId);
+        if (!filme) {
+            renderizarEstadoVazioFilme({
+                groupId: currentGroupId,
+                groupName: grupo?.name || null
+            });
+            return;
+        }
+
+        if (avaliarFromQuery) {
+            abrirModalAvaliacao(filme, usuario, true, false, currentGroupId);
+            normalizeDetalhesFilmeUrl(filmeId, currentGroupId, false);
         }
 
         preencherDetalhes(filme, usuario,);
@@ -242,6 +364,8 @@ window.addEventListener('filmeAtualizado', async (e) => {
         
         const botao = document.querySelector('#botao-avaliar button');
         const minhaAvaliacao = document.querySelector('#minha-avaliacao');
+
+        if (!botao || !minhaAvaliacao) return;
 
         atualizarBotaoEMinhaAvaliacao(filmeAtualizado, usuario, botao, minhaAvaliacao);
     } catch (err) {

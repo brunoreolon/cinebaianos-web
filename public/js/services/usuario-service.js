@@ -7,14 +7,14 @@ import { authService } from './auth-service.js';
 export class UsuarioService {
 
     /**
-     * Retorna os dados de um usuário pelo seu Discord ID.
+     * Retorna os dados de um usuário pelo seu ID.
      *
-     * @param {string} discordId - ID do usuário no Discord
+     * @param {number|string} userId - ID do usuário
      * @returns {Promise<Object>} - Objeto usuário
      * @throws {ApiError} - Se a requisição falhar
      */
-    async getUsuarioById(discordId) {
-        const url = new URL(`/api/users/${discordId}`, window.location.origin);
+    async getUsuarioById(userId) {
+        const url = new URL(`/api/users/${userId}`, window.location.origin);
         const response = await authService.apiFetch(url);
 
         return await response.json();
@@ -23,7 +23,7 @@ export class UsuarioService {
     /**
      * Altera os dados de um usuário.
      *
-     * @param {string} discordId - ID do usuário
+     * @param {number|string} userId - ID do usuário
      * @param {Object} dados - Dados do usuário a atualizar
      * @param {string} [dados.avatar] - URL do avatar
      * @param {string} [dados.name] - Nome do usuário
@@ -32,8 +32,8 @@ export class UsuarioService {
      * @returns {Promise<Object>} - Usuário atualizado
      * @throws {ApiError} - Se a requisição falhar
      */
-    async alterarDadosUsuario(discordId, dados) {
-        const url = new URL(`/api/users/${discordId}`, window.location.origin);
+    async alterarDadosUsuario(userId, dados) {
+        const url = new URL(`/api/users/${userId}`, window.location.origin);
 
         const response = await authService.apiFetch(url, {
             method: 'PATCH',
@@ -63,12 +63,12 @@ export class UsuarioService {
     /**
      * Busca estatísticas de um usuário.
      *
-     * @param {string} discordId - ID do usuário
+     * @param {number|string} userId - ID do usuário
      * @returns {Promise<Object>} - Estatísticas do usuário
      * @throws {ApiError} - Se a requisição falhar
      */
-    async buscarStatisticasUsuario(discordId) {
-        const url = new URL(`/api/users/${discordId}/summary`, window.location.origin);
+    async buscarStatisticasUsuario(userId) {
+        const url = new URL(`/api/users/${userId}/summary`, window.location.origin);
         const response = await authService.apiFetch(url);
 
         return await response.json();
@@ -77,12 +77,12 @@ export class UsuarioService {
     /**
      * Retorna os votos que o usuário recebeu.
      *
-     * @param {string} discordId - ID do usuário
+     * @param {number|string} userId - ID do usuário
      * @returns {Promise<Array>} - Lista de votos recebidos
      * @throws {ApiError} - Se a requisição falhar
      */
-    async buscarStatisticasVotosRecebidosUsuario(discordId) {
-        const url = new URL(`/api/users/${discordId}/votes/received`, window.location.origin);
+    async buscarStatisticasVotosRecebidosUsuario(userId) {
+        const url = new URL(`/api/users/${userId}/votes/received`, window.location.origin);
         const response = await authService.apiFetch(url);
 
         return await response.json();
@@ -91,12 +91,12 @@ export class UsuarioService {
     /**
      * Retorna os votos que o usuário deu.
      *
-     * @param {string} discordId - ID do usuário
+     * @param {number|string} userId - ID do usuário
      * @returns {Promise<Array>} - Lista de votos dados
      * @throws {ApiError} - Se a requisição falhar
      */
-    async buscarStatisticasVotosDadosUsuario(discordId) {
-        const url = new URL(`/api/users/${discordId}/votes/given`, window.location.origin);
+    async buscarStatisticasVotosDadosUsuario(userId) {
+        const url = new URL(`/api/users/${userId}/votes/given`, window.location.origin);
         const response = await authService.apiFetch(url);
 
         return await response.json();

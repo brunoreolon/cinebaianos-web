@@ -2,179 +2,445 @@
 <html lang="pt-BR">
     <head>
         <meta charset="UTF-8" />
-
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-        <link rel="stylesheet" href="./css/components/mensagem-container.css" type="text/css">
         <link rel="stylesheet" href="./css/global.css" type="text/css">
-        <link rel="stylesheet" href="./css/components/header.css" type="text/css">
         <link rel="stylesheet" href="./css/components/footer.css" type="text/css">
-        <link rel="stylesheet" href="./css/pages/modal-avaliar.css" type="text/css">
-        <link rel="stylesheet" href="./css/pages/index.css" type="text/css">
+        <link rel="stylesheet" href="./css/pages/landing.css" type="text/css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 
-        <link rel="icon" type="image/png" href="assets/icons/favicon.png" />
+        <link rel="icon" type="image/png" href="./assets/icons/favicon.png" />
 
-        <title>CineBaianos</title>
+        <title>CineBaianos | Descubra, organize e vote em filmes com seu grupo</title>
     </head>
     <body>
-        <div id="loader">
-            <div class="spinner">
-                <p>Carregando página...</p>
-            </div>
-        </div>
+        <div class="landing-shell">
+            <header class="landing-header">
+                <a href="./index.html" class="landing-logo">
+                    <span class="landing-logo-icon"><i class="fa-solid fa-clapperboard"></i></span>
+                    <span class="landing-logo-copy">
+                        <strong>CineBaianos</strong>
+                        <small>Filmes, grupos e votos em um só lugar</small>
+                    </span>
+                </a>
 
-        <div id="container" class="inativo-js">
-            <div id="header-container"></div>
-            <div class="mensagem-container"></div>
-            <div id="adicionar-filme">
-                <button type="button" class="adicionar">
-                    <i class="fa-solid fa-plus"></i>
-                    Adicionar Filme
+                <button type="button" class="landing-nav-toggle" id="landing-nav-toggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="landing-nav">
+                    <span></span>
+                    <span></span>
+                    <span></span>
                 </button>
-            </div>
-            <div id="modal-novo-filme" class="modal inativo">
-                <div class="modal-content">
-                    <header>
-                        <h3>Adicionar Novo Filme</h3>
-                        <span class="close">&times;</span>
-                    </header>
-                    <section class="dados">
-                        <div class="campo">
-                            <input id="titulo" type="text" placeholder="Digite o nome do filme...">
-                            <button class="btn-pesquisar">
-                                <i class="fa-solid fa-magnifying-glass"></i>
-                            </button>
-                        </div>
-                        <div class="dica">
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                            <span>Busque por um filme para adicionar</span>
-                        </div>
-                        <div class="filmes-encontrados" style="display: none;">
-                            <ul></ul>
-                        </div>
-                    </section>
-                </div>
-            </div>
-            <main>
-                <!-- <section class="recentes">
-                    <header><h2>Adicionados Recentemente</h2></header>
-                    <div class="inline"></div>
-                </section> -->
-                <section class="aguardando-avaliacao">
-                    <header><h2>Aguardando Sua Avaliação</h2></header>
-                    <div class="inline"></div>
-                </section>
-                <section class="todos">
-                    <header><h2>Todos os Filmes</h2></header>
 
-                    <!-- FILTROS -->
-                    <div id="filtro">
-                        <div class="filtros-superiores">
-                            <!-- Ordenar por -->
-                            <div class="filtro-ordenar">
-                                <span>Ordenar por:</span>
+                <nav class="landing-nav" id="landing-nav">
+                    <a href="#como-funciona">Como funciona</a>
+                    <a href="#para-quem-e">Para quem é</a>
+                    <a href="#funcionalidades">Funcionalidades</a>
+                    <a href="#experiencia" class="landing-nav-mobile-only">Experiência</a>
+                    <a href="#destaques" class="landing-nav-mobile-only">Destaques</a>
+                    <a href="#faq">FAQ</a>
+                    <a href="./login.html" class="landing-nav-login">Entrar</a>
+                    <a href="./cadastro.html" class="landing-nav-cta">Criar conta</a>
+                </nav>
+            </header>
 
-                                <select id="ordenar-por">
-                                    <option value="dateAdded" selected>Adicionado em</option>
-                                    <option value="title">Título</option>
-                                    <option value="chooser.name">Usuário</option>
-                                </select>
+            <main class="landing-main">
+                <section class="landing-hero">
+                    <div class="landing-hero-copy">
+                        <span class="landing-eyebrow">Comunidade + catálogo + votação</span>
+                        <h1>Pare de decidir filme no caos e transforme cada sessão em uma experiência compartilhada.</h1>
+                        <p>
+                            O CineBaianos reúne tudo em um só lugar: grupos, catálogo, votos, convites e ranking. Você organiza melhor, decide mais rápido e ainda cria uma identidade própria para cada comunidade.
+                        </p>
 
-                                <div class="ordenacao-direcao">
-                                    <button id="ordenar-direcao" type="button" data-direction="desc"
-                                        class="inline-flex items-center justify-center h-8 rounded-md gap-1.5 px-3
-                                            bg-slate-700 border border-slate-600 hover:bg-slate-600 text-white"
-                                        aria-label="Alternar direção da ordenação">
-                                        <!-- Ícone -->
-                                        <svg
-                                            id="icone-direcao"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            stroke-width="2"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            class="w-4 h-4"
-                                        >
-                                            <path d="m21 16-4 4-4-4"></path>
-                                            <path d="M17 20V4"></path>
-                                            <path d="m3 8 4-4 4 4"></path>
-                                            <path d="M7 4v16"></path>
-                                        </svg>
-                                    </button>
-                                    <span id="texto-direcao" class="texto-direcao">Z - A</span>
-                                </div>
-                            </div>
-
-                            <div class="divisao"></div>
-
-                            <!-- Filtrar por usuário -->
-                            <div class="filtro-usuario">
-                                <span>Usuário:</span>
-                                <select id="filtro-usuario">
-                                    <option value="">Todos</option>
-                                </select>
-                            </div>
-
-                            <div class="divisao"></div>
-
-                            <div class="filtro-voto">
-                                <span>Voto:</span>
-                                <select id="filtro-voto">
-                                    <option value="">Todos</option>
-                                </select>
-                            </div>
-
-                            <div class="divisao"></div>
-
-                            <div class="filtro-genero">
-                                <span>Gênero:</span>
-                                <select id="filtro-genero">
-                                    <option value="">Todos</option>
-                                </select>
-                            </div>
-
-                            <div class="divisao"></div>
-
-                            <!-- Quantidade por página -->
-                            <div class="filtro-size">
-                                <span>Itens por página:</span>
-                                <select id="filmes-size">
-                                    <option value="10">10</option>
-                                    <option value="20" selected>20</option>
-                                    <option value="50">50</option>
-                                    <option value="100">100</option>
-                                </select>
-                            </div>
+                        <div class="landing-hero-actions" id="landing-hero-actions">
+                            <a href="./login.html" class="landing-btn landing-btn-primary">Entrar</a>
+                            <a href="./cadastro.html" class="landing-btn landing-btn-secondary">Criar conta</a>
                         </div>
 
-                        <!-- Buscar por título -->
-                        <div class="filtro-busca">
-                            <input type="text" id="buscar-titulo" placeholder="Buscar por título" />
+                        <ul class="landing-hero-highlights">
+                            <li><i class="fa-solid fa-users"></i> Grupos públicos, privados ou por convite</li>
+                            <li><i class="fa-solid fa-film"></i> Um catálogo separado para cada grupo</li>
+                            <li><i class="fa-solid fa-star-half-stroke"></i> Votos com a personalidade da sua comunidade</li>
+                        </ul>
+
+                        <div class="landing-proof-strip">
+                            <div class="landing-proof-item">
+                                <strong>Conta própria</strong>
+                                <span>Cadastro por email com confirmação</span>
+                            </div>
+                            <div class="landing-proof-item">
+                                <strong>Contexto por grupo</strong>
+                                <span>Navegação multi-tenant sem confusão</span>
+                            </div>
+                            <div class="landing-proof-item">
+                                <strong>Gestão completa</strong>
+                                <span>Convites, solicitações, bans e ownership</span>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="inline"></div>
+                    <aside class="landing-hero-panel">
+                        <div class="landing-stat-card">
+                            <span class="landing-stat-icon"><i class="fa-solid fa-people-group"></i></span>
+                            <strong>Grupos com identidade própria</strong>
+                            <p>Defina admins, convites, política de entrada, votos disponíveis e contexto ativo para navegar sem confusão.</p>
+                        </div>
+                        <div class="landing-stat-card is-accent">
+                            <span class="landing-stat-icon"><i class="fa-solid fa-ranking-star"></i></span>
+                            <strong>Ranking e decisões melhores</strong>
+                            <p>Veja rapidamente o que falta avaliar, quais filmes estão bombando e como o grupo está reagindo às escolhas.</p>
+                        </div>
 
-                    <div class="paginacao"></div>
+                        <div class="landing-app-preview">
+                            <div class="landing-app-window">
+                                <div class="landing-app-topbar">
+                                    <span></span><span></span><span></span>
+                                </div>
+                                <div class="landing-app-body">
+                                    <div class="landing-app-group-pill">
+                                        <i class="fa-solid fa-star"></i>
+                                        <span>Grupo atual: Cine Lovers</span>
+                                    </div>
+                                    <div class="landing-app-card">
+                                        <div class="landing-app-card-header">
+                                            <strong>Filme em destaque</strong>
+                                            <span>Aguardando sua avaliação</span>
+                                        </div>
+                                        <div class="landing-app-card-content">
+                                            <div class="landing-app-poster"></div>
+                                            <div class="landing-app-card-copy">
+                                                <h3>Donnie Darko</h3>
+                                                <p>Adicionado por Bruno • Grupo privado</p>
+                                                <div class="landing-app-votes">
+                                                    <span><i class="fa-solid fa-heart"></i> Favorito cult</span>
+                                                    <span><i class="fa-solid fa-face-grin-stars"></i> Que filme foi esse?</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="landing-app-bottom-grid">
+                                        <div class="landing-app-mini-card">
+                                            <strong>Convites</strong>
+                                            <span>2 pendentes</span>
+                                        </div>
+                                        <div class="landing-app-mini-card">
+                                            <strong>Ranking</strong>
+                                            <span>Top 3 atualizado</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </aside>
+                </section>
+
+                <section class="landing-summary-band" aria-label="Resumo do produto">
+                    <article class="landing-summary-card">
+                        <i class="fa-solid fa-layer-group"></i>
+                        <div>
+                            <strong>Multi-grupo de verdade</strong>
+                            <span>Cada grupo possui contexto, regras e catálogo próprios.</span>
+                        </div>
+                    </article>
+                    <article class="landing-summary-card">
+                        <i class="fa-solid fa-envelope-open-text"></i>
+                        <div>
+                            <strong>Onboarding guiado</strong>
+                            <span>Cadastro por código, convites e solicitações de entrada.</span>
+                        </div>
+                    </article>
+                    <article class="landing-summary-card">
+                        <i class="fa-solid fa-sliders"></i>
+                        <div>
+                            <strong>Regras sob medida</strong>
+                            <span>Admins, ownership, votos globais e políticas configuráveis.</span>
+                        </div>
+                    </article>
+                </section>
+
+                <section class="landing-section" id="para-quem-e">
+                    <div class="landing-section-heading">
+                        <span class="landing-section-kicker">Para quem é</span>
+                        <h2>Feito para grupos que querem descobrir, discutir e lembrar melhor dos filmes que assistem juntos.</h2>
+                    </div>
+
+                    <div class="landing-audience-grid">
+                        <article class="landing-audience-card">
+                            <i class="fa-solid fa-user-group"></i>
+                            <h3>Grupos de amigos</h3>
+                            <p>Perfeito para decidir o próximo filme sem depender de conversa perdida em chat ou enquete improvisada.</p>
+                        </article>
+
+                        <article class="landing-audience-card">
+                            <i class="fa-solid fa-popcorn"></i>
+                            <h3>Clubes do filme</h3>
+                            <p>Organize sessões, mantenha histórico do que foi visto e acompanhe como cada pessoa avaliou.</p>
+                        </article>
+
+                        <article class="landing-audience-card">
+                            <i class="fa-solid fa-comments"></i>
+                            <h3>Comunidades online</h3>
+                            <p>Ideal para comunidades que querem centralizar descoberta, votação e ranking em um ambiente próprio.</p>
+                        </article>
+
+                        <article class="landing-audience-card">
+                            <i class="fa-solid fa-house"></i>
+                            <h3>Famílias e casais</h3>
+                            <p>Uma forma simples de montar listas, votar em opções e evitar aquela dúvida eterna do “o que vamos assistir?”.</p>
+                        </article>
+
+                        <article class="landing-audience-card">
+                            <i class="fa-solid fa-masks-theater"></i>
+                            <h3>Grupos temáticos</h3>
+                            <p>Horror, trash, cult, nostalgia ou cinema ruim de estimação: cada grupo pode ter seus próprios votos e regras.</p>
+                        </article>
+
+                        <article class="landing-audience-card">
+                            <i class="fa-solid fa-shield-heart"></i>
+                            <h3>Admins que querem controle</h3>
+                            <p>Convites, solicitações, papéis, ownership e bans em um fluxo mais organizado e visualmente claro.</p>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="landing-section" id="como-funciona">
+                    <div class="landing-section-heading">
+                        <span class="landing-section-kicker">Como funciona</span>
+                        <h2>Entre, escolha seu grupo e comece a votar em poucos passos.</h2>
+                    </div>
+
+                    <div class="landing-steps-grid">
+                        <article class="landing-step-card">
+                            <span class="landing-step-number">1</span>
+                            <h3>Crie sua conta</h3>
+                            <p>Cadastre-se com email e senha, confirme o código enviado e entre no sistema com segurança.</p>
+                        </article>
+                        <article class="landing-step-card">
+                            <span class="landing-step-number">2</span>
+                            <h3>Entre ou crie um grupo</h3>
+                            <p>Monte o seu espaço, convide pessoas ou solicite entrada em grupos públicos e privados.</p>
+                        </article>
+                        <article class="landing-step-card">
+                            <span class="landing-step-number">3</span>
+                            <h3>Adicione filmes ao catálogo do grupo</h3>
+                            <p>Busque filmes, organize as escolhas e veja o que ainda está aguardando sua avaliação.</p>
+                        </article>
+                        <article class="landing-step-card">
+                            <span class="landing-step-number">4</span>
+                            <h3>Vote e acompanhe o ranking</h3>
+                            <p>Use votos do grupo ou globais, descubra tendências e acompanhe o que mais marcou a comunidade.</p>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="landing-section" id="funcionalidades">
+                    <div class="landing-section-heading">
+                        <span class="landing-section-kicker">Funcionalidades</span>
+                        <h2>Tudo o que você precisa para descobrir, organizar e avaliar filmes em conjunto.</h2>
+                    </div>
+
+                    <div class="landing-feature-grid">
+                        <article class="landing-feature-card">
+                            <i class="fa-solid fa-users-viewfinder"></i>
+                            <h3>Gestão de grupos</h3>
+                            <p>Owner, admins, membros, grupo atual, grupo padrão, convites, solicitações e bans por grupo.</p>
+                        </article>
+                        <article class="landing-feature-card">
+                            <i class="fa-solid fa-photo-film"></i>
+                            <h3>Catálogo contextual</h3>
+                            <p>Cada grupo tem seu próprio catálogo, histórico de votos e visualização dedicada por filme.</p>
+                        </article>
+                        <article class="landing-feature-card">
+                            <i class="fa-solid fa-face-grin-stars"></i>
+                            <h3>Votos personalizados</h3>
+                            <p>Crie tipos de voto por grupo, combine com votos globais e deixe a avaliação com a cara da comunidade.</p>
+                        </article>
+                        <article class="landing-feature-card">
+                            <i class="fa-solid fa-trophy"></i>
+                            <h3>Ranking e descoberta</h3>
+                            <p>Veja o que está em alta, acompanhe tendências do grupo e descubra quais filmes ainda faltam avaliar.</p>
+                        </article>
+                        <article class="landing-feature-card">
+                            <i class="fa-solid fa-ticket"></i>
+                            <h3>Convites e entrada controlada</h3>
+                            <p>Use convites diretos ou genéricos, aprove solicitações e controle a política de acesso ao grupo.</p>
+                        </article>
+                        <article class="landing-feature-card">
+                            <i class="fa-solid fa-heart"></i>
+                            <h3>Apoio ao projeto</h3>
+                            <p>Usuários logados podem contribuir com doações para ajudar a manter o CineBaianos crescendo.</p>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="landing-section" id="experiencia">
+                    <div class="landing-section-heading">
+                        <span class="landing-section-kicker">Experiência do produto</span>
+                        <h2>Uma visão rápida de como o sistema organiza grupos, filmes e decisões em um fluxo mais claro.</h2>
+                    </div>
+
+                    <div class="landing-showcase-grid">
+                        <article class="landing-showcase-card is-large">
+                            <div class="landing-showcase-copy">
+                                <span class="landing-showcase-label">Catálogo do grupo</span>
+                                <h3>Descubra o que ainda falta avaliar sem perder o contexto do grupo atual.</h3>
+                                <p>O catálogo prioriza o grupo ativo, mostra o que está pendente, mantém os filtros acessíveis e ajuda o usuário a decidir mais rápido.</p>
+                            </div>
+                            <div class="landing-showcase-mock landing-showcase-mock-catalogo">
+                                <div class="landing-mock-toolbar">
+                                    <span class="landing-mock-chip is-selected"><i class="fa-solid fa-star"></i> Grupo atual</span>
+                                    <span class="landing-mock-chip"><i class="fa-solid fa-filter"></i> Filtros</span>
+                                </div>
+                                <div class="landing-mock-grid-posters">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </div>
+                                <div class="landing-mock-grid-posters is-small">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="landing-showcase-card">
+                            <div class="landing-showcase-copy">
+                                <span class="landing-showcase-label">Gestão</span>
+                                <h3>Convites, solicitações e regras do grupo no mesmo espaço.</h3>
+                                <p>Admins e owner conseguem gerenciar entrada, bans e ownership com clareza.</p>
+                            </div>
+                            <div class="landing-showcase-mock landing-showcase-mock-gestao">
+                                <div class="landing-mock-list-item">
+                                    <strong>Solicitação pendente</strong>
+                                    <span>Aprovar • Rejeitar</span>
+                                </div>
+                                <div class="landing-mock-list-item">
+                                    <strong>Convite genérico</strong>
+                                    <span>Token pronto para compartilhar</span>
+                                </div>
+                                <div class="landing-mock-list-item">
+                                    <strong>Banimento ativo</strong>
+                                    <span>Temporário • Desbanir</span>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="landing-showcase-card">
+                            <div class="landing-showcase-copy">
+                                <span class="landing-showcase-label">Votos e ranking</span>
+                                <h3>Tipos de voto com personalidade para cada comunidade.</h3>
+                                <p>Combine votos globais e locais para criar uma identidade real para o seu grupo.</p>
+                            </div>
+                            <div class="landing-showcase-mock landing-showcase-mock-votos">
+                                <div class="landing-mock-vote-pill"><i class="fa-solid fa-heart"></i> Favorito</div>
+                                <div class="landing-mock-vote-pill"><i class="fa-solid fa-ghost"></i> Bizarro</div>
+                                <div class="landing-mock-vote-pill"><i class="fa-solid fa-fire"></i> Surpreendente</div>
+                                <div class="landing-mock-ranking">
+                                    <strong>Top do grupo</strong>
+                                    <span>#1 Donnie Darko</span>
+                                    <span>#2 A Bruxa</span>
+                                    <span>#3 Hereditário</span>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="landing-section landing-section-highlight" id="destaques">
+                    <div class="landing-section-heading">
+                        <span class="landing-section-kicker">Destaques do produto</span>
+                        <h2>Um fluxo pensado para comunidades que realmente escolhem filmes juntas.</h2>
+                    </div>
+
+                    <div class="landing-highlight-grid">
+                        <article class="landing-highlight-card">
+                            <strong>Você sempre sabe em qual grupo está</strong>
+                            <p>Troque rapidamente de grupo e navegue com segurança no catálogo, nos votos e nas ações certas do contexto atual.</p>
+                        </article>
+                        <article class="landing-highlight-card">
+                            <strong>Decisões com menos bagunça e mais contexto</strong>
+                            <p>Convites, solicitações, permissões e ownership deixam a gestão previsível para admins e muito mais simples para membros.</p>
+                        </article>
+                        <article class="landing-highlight-card">
+                            <strong>Uma base pronta para crescer com a comunidade</strong>
+                            <p>O sistema já foi pensado para evoluir com novas integrações, automações e experiências mais sociais no futuro.</p>
+                        </article>
+                    </div>
+
+                    <div class="landing-quote-card">
+                        <i class="fa-solid fa-quote-left"></i>
+                        <p>
+                            Em vez de decidir filmes em mensagens soltas, o grupo passa a ter um espaço próprio para escolher melhor, votar com personalidade e lembrar o que realmente marcou.
+                        </p>
+                    </div>
+                </section>
+
+                <section class="landing-section" id="faq">
+                    <div class="landing-section-heading">
+                        <span class="landing-section-kicker">FAQ</span>
+                        <h2>Perguntas rápidas para quem está chegando agora.</h2>
+                    </div>
+
+                    <div class="landing-faq-list">
+                        <article class="landing-faq-item">
+                            <button type="button" class="landing-faq-question" aria-expanded="false">
+                                <span>Preciso fazer parte de um grupo para usar o sistema?</span>
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                            <div class="landing-faq-answer">
+                                <p>Sim. O catálogo, os votos e a experiência principal funcionam no contexto de um grupo. Você pode criar um grupo, entrar em um grupo público ou solicitar convite.</p>
+                            </div>
+                        </article>
+
+                        <article class="landing-faq-item">
+                            <button type="button" class="landing-faq-question" aria-expanded="false">
+                                <span>Posso criar conta normalmente sem Discord?</span>
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                            <div class="landing-faq-answer">
+                                <p>Sim. O cadastro funciona por email e senha, com confirmação por código. A integração com Discord pode ser conectada depois.</p>
+                            </div>
+                        </article>
+
+                        <article class="landing-faq-item">
+                            <button type="button" class="landing-faq-question" aria-expanded="false">
+                                <span>Como funcionam os votos?</span>
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                            <div class="landing-faq-answer">
+                                <p>Cada grupo pode usar votos próprios, além de votos globais quando permitido. Isso deixa a avaliação alinhada com o estilo de cada comunidade.</p>
+                            </div>
+                        </article>
+
+                        <article class="landing-faq-item">
+                            <button type="button" class="landing-faq-question" aria-expanded="false">
+                                <span>É possível controlar quem entra no grupo?</span>
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                            <div class="landing-faq-answer">
+                                <p>Sim. O grupo pode ser aberto, por solicitação ou somente por convite, com regras e gestão de membros diretamente pelo owner e admins.</p>
+                            </div>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="landing-section landing-final-cta">
+                    <div class="landing-final-cta-card">
+                        <span class="landing-section-kicker">Comece agora</span>
+                        <h2>Crie seu espaço, convide pessoas e faça o grupo decidir melhor junto.</h2>
+                        <p>Cadastre-se, monte o seu grupo ou entre em um já existente e transforme cada filme em descoberta, conversa e ranking de verdade.</p>
+                        <div class="landing-hero-actions" id="landing-final-actions">
+                            <a href="./cadastro.html" class="landing-btn landing-btn-primary">Criar conta</a>
+                            <a href="./login.html" class="landing-btn landing-btn-secondary">Já tenho conta</a>
+                        </div>
+                    </div>
                 </section>
             </main>
+
             <div id="footer-container"></div>
         </div>
-        <div id="modal-avaliar" class="modal inativo">
-            <div class="modal-content">
-                <h3>Como você avalia este filme?</h3>
-                <span>Escolha uma das opções abaixo</span>
-                <span class="close">&times;</span>
-                <div id="opcoes-voto">
-                    <ul></ul>
-                </div>
-            </div>
-        </div>
 
-        <script type="module" src="./js/include.js"></script>
-        <script type="module" src="./js/pages/index.js"></script>
+        <script type="module" src="./js/pages/landing.js"></script>
     </body>
 </html>

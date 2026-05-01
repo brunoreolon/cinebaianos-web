@@ -1,0 +1,166 @@
+.modal-banimento-content {
+    max-width: 560px;
+}
+
+.banimento-destino {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    border: 1px solid oklch(var(--cor-preto-1-params) / 0.12);
+    border-radius: 18px;
+    padding: 18px;
+    background: linear-gradient(180deg, oklch(var(--cor-preto-1-params) / 0.16), transparent);
+}
+
+.banimento-topo {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.banimento-texto {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.banimento-destino h3,
+.banimento-destino p {
+    margin: 0;
+}
+
+.banimento-usuario-card.inativo {
+    display: none;
+}
+
+.banimento-contexto {
+    align-self: flex-start;
+    border: 1px solid oklch(var(--cor-roxo-2-params) / 0.28);
+    color: var(--cor-roxo-1);
+    background: oklch(var(--cor-roxo-2-params) / 0.12);
+}
+
+.banimento-formulario,
+.banimento-confirmacao {
+    margin-top: 4px;
+}
+
+.banimento-formulario {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.banimento-contador {
+    float: right;
+    color: var(--cor-branco-2);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.banimento-erro {
+    margin: 8px 0 0;
+    color: var(--cor-vermelho-2);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.banimento-erro.inativo {
+    display: none;
+}
+
+.modal-banimento-content .campo input.input-invalido {
+    border-color: var(--cor-vermelho-1);
+    box-shadow: 0 0 0 2px oklch(var(--cor-preto-1-params) / 0.12);
+}
+
+.banimento-confirmacao.inativo {
+    display: none;
+}
+
+.banimento-confirmacao {
+    border: 1px dashed oklch(var(--cor-preto-1-params) / 0.18);
+    border-radius: 16px;
+    padding: 18px;
+    color: var(--cor-branco-2);
+    background: linear-gradient(180deg, oklch(var(--cor-preto-1-params) / 0.08), transparent);
+}
+
+.banimento-confirmacao-texto {
+    margin: 0;
+}
+
+.banimento-ajuda {
+    margin-top: 2px;
+    color: var(--cor-branco-2);
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.banimento-acoes {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 24px;
+}
+
+.btn-confirmar-banimento {
+    min-height: 44px;
+    padding: 0 18px;
+    border: 1px solid oklch(0.63 0.20 29.223 / 0.35);
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    color: var(--cor-branco-1);
+    background: linear-gradient(135deg, oklch(0.58 0.18 28), oklch(0.52 0.2 24));
+    box-shadow: 0 10px 20px oklch(0.58 0.18 28 / 0.18);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.btn-confirmar-banimento:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 14px 24px oklch(0.58 0.18 28 / 0.22);
+    filter: saturate(1.04);
+}
+
+.btn-confirmar-banimento:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.banimento-acoes .btn-cancelar {
+    min-height: 44px;
+    padding: 0 18px;
+    border: 1px solid oklch(var(--cor-preto-1-params) / 0.16);
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    color: var(--cor-branco-1);
+    background: oklch(var(--cor-preto-1-params) / 0.2);
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s, background 0.2s;
+}
+
+.banimento-acoes .btn-cancelar:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 18px oklch(var(--cor-preto-1-params) / 0.16);
+    border-color: oklch(var(--cor-roxo-2-params) / 0.26);
+    background: oklch(var(--cor-roxo-2-params) / 0.12);
+}
+
+.banimento-acoes .btn-cancelar:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 6px oklch(var(--cor-preto-1-params) / 0.15);
+}
+
+.modal-banimento-content.modo-desbanir .banimento-formulario {
+    display: none;
+}
+
+.modal-banimento-content.modo-desbanir .btn-confirmar-banimento {
+    border-color: oklch(var(--cor-roxo-2-params) / 0.28);
+    background: linear-gradient(135deg, var(--cor-roxo-3), var(--cor-roxo-4));
+    box-shadow: 0 10px 20px oklch(var(--cor-roxo-2-params) / 0.16);
+}

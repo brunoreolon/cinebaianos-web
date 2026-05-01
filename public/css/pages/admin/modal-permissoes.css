@@ -9,15 +9,19 @@
     justify-content: flex-start;
     align-items: center;
     gap: 14px;
-    padding: 16px;
-    border: 1px solid var(--cor-cinza-3);
-    border-radius: 10px;
-    background: var(--cor-preto-7);
+    padding: 18px;
+    border: 1px solid oklch(var(--cor-preto-1-params) / 0.12);
+    border-radius: 18px;
+    background: linear-gradient(180deg, oklch(var(--cor-preto-1-params) / 0.16), transparent);
 }
 
 .dados-usuario > img {
     width: 80px;
+    height: 80px;
+    object-fit: cover;
     border-radius: 50px;
+    border: 2px solid oklch(var(--cor-roxo-2-params) / 0.24);
+    box-shadow: 0 8px 16px oklch(var(--cor-preto-1-params) / 0.14);
 }
 
 .usuario-info {
@@ -47,10 +51,10 @@
 
 .conta-ativa, 
 .administrador {
-    padding: 24px;
-    border: 1px solid var(--cor-cinza-3);
-    border-radius: 10px;
-    background:  var(--cor-preto-7);
+    padding: 22px;
+    border: 1px solid oklch(var(--cor-preto-1-params) / 0.12);
+    border-radius: 18px;
+    background: linear-gradient(180deg, oklch(var(--cor-preto-1-params) / 0.16), transparent);
 }
 
 .conta-ativa {
@@ -91,12 +95,23 @@
     color: var(--cor-ouro-1);
 }
 
+.titulo-permissao {
+    font-weight: 700;
+}
+
+.descricao-permissao {
+    color: var(--cor-branco-2);
+    font-size: 13px;
+    margin-top: 2px;
+}
+
 .permissoes > p {
     padding: 18px;
-    border-radius: 10px;
-    margin-top: 20px;
+    border-radius: 16px;
+    margin-top: 8px;
     color: var(--cor-ouro-1);
     background-color: color-mix(in oklab, var(--cor-ouro-1) 10%, transparent);
+    border: 1px solid oklch(0.85 0.12 91.936 / 0.24);
 }
 
 .gerenciamento-acoes {
@@ -116,20 +131,24 @@
 }
 
 .btn-concluir {
-    padding: 10px 20px;
-    border-radius: 10px;
-    border: none; 
+    min-height: 44px;
+    padding: 0 20px;
+    border-radius: 12px;
+    border: 1px solid oklch(var(--cor-roxo-2-params) / 0.28);
     margin-top: 30px;
     font-size: 14px;
-    font-weight: 600;
-    transition: background 0.3s;
+    font-weight: 700;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease, background 0.2s ease;
     color: var(--cor-branco-1);
-    background: var(--cor-roxo-3);
+    background: linear-gradient(135deg, var(--cor-roxo-3), var(--cor-roxo-4));
+    box-shadow: 0 10px 20px oklch(var(--cor-roxo-2-params) / 0.16);
     cursor: pointer;
 }
 
 .btn-concluir:hover {
-    background: var(--cor-roxo-4);
+    background: linear-gradient(135deg, var(--cor-roxo-3), var(--cor-roxo-4));
+    box-shadow: 0 14px 24px oklch(var(--cor-roxo-2-params) / 0.2);
+    filter: saturate(1.06);
 }
 
 .toggle {
@@ -146,7 +165,7 @@
   display: block;
   width: 100%;
   height: 100%;
-  background-color: var(--cor-cinza-1);
+   background-color: oklch(var(--cor-preto-1-params) / 0.28);
   border-radius: 10px;
   position: relative;
   cursor: pointer;

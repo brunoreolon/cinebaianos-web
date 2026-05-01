@@ -8,25 +8,37 @@ export function abrirModalRedefinirSenha(dados) {
     modal.classList.remove("inativo");
     modal.classList.add("ativo");
 
-    modal.dataset.discordId = dados.discordId;
+    modal.dataset.userId = dados.userId;
 
      // Seleciona os elementos do modal para exibir nome e email
     const nomeEl = modal.querySelector(".nome-usuario");  // crie essa classe no span do modal
     const emailEl = modal.querySelector(".email-usuario"); // crie essa classe no span do modal
+    const avatarEl = modal.querySelector('.redefinicao-avatar-usuario');
+    const nomeCardEl = modal.querySelector('.redefinicao-nome-usuario');
+    const emailCardEl = modal.querySelector('.redefinicao-email-usuario');
     const senha = modal.querySelector("#senha");
     const btnRedefinir = modal.querySelector(".btn-redefinir-senha");
 
     // Preenche as informações
     nomeEl.textContent = dados.nome;
     emailEl.textContent = dados.email;
-    
+    if (avatarEl) {
+        avatarEl.src = dados.avatar || './assets/img/placeholder-avatar.png';
+        avatarEl.alt = `Avatar de ${dados?.nome || 'usuário'}`;
+        avatarEl.addEventListener('error', () => {
+            avatarEl.src = './assets/img/placeholder-avatar.png';
+        }, { once: true });
+    }
+    if (nomeCardEl) nomeCardEl.textContent = dados.nome;
+    if (emailCardEl) emailCardEl.textContent = dados.email || 'Sem email cadastrado';
+
     btnRedefinir.onclick = async () => {
         if (senha.value.length < 6) {
             alert("A senha deve ter no mínimo 6 caracteres");
             return;
         }
         try {
-            const novaSenha = await adminService.redefinirSenha(modal.dataset.discordId, senha.value);
+            await adminService.redefinirSenha(modal.dataset.userId, senha.value);
             fecharModal(modal);
             criarMensagem(`Senha redefinida com sucesso para o usuário ${dados.nome}. Um email será enviado para o usuário contendo a nova senha`, MensagemTipo.SUCCESS);
         } catch(err) {

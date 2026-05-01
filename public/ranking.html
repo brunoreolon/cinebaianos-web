@@ -19,7 +19,7 @@
 
         <div id="loader">
             <div class="spinner">
-                <p>Carregando página...</p>
+                <p>Carregando ranking...</p>
             </div>
         </div>
 
@@ -40,11 +40,17 @@
                 </div>
 
                 <div class="filtro-ordem">
-                    <span class="fonte-secundaria">Ordenar por:</span>
-                    <div class="filtros">
+                    <div class="filtro-bloco">
+                        <span class="fonte-secundaria">Grupo:</span>
+                        <select id="filtro-grupo" class="filtro-grupo-select" aria-label="Selecionar grupo"></select>
+                    </div>
+                    <div class="filtro-bloco">
+                        <span class="fonte-secundaria">Tipo de voto:</span>
+                        <div class="filtros" id="filtro-votos"></div>
                     </div>
                 </div>
 
+                <div id="resumo-vencedores"></div>
                 <div class="cards"></div>
             </main>
 
