@@ -243,6 +243,23 @@
     display: none;
 }
 
+.grupo-ranking-wrap {
+    display: grid;
+    gap: 16px;
+}
+
+.grupo-ranking-header {
+    margin-bottom: 0;
+}
+
+.grupo-ranking-filtro {
+    margin-bottom: 0;
+}
+
+#grupo-ranking-cards .card-ranking {
+    background: oklch(var(--cor-preto-1-params) / 0.1);
+}
+
 .membros-grid,
 .filmes-grupo-grid {
     display: grid;
@@ -1161,7 +1178,7 @@
 
     .grupo-tabs {
         display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-template-columns: repeat(5, minmax(0, 1fr));
         width: 100%;
         box-sizing: border-box;
         border-radius: 18px;

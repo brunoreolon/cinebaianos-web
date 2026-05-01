@@ -10,6 +10,7 @@
         <link rel="stylesheet" href="./css/components/footer.css" type="text/css">
         <link rel="stylesheet" href="./css/components/group-preview-card.css" type="text/css">
         <link rel="stylesheet" href="./css/components/movie-filters.css" type="text/css">
+        <link rel="stylesheet" href="./css/pages/ranking.css" type="text/css">
         <link rel="stylesheet" href="./css/pages/detalhes-grupo.css" type="text/css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 
@@ -59,6 +60,10 @@
                     <button class="grupo-tab" data-tab="votos">
                         <i class="fa-solid fa-star-half-stroke"></i>
                         Votos
+                    </button>
+                    <button class="grupo-tab" data-tab="ranking">
+                        <i class="fa-solid fa-trophy"></i>
+                        Ranking
                     </button>
                     <button class="grupo-tab" data-tab="gestao" id="tab-gestao-btn">
                         <i class="fa-solid fa-user-gear"></i>
@@ -183,6 +188,29 @@
                             </header>
                             <div id="votos-globais-lista" class="gestao-list"></div>
                         </article>
+                    </section>
+                </div>
+
+                <!-- Aba: Ranking -->
+                <div id="tab-ranking" class="tab-content">
+                    <section class="grupo-ranking-wrap">
+                        <div class="cabecalho grupo-ranking-header">
+                            <div class="titulo">
+                                <i class="fa-solid fa-trophy fa-2x"></i>
+                                <h2>Ranking de Votos Recebidos</h2>
+                            </div>
+                            <p class="fonte-secundaria">Classificação dos membros com base nos votos recebidos neste grupo.</p>
+                        </div>
+
+                        <div class="filtro-ordem grupo-ranking-filtro">
+                            <div class="filtro-bloco">
+                                <span class="fonte-secundaria">Tipo de voto:</span>
+                                <div class="filtros" id="grupo-ranking-filtros-voto"></div>
+                            </div>
+                        </div>
+
+                        <div id="grupo-ranking-resumo"></div>
+                        <div id="grupo-ranking-cards" class="cards"></div>
                     </section>
                 </div>
 

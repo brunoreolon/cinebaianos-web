@@ -28,11 +28,33 @@
     display: flex;
     flex-wrap: wrap;
     gap: 14px;
-    align-items: center;
+    align-items: flex-start;
     padding: 24px;
     margin-bottom: 28px;
     border: 1px solid var(--cor-cinza-3);
     border-radius: 10px;
+}
+
+.filtro-bloco {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.filtro-grupo-select {
+    min-height: 38px;
+    min-width: 240px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--cor-cinza-3);
+    background: var(--cor-preto-7);
+    color: var(--cor-branco-1);
+}
+
+.filtro-grupo-select:focus {
+    outline: none;
+    border-color: var(--cor-roxo-1);
+    box-shadow: 0 0 0 3px oklch(var(--cor-roxo-2-params) / 0.14);
 }
 
 .filtros {
@@ -106,9 +128,21 @@
     text-align: center;
 }
 
+.posicao > span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 34px;
+    line-height: 1;
+}
+
 .sem-medalha {
     font-size: 22px;
     color: var(--cor-branco-2);
+}
+
+.sem-medalha > span {
+    font-size: 22px;
 }
 
 .primeiro { color: var(--cor-ouro-1); }

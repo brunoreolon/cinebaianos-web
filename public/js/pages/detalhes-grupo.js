@@ -74,6 +74,10 @@ const state = {
     pendingRequests: [],
     pendingInvites: [],
     bans: [],
+    rankingVoteTypes: [],
+    rankingSummaryStats: [],
+    rankingStats: [],
+    rankingSelectedVoteTypeId: null,
     memberTarget: null,
     voteTypeTarget: null,
     currentGroup: null,
@@ -1371,6 +1375,241 @@ function renderVotesTab() {
     }
 }
 
+function getGroupRankingVoteTotal(stats, voteTypeId) {
+    return Number(stats?.votes?.find(v => Number(v?.type?.id) === Number(voteTypeId))?.totalVotes || 0);
+}
+
+function getRoleLabelForRanking(userId) {
+    const role = state.members.find(member => Number(member?.member?.id) === Number(userId))?.role || 'MEMBER';
+    if (role === 'OWNER') return 'Dono';
+    if (role === 'ADMIN') return 'Admin';
+    return 'Membro';
+}
+
+function sortGroupRanking(stats, voteTypeId) {
+    return [...stats].sort((a, b) => {
+        const diff = getGroupRankingVoteTotal(b, voteTypeId) - getGroupRankingVoteTotal(a, voteTypeId);
+        if (diff !== 0) return diff;
+        return (a?.user?.name || '').localeCompare(b?.user?.name || '', 'pt-BR', { sensitivity: 'base' });
+    });
+}
+
+function createGroupRankingPosition(position) {
+    const container = document.createElement('div');
+    container.className = 'posicao ranking-position';
+
+    const content = document.createElement('span');
+    if (position === 1) {
+        container.classList.add('primeiro');
+        content.textContent = '🥇';
+    } else if (position === 2) {
+        container.classList.add('segundo');
+        content.textContent = '🥈';
+    } else if (position === 3) {
+        container.classList.add('terceiro');
+        content.textContent = '🥉';
+    } else {
+        container.classList.add('sem-medalha');
+        content.textContent = `#${position}`;
+    }
+
+    container.appendChild(content);
+    return container;
+}
+
+function renderRankingResumoRecebidos() {
+    const container = document.getElementById('grupo-ranking-resumo');
+    if (!container) return;
+
+    container.innerHTML = '';
+    if (!state.rankingVoteTypes.length) return;
+
+    const resumo = document.createElement('div');
+    resumo.className = 'resumo-vencedores';
+
+    state.rankingVoteTypes.forEach(voteType => {
+        const ordenados = sortGroupRanking(state.rankingSummaryStats, voteType.id);
+        const vencedor = ordenados[0];
+        const total = vencedor ? getGroupRankingVoteTotal(vencedor, voteType.id) : 0;
+
+        const item = document.createElement('div');
+        item.className = 'resumo-item';
+
+        const emoji = document.createElement('i');
+        emoji.textContent = voteType.emoji || '⭐';
+
+        const texto = document.createElement('span');
+        texto.textContent = total > 0 && vencedor
+            ? `${vencedor?.user?.name || 'Usuário'} (${total} votos)`
+            : 'Sem votos ainda';
+
+        item.append(emoji, texto);
+        resumo.appendChild(item);
+    });
+
+    container.appendChild(resumo);
+}
+
+function renderRankingCardsRecebidos() {
+    const container = document.getElementById('grupo-ranking-cards');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    const voteType = state.rankingVoteTypes.find(v => Number(v.id) === Number(state.rankingSelectedVoteTypeId));
+    if (!voteType) {
+        container.innerHTML = '<p class="fonte-secundaria">Nenhum tipo de voto disponível para este grupo.</p>';
+        return;
+    }
+
+    const sorted = sortGroupRanking(state.rankingStats, voteType.id);
+    const hasAnyVotes = sorted.some(item => getGroupRankingVoteTotal(item, voteType.id) > 0);
+    if (!hasAnyVotes) {
+        container.innerHTML = '<p class="fonte-secundaria">Ainda não há votos recebidos para este filtro.</p>';
+        return;
+    }
+
+    const maxVisible = 10;
+    const visible = sorted.slice(0, maxVisible);
+    const loggedIndex = sorted.findIndex(item => Number(item?.user?.id) === Number(state.usuario?.id));
+    if (loggedIndex >= maxVisible) {
+        visible.push(sorted[loggedIndex]);
+    }
+
+    visible.forEach(item => {
+        const rankPosition = sorted.findIndex(row => Number(row?.user?.id) === Number(item?.user?.id)) + 1;
+        const isCurrentUserCard = Number(item?.user?.id) === Number(state.usuario?.id);
+        const totalVotes = getGroupRankingVoteTotal(item, voteType.id);
+
+        const card = document.createElement('article');
+        card.className = `card-ranking${isCurrentUserCard ? ' voce' : ''}`;
+
+        const parte1 = document.createElement('div');
+        parte1.className = 'parte-1';
+
+        const avatarWrap = document.createElement('div');
+        avatarWrap.className = 'usuario-avatar ranking-avatar';
+        const avatar = document.createElement('img');
+        avatar.src = item?.user?.avatar || './assets/img/placeholder-avatar.png';
+        avatar.alt = `Avatar de ${item?.user?.name || 'usuário'}`;
+        avatar.addEventListener('error', () => {
+            avatar.src = './assets/img/placeholder-avatar.png';
+        }, { once: true });
+        avatarWrap.appendChild(avatar);
+
+        const infoUsuario = document.createElement('div');
+        infoUsuario.className = 'usuario-info ranking-info';
+        const linhaUsuario = document.createElement('div');
+        linhaUsuario.className = 'usuario';
+        const nome = document.createElement('h3');
+        nome.textContent = item?.user?.name || 'Usuário';
+        linhaUsuario.appendChild(nome);
+        if (isCurrentUserCard) {
+            const badge = document.createElement('span');
+            badge.className = 'badge-voce';
+            badge.textContent = 'Você';
+            linhaUsuario.appendChild(badge);
+        }
+        const cargo = document.createElement('p');
+        cargo.textContent = `Cargo no grupo: ${getRoleLabelForRanking(item?.user?.id)}`;
+        infoUsuario.append(linhaUsuario, cargo);
+
+        const infoTotal = document.createElement('div');
+        infoTotal.className = 'info';
+        const valor = document.createElement('div');
+        valor.textContent = String(totalVotes);
+        const descricao = document.createElement('p');
+        descricao.className = 'fonte-secundaria';
+        descricao.textContent = voteType.description || voteType.name || 'Votos';
+        infoTotal.append(valor, descricao);
+
+        parte1.append(createGroupRankingPosition(rankPosition), avatarWrap, infoUsuario, infoTotal);
+
+        const separator = document.createElement('div');
+        separator.className = 'separador';
+
+        const votosGrid = document.createElement('div');
+        votosGrid.className = 'votos';
+        state.rankingVoteTypes.forEach(type => {
+            const voto = document.createElement('div');
+            voto.className = 'voto';
+
+            const votoInfo = document.createElement('div');
+            votoInfo.className = 'voto-info';
+            const emoji = document.createElement('i');
+            emoji.textContent = type.emoji || '⭐';
+            const total = document.createElement('p');
+            total.textContent = String(getGroupRankingVoteTotal(item, type.id));
+            votoInfo.append(emoji, total);
+
+            const label = document.createElement('p');
+            label.textContent = type.description || type.name || 'Voto';
+            voto.append(votoInfo, label);
+
+            votosGrid.appendChild(voto);
+        });
+
+        card.append(parte1, separator, votosGrid);
+        container.appendChild(card);
+    });
+}
+
+async function carregarRankingRecebidosSelecionado() {
+    if (!state.rankingSelectedVoteTypeId) {
+        state.rankingStats = [];
+        renderRankingCardsRecebidos();
+        return;
+    }
+
+    try {
+        state.rankingStats = await votoService.buscarRankingVotosRecebidosGrupo(
+            state.groupId,
+            state.rankingSelectedVoteTypeId
+        );
+    } catch (err) {
+        state.rankingStats = [];
+        handleUiError(err, 'Não foi possível atualizar o ranking de votos recebidos.');
+    }
+
+    renderRankingCardsRecebidos();
+}
+
+function renderRankingRecebidos() {
+    const filtrosContainer = document.getElementById('grupo-ranking-filtros-voto');
+    if (!filtrosContainer) return;
+
+    filtrosContainer.innerHTML = '';
+
+    state.rankingVoteTypes.forEach(voteType => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = `filtro${Number(voteType.id) === Number(state.rankingSelectedVoteTypeId) ? ' ativo' : ''}`;
+        button.style.backgroundColor = voteType.color || '#9810FA';
+
+        const emoji = document.createElement('i');
+        emoji.textContent = voteType.emoji || '⭐';
+        const texto = document.createElement('span');
+        texto.textContent = voteType.description || voteType.name || 'Voto';
+        button.append(emoji, texto);
+
+        button.addEventListener('click', async () => {
+            if (Number(state.rankingSelectedVoteTypeId) === Number(voteType.id)) return;
+            state.rankingSelectedVoteTypeId = Number(voteType.id);
+            renderRankingRecebidos();
+            await carregarRankingRecebidosSelecionado();
+        });
+
+        filtrosContainer.appendChild(button);
+    });
+
+    renderRankingResumoRecebidos();
+    renderRankingCardsRecebidos();
+}
+
+function configurarRankingRecebidosTab() {
+    renderRankingRecebidos();
+}
+
 function buildMemberActions(member) {
     const actions = document.createElement('div');
     actions.className = 'membro-card-actions';
@@ -2316,10 +2555,16 @@ async function carregarDados() {
     state.bans = [];
     state.groupVotes = [];
     state.globalVotes = [];
+    state.rankingVoteTypes = [];
+    state.rankingSummaryStats = [];
+    state.rankingStats = [];
+    state.rankingSelectedVoteTypeId = null;
 
-    const [groupVotesResult, globalVotesResult] = await Promise.allSettled([
+    const [groupVotesResult, globalVotesResult, rankingVoteTypesResult, rankingSummaryResult] = await Promise.allSettled([
         votoService.buscarTiposVotosDoGrupo(state.groupId),
-        votoService.buscarTiposVotosGlobaisNoGrupo(state.groupId)
+        votoService.buscarTiposVotosGlobaisNoGrupo(state.groupId),
+        votoService.buscarTiposVotosDisponiveis(state.groupId),
+        votoService.buscarRankingVotosRecebidosGrupo(state.groupId)
     ]);
 
     if (groupVotesResult.status === 'fulfilled') {
@@ -2328,6 +2573,25 @@ async function carregarDados() {
 
     if (globalVotesResult.status === 'fulfilled') {
         state.globalVotes = globalVotesResult.value || [];
+    }
+
+    if (rankingVoteTypesResult.status === 'fulfilled') {
+        state.rankingVoteTypes = rankingVoteTypesResult.value || [];
+        state.rankingSelectedVoteTypeId = Number(state.rankingVoteTypes[0]?.id || null);
+    }
+
+    if (rankingSummaryResult.status === 'fulfilled') {
+        state.rankingSummaryStats = rankingSummaryResult.value || [];
+    }
+
+    if (state.rankingSelectedVoteTypeId) {
+        const rankingFilteredResult = await Promise.allSettled([
+            votoService.buscarRankingVotosRecebidosGrupo(state.groupId, state.rankingSelectedVoteTypeId)
+        ]);
+
+        if (rankingFilteredResult[0].status === 'fulfilled') {
+            state.rankingStats = rankingFilteredResult[0].value || [];
+        }
     }
 
     if (state.permissions?.canManage) {
@@ -2360,6 +2624,7 @@ async function carregarPagina() {
     renderMembers();
     renderMovies();
     renderVotesTab();
+    renderRankingRecebidos();
     renderGestao();
 }
 
@@ -2402,6 +2667,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         configurarSubabasGestao();
         configurarModais();
         configurarModalVotoGrupoInteractions();
+        configurarRankingRecebidosTab();
         configurarGestaoHandlers();
         ativarSubabaGestao(state.gestaoSubtab || 'convites');
     } catch (err) {

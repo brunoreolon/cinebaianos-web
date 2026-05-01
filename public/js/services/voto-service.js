@@ -267,6 +267,19 @@ export class VotoService {
         });
         return true;
     }
+
+    /**
+     * Busca o ranking de votos recebidos por membros do grupo.
+     * @param {number} groupId - ID do grupo
+     * @param {number|null} voteTypeId - ID do tipo de voto (opcional)
+     * @returns {Promise<Array>} - Lista de UserVoteStatsResponse
+     */
+    async buscarRankingVotosRecebidosGrupo(groupId, voteTypeId = null) {
+        let url = new URL(`/api/groups/${groupId}/votes/received`, window.location.origin);
+        if (voteTypeId) url.searchParams.set('vote', voteTypeId);
+        const response = await authService.apiFetch(url);
+        return await response.json();
+    }
 }
 
 export const votoService = new VotoService();

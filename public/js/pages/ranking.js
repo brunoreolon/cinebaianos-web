@@ -1,194 +1,308 @@
 import { authService } from '../services/auth-service.js';
 import { votoService } from '../services/voto-service.js';
-import { usuarioService } from '../services/usuario-service.js';
-import { criarElemento } from '../global.js';
+import { groupService } from '../services/group-service.js';
+import { getCurrentGroup, loadCurrentGroup } from '../services/group-context.js';
 import { ApiError } from '../exception/api-error.js';
 import { criarMensagem } from '../components/mensagens.js';
 import { MensagemTipo } from '../components/mensagem-tipo.js';
 
-async function criarFiltroVotos(votos, usuarioLogado) {
-    const divFiltro = document.querySelector('.filtro-ordem .filtros');
-    
-    votos.forEach((v, index) => {
-        const classes = ['filtro'];
-        if (index === 0) classes.push('ativo');
+const MAX_VISIBLE_ITEMS = 10;
 
-        const botaoVoto = criarElemento('button', classes, '');
-        
-        const icone = criarElemento('i', [], v.emoji);
-        const texto = criarElemento('span', [], v.description);
-        botaoVoto.append(icone, texto);
+const ROLE_LABELS = {
+    OWNER: 'Dono',
+    ADMIN: 'Admin',
+    MEMBER: 'Membro'
+};
 
-        botaoVoto.style.backgroundColor = v.color;
-        botaoVoto.dataset.color = v.color; 
+const state = {
+    usuarioLogado: null,
+    grupos: [],
+    groupId: null,
+    voteTypes: [],
+    selectedVoteTypeId: null,
+    summaryStats: [],
+    rankingStats: [],
+    roleByUserId: new Map(),
+    requestToken: 0
+};
 
-        const containerMain = document.querySelector('.cards');
+function getVoteTotal(stats, voteTypeId) {
+    return Number(stats?.votes?.find(v => Number(v?.type?.id) === Number(voteTypeId))?.totalVotes || 0);
+}
 
-        botaoVoto.addEventListener('click', () => {
-            document.querySelectorAll('.filtro-ordem .filtro').forEach(btn => btn.classList.remove('ativo'));
-            botaoVoto.classList.add('ativo');
-
-            containerMain.innerHTML = '';
-            criarCardRanking(v, usuarioLogado);
-        });
-
-        botaoVoto.addEventListener('mouseenter', () => {
-            botaoVoto.style.filter = 'brightness(85%)'; 
-        });
-
-        botaoVoto.addEventListener('mouseleave', () => {
-            botaoVoto.style.filter = 'brightness(100%)';
-        });
-
-        divFiltro.appendChild(botaoVoto);
+function sortRanking(stats, voteTypeId) {
+    return [...stats].sort((a, b) => {
+        const diff = getVoteTotal(b, voteTypeId) - getVoteTotal(a, voteTypeId);
+        if (diff !== 0) return diff;
+        return (a?.user?.name || '').localeCompare(b?.user?.name || '', 'pt-BR', { sensitivity: 'base' });
     });
 }
 
-function ordenarUsuariosPorVoto(usuariosStats, votoSelecionado) {
-    return [...usuariosStats].sort((a, b) => {
-        const votosA = a.votes.find(v => v.type.id === votoSelecionado.id)?.totalVotes ?? 0;
-        const votosB = b.votes.find(v => v.type.id === votoSelecionado.id)?.totalVotes ?? 0;
+function createPositionElement(position) {
+    const container = document.createElement('div');
+    container.className = 'posicao ranking-position';
 
-        return votosB - votosA || a.user.name.localeCompare(b.user.name);
-    });
-}
-
-async function criarCardRanking(votoSelecionado, usuarioLogado) {
-    const usuariosStatsVotosRecebidos = await votoService.buscarStatisticasVotosRecebidosUsuarios();
-
-    const usuariosOrdenados = ordenarUsuariosPorVoto(
-        usuariosStatsVotosRecebidos,
-        votoSelecionado
-    );
-
-    const containerMain = document.querySelector('.cards');
-
-    for (const [index, usuarioStatsVotos] of usuariosOrdenados.entries()) {
-
-        const posicaoRanking = index + 1;
-
-        const usuario = usuarioStatsVotos.user;
-        const usuarioVotos = usuarioStatsVotos.votes;
-
-        const usuarioStats = await usuarioService.buscarStatisticasUsuario(usuario.discordId);
-
-        const classesContainerCardRanking = ['card-ranking'];
-        const voce = usuario.discordId === usuarioLogado.discordId;
-
-        if (voce) {
-            classesContainerCardRanking.push('voce');
-        }
-
-        const containerCardRanking = criarElemento('div', classesContainerCardRanking);
-
-        const parte1 = criarElemento('div', ['parte-1']);
-
-        const posicao = criarPosicaoRanking(posicaoRanking);
-
-        const containerAvatar = criarElemento('div', ['usuario-avatar']);
-        const avatar = criarElemento('img');
-        avatar.src = usuario.avatar;
-        avatar.alt = 'Avatar';
-        containerAvatar.appendChild(avatar);
-
-        const containerUsuarioInfo = criarElemento('div', ['usuario-info']);
-        const containerUsuario = criarElemento('div', ['usuario']);
-        const nomeUsuario = criarElemento('h3', [], usuario.name);
-        if (voce) {
-            const badgeVoce = criarElemento('span', ['badge-voce'], 'Você');
-            containerUsuario.append(nomeUsuario, badgeVoce);
-        } else {
-            containerUsuario.appendChild(nomeUsuario);
-        }
-
-        const totalFilmesAdicionado = criarElemento('p', [], usuarioStats.userStats.totalMoviesAdded + ' filmes adicionados');
-        containerUsuarioInfo.append(containerUsuario, totalFilmesAdicionado);
-        
-        const containerInfo = criarElemento('div', ['info']);
-
-        // VALOR DINAMICO POR FILTRO SELECIONADO
-        const vv = usuarioVotos.find(v => v.type.id === votoSelecionado.id);
-        const valor = criarElemento('div', [], vv.totalVotes.toString());
-        const descricao = criarElemento('p', ['fonte-secundaria'], vv.type.description);
-        //
-        containerInfo.append(valor, descricao);
-
-        parte1.append(posicao, containerAvatar, containerUsuarioInfo, containerInfo);
-
-        const separator = criarElemento('div', ['separador']);
-
-        const contaienerVotos = criarElemento('div', ['votos']);
-        usuarioVotos.forEach(v => {
-            const contaienerVoto = criarElemento('div', ['voto']);
-
-            const contaienerVotoInfo = criarElemento('div', ['voto-info']);
-            const iconeVoto = criarElemento('i', [], v.type.emoji);
-            const totalVotos = criarElemento('p', [], v.totalVotes.toString());
-            contaienerVotoInfo.append(iconeVoto, totalVotos);
-
-            const descricaoVoto = criarElemento('p', [], v.type.description);
-            contaienerVoto.append(contaienerVotoInfo, descricaoVoto);
-            
-            contaienerVotos.appendChild(contaienerVoto);
-        });
-
-        containerCardRanking.append(parte1, separator, contaienerVotos);
-        containerMain.appendChild(containerCardRanking);
-    };
-}
-
-function criarPosicaoRanking(posicaoRanking) {
-    let classes = ['posicao'];
-    let elemento;
-
-    if (posicaoRanking === 1) {
-        classes.push('primeiro');
-        elemento = criarElemento('i', ['fa-solid', 'fa-trophy', 'fa-2x']);
-    }
-    else if (posicaoRanking === 2) {
-        classes.push('segundo');
-        elemento = criarElemento('i', ['fa-solid', 'fa-medal', 'fa-2x']);
-    }
-    else if (posicaoRanking === 3) {
-        classes.push('terceiro');
-        elemento = criarElemento('i', ['fa-solid', 'fa-medal', 'fa-2x']);
-    }
-    else {
-        classes.push('sem-medalha');
-        elemento = criarElemento('span', [], `#${posicaoRanking}`);
+    const content = document.createElement('span');
+    if (position === 1) {
+        container.classList.add('primeiro');
+        content.textContent = '🥇';
+    } else if (position === 2) {
+        container.classList.add('segundo');
+        content.textContent = '🥈';
+    } else if (position === 3) {
+        container.classList.add('terceiro');
+        content.textContent = '🥉';
+    } else {
+        container.classList.add('sem-medalha');
+        content.textContent = `#${position}`;
     }
 
-    const container = criarElemento('div', classes);
-    container.appendChild(elemento);
-
+    container.appendChild(content);
     return container;
 }
 
-async function criarResumoVencedores() {
-    const containerMain = document.querySelector('.cards');
+function renderRankingCards() {
+    const cards = document.querySelector('.cards');
+    if (!cards) return;
 
-    const resumoAntigo = document.querySelector('.resumo-vencedores');
-    if (resumoAntigo) resumoAntigo.remove();
+    cards.innerHTML = '';
 
-    const votos = await votoService.buscarTiposVotos();
-    const usuariosStatsVotosRecebidos = await votoService.buscarStatisticasVotosRecebidosUsuarios();
+    const selectedVoteType = state.voteTypes.find(v => Number(v.id) === Number(state.selectedVoteTypeId));
+    if (!selectedVoteType) {
+        cards.innerHTML = '<p class="fonte-secundaria">Nenhum tipo de voto disponível para este grupo.</p>';
+        return;
+    }
 
-    const resumoContainer = criarElemento('div', ['resumo-vencedores']);
+    const sorted = sortRanking(state.rankingStats, selectedVoteType.id);
+    const hasAnyVotes = sorted.some(item => getVoteTotal(item, selectedVoteType.id) > 0);
 
-    votos.forEach(voto => {
-        const usuariosOrdenados = ordenarUsuariosPorVoto(usuariosStatsVotosRecebidos, voto);
-        const vencedor = usuariosOrdenados[0];
-        const totalVotos = vencedor.votes.find(v => v.type.id === voto.id)?.totalVotes ?? 0;
+    if (!hasAnyVotes) {
+        cards.innerHTML = '<p class="fonte-secundaria">Ainda não há votos recebidos para este filtro.</p>';
+        return;
+    }
 
-        const itemResumo = criarElemento('div', ['resumo-item']);
-        const emoji = criarElemento('i', [], voto.emoji);
-        const texto = criarElemento('span', [], `${vencedor.user.name} (${totalVotos} votos)`);
+    const visible = sorted.slice(0, MAX_VISIBLE_ITEMS);
+    const loggedIndex = sorted.findIndex(item => Number(item?.user?.id) === Number(state.usuarioLogado?.id));
+    const shouldAppendLogged = loggedIndex >= MAX_VISIBLE_ITEMS;
 
-        itemResumo.append(emoji, texto);
-        resumoContainer.appendChild(itemResumo);
+    if (shouldAppendLogged) {
+        visible.push(sorted[loggedIndex]);
+    }
+
+    visible.forEach(item => {
+        const rankPosition = sorted.findIndex(row => Number(row?.user?.id) === Number(item?.user?.id)) + 1;
+        const isCurrentUser = Number(item?.user?.id) === Number(state.usuarioLogado?.id);
+        const totalVotes = getVoteTotal(item, selectedVoteType.id);
+
+        const card = document.createElement('article');
+        card.className = `card-ranking${isCurrentUser ? ' voce' : ''}`;
+
+        const header = document.createElement('div');
+        header.className = 'parte-1';
+
+        const avatarWrap = document.createElement('div');
+        avatarWrap.className = 'usuario-avatar ranking-avatar';
+        const avatar = document.createElement('img');
+        avatar.src = item?.user?.avatar || './assets/img/placeholder-avatar.png';
+        avatar.alt = `Avatar de ${item?.user?.name || 'usuário'}`;
+        avatar.addEventListener('error', () => {
+            avatar.src = './assets/img/placeholder-avatar.png';
+        }, { once: true });
+        avatarWrap.appendChild(avatar);
+
+        const userInfo = document.createElement('div');
+        userInfo.className = 'usuario-info ranking-info';
+        const userNameLine = document.createElement('div');
+        userNameLine.className = 'usuario';
+        const userName = document.createElement('h3');
+        userName.textContent = item?.user?.name || 'Usuário';
+        userNameLine.appendChild(userName);
+        if (isCurrentUser) {
+            const badge = document.createElement('span');
+            badge.className = 'badge-voce';
+            badge.textContent = 'Você';
+            userNameLine.appendChild(badge);
+        }
+
+        const role = state.roleByUserId.get(Number(item?.user?.id)) || 'MEMBER';
+        const subtitle = document.createElement('p');
+        subtitle.textContent = `Cargo no grupo: ${ROLE_LABELS[role] || 'Membro'}`;
+        userInfo.append(userNameLine, subtitle);
+
+        const totalInfo = document.createElement('div');
+        totalInfo.className = 'info';
+        const value = document.createElement('div');
+        value.textContent = String(totalVotes);
+        const description = document.createElement('p');
+        description.className = 'fonte-secundaria';
+        description.textContent = selectedVoteType.description || selectedVoteType.name || 'Votos';
+        totalInfo.append(value, description);
+
+        header.append(createPositionElement(rankPosition), avatarWrap, userInfo, totalInfo);
+
+        const separator = document.createElement('div');
+        separator.className = 'separador';
+
+        const votesGrid = document.createElement('div');
+        votesGrid.className = 'votos';
+        state.voteTypes.forEach(voteType => {
+            const voteItem = document.createElement('div');
+            voteItem.className = 'voto';
+
+            const voteInfo = document.createElement('div');
+            voteInfo.className = 'voto-info';
+            const emoji = document.createElement('i');
+            emoji.textContent = voteType.emoji || '⭐';
+            const amount = document.createElement('p');
+            amount.textContent = String(getVoteTotal(item, voteType.id));
+            voteInfo.append(emoji, amount);
+
+            const voteLabel = document.createElement('p');
+            voteLabel.textContent = voteType.description || voteType.name || 'Voto';
+            voteItem.append(voteInfo, voteLabel);
+            votesGrid.appendChild(voteItem);
+        });
+
+        card.append(header, separator, votesGrid);
+        cards.appendChild(card);
+    });
+}
+
+function renderSummary() {
+    const container = document.getElementById('resumo-vencedores');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    if (!state.voteTypes.length) return;
+
+    const summary = document.createElement('div');
+    summary.className = 'resumo-vencedores';
+
+    state.voteTypes.forEach(voteType => {
+        const sorted = sortRanking(state.summaryStats, voteType.id);
+        const winner = sorted[0];
+        const total = winner ? getVoteTotal(winner, voteType.id) : 0;
+
+        const item = document.createElement('div');
+        item.className = 'resumo-item';
+
+        const emoji = document.createElement('i');
+        emoji.textContent = voteType.emoji || '⭐';
+
+        const text = document.createElement('span');
+        text.textContent = total > 0 && winner
+            ? `${winner?.user?.name || 'Usuário'} (${total} votos)`
+            : 'Sem votos ainda';
+
+        item.append(emoji, text);
+        summary.appendChild(item);
     });
 
-    containerMain.prepend(resumoContainer);
+    container.appendChild(summary);
+}
+
+function renderVoteTypeFilter() {
+    const container = document.getElementById('filtro-votos');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    state.voteTypes.forEach(voteType => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = `filtro${Number(voteType.id) === Number(state.selectedVoteTypeId) ? ' ativo' : ''}`;
+        button.style.backgroundColor = voteType.color || '#9810FA';
+
+        const emoji = document.createElement('i');
+        emoji.textContent = voteType.emoji || '⭐';
+        const text = document.createElement('span');
+        text.textContent = voteType.description || voteType.name || 'Voto';
+        button.append(emoji, text);
+
+        button.addEventListener('click', async () => {
+            if (Number(state.selectedVoteTypeId) === Number(voteType.id)) return;
+            state.selectedVoteTypeId = Number(voteType.id);
+            renderVoteTypeFilter();
+            await loadRankingBySelectedVote();
+        });
+
+        container.appendChild(button);
+    });
+}
+
+function renderGroupFilter() {
+    const select = document.getElementById('filtro-grupo');
+    if (!select) return;
+
+    select.innerHTML = '';
+
+    state.grupos.forEach(group => {
+        const option = document.createElement('option');
+        option.value = String(group.id);
+        option.textContent = group.name || `Grupo #${group.id}`;
+        option.selected = Number(group.id) === Number(state.groupId);
+        select.appendChild(option);
+    });
+
+    if (select.dataset.bound === 'true') return;
+    select.dataset.bound = 'true';
+    select.addEventListener('change', async () => {
+        await changeGroup(Number(select.value));
+    });
+}
+
+async function loadRankingBySelectedVote() {
+    try {
+        const data = await votoService.buscarRankingVotosRecebidosGrupo(state.groupId, state.selectedVoteTypeId);
+        state.rankingStats = Array.isArray(data) ? data : [];
+    } catch (err) {
+        state.rankingStats = [];
+        if (err instanceof ApiError) {
+            criarMensagem(err.detail || 'Não foi possível carregar o ranking para este filtro.', MensagemTipo.ERROR);
+        } else {
+            criarMensagem('Erro de conexão ao atualizar o ranking.', MensagemTipo.ERROR);
+        }
+    }
+
+    renderRankingCards();
+}
+
+async function changeGroup(groupId) {
+    state.groupId = Number(groupId);
+    const requestToken = ++state.requestToken;
+
+    const [membersResponse, voteTypesResponse, summaryResponse] = await Promise.all([
+        groupService.buscarMembrosDoGrupo(state.groupId),
+        votoService.buscarTiposVotosDisponiveis(state.groupId),
+        votoService.buscarRankingVotosRecebidosGrupo(state.groupId)
+    ]);
+
+    if (requestToken !== state.requestToken) return;
+
+    state.roleByUserId = new Map((membersResponse?.members || []).map(member => [
+        Number(member?.member?.id),
+        member?.role || 'MEMBER'
+    ]));
+    state.voteTypes = Array.isArray(voteTypesResponse) ? voteTypesResponse : [];
+    state.summaryStats = Array.isArray(summaryResponse) ? summaryResponse : [];
+
+    const hasSelected = state.voteTypes.some(v => Number(v.id) === Number(state.selectedVoteTypeId));
+    if (!hasSelected) {
+        state.selectedVoteTypeId = Number(state.voteTypes[0]?.id || null);
+    }
+
+    renderGroupFilter();
+    renderVoteTypeFilter();
+    renderSummary();
+
+    if (!state.selectedVoteTypeId) {
+        state.rankingStats = [];
+        renderRankingCards();
+        return;
+    }
+
+    await loadRankingBySelectedVote();
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -197,23 +311,41 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (loader) loader.style.display = 'block';
 
     try {
-        authService.requireLogin();
+        await authService.requireLogin();
 
-        const usuarioLogado = await authService.getUsuarioLogado();
-        if (!usuarioLogado) window.location.href = "./login.html";
+        state.usuarioLogado = await authService.getUsuarioLogado();
+        if (!state.usuarioLogado) {
+            window.location.href = './login.html';
+            return;
+        }
 
-        const votos = await votoService.buscarTiposVotos();
-        criarFiltroVotos(votos, usuarioLogado);
-        criarResumoVencedores();
-        criarCardRanking(votos[0], usuarioLogado);
+        const [groups, currentGroup] = await Promise.all([
+            groupService.buscarMeusGrupos(),
+            loadCurrentGroup().catch(() => getCurrentGroup())
+        ]);
+
+        state.grupos = Array.isArray(groups) ? groups : [];
+        if (!state.grupos.length) {
+            criarMensagem('Você ainda não participa de nenhum grupo para visualizar este ranking.', MensagemTipo.INFO);
+            document.querySelector('.cards').innerHTML = '<p class="fonte-secundaria">Entre em um grupo para liberar o ranking.</p>';
+            return;
+        }
+
+        const defaultGroupId = Number(currentGroup?.id);
+        const fallbackGroupId = Number(state.grupos[0]?.id);
+        const groupId = state.grupos.some(group => Number(group.id) === defaultGroupId)
+            ? defaultGroupId
+            : fallbackGroupId;
+
+        await changeGroup(groupId);
     } catch (err) {
         if (err instanceof ApiError) {
-            criarMensagem(err.detail || "Erro ao carregar dados da aplicação.", MensagemTipo.ERROR);
+            criarMensagem(err.detail || 'Erro ao carregar dados da aplicação.', MensagemTipo.ERROR);
         } else {
-            criarMensagem("Erro de conexão com o servidor.", MensagemTipo.ERROR);
+            criarMensagem('Erro de conexão com o servidor.', MensagemTipo.ERROR);
         }
     } finally {
-        if (container) container.classList.remove('inativo-js');  
+        if (container) container.classList.remove('inativo-js');
         if (loader) loader.style.display = 'none';
     }
 });
